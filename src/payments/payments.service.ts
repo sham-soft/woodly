@@ -47,6 +47,6 @@ export class PaymentsService {
             return response;
         }
 
-        return 'Некорректные входящие данные!';
+        return 'Данные введены некорректно или нет свободных реквизитов!';
     }
 }
