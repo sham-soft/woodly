@@ -10,6 +10,9 @@ export class Transaction {
 
     @Prop()
     methodId: string;
+
+    @Prop()
+    amount: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
