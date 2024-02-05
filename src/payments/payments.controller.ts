@@ -6,9 +6,11 @@ import {
     Body,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { PaymentDto } from './dto/payment.dto';
+import { PaymentCreateDto } from './dto/payment-create.dto';
+import { PaymentMakeDto } from './dto/payment-make.dto';
+import { PaymentConfirmDto } from './dto/payment-confirm.dto';
 import { Payment } from './schemas/payment.schema';
-import { PaymentInProcess } from './schemas/payment-in-process.schema';
+import { Transaction } from './schemas/transaction.schema';
 
 @Controller('payments')
 export class PaymentsController {
@@ -19,9 +21,9 @@ export class PaymentsController {
         return this.paymentsService.getPayments();
     }
 
-    @Get('in-process/')
-    getPaymentsInProcess(): Promise<PaymentInProcess[]> {
-        return this.paymentsService.getPaymentsInProcess();
+    @Get('transactions/')
+    getTransactions(): Promise<Transaction[]> {
+        return this.paymentsService.getTransactions();
     }
 
     @Get(':id')
@@ -29,8 +31,18 @@ export class PaymentsController {
         return this.paymentsService.getPaymentId(id);
     }
 
-    @Post()
-    getPaymentAvailable(@Body() paymentDto: PaymentDto): Promise<Payment | string> {
-        return this.paymentsService.getPaymentAvailable(paymentDto);
+    @Post('create/')
+    createOperation(@Body() paymentDto: PaymentCreateDto): Promise<Payment | string> {
+        return this.paymentsService.createOperation(paymentDto);
+    }
+
+    @Post('make/')
+    makePayment(@Body() paymentDto: PaymentMakeDto): Promise<string> {
+        return this.paymentsService.makePayment(paymentDto);
+    }
+
+    @Post('confirm/')
+    confirmPayment(@Body() paymentDto: PaymentConfirmDto): string {
+        return this.paymentsService.confirmPayment(paymentDto);
     }
 }
