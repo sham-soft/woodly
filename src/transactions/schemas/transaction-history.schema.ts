@@ -1,10 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type TransactionDocument = HydratedDocument<Transaction>;
+export type TransactionHistoryDocument = HydratedDocument<TransactionHistory>;
 
-@Schema({ timestamps: true })
-export class Transaction {
+@Schema()
+export class TransactionHistory {
+    @Prop()
+    transactionId: string;
+
     @Prop()
     paymentId: string;
 
@@ -22,7 +25,9 @@ export class Transaction {
 
     @Prop()
     amount: string;
+
+    @Prop()
+    paymentTime: string;
 }
 
-export const TransactionSchema = SchemaFactory.createForClass(Transaction);
-TransactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 });
+export const TransactionHistorySchema = SchemaFactory.createForClass(TransactionHistory);

@@ -10,7 +10,7 @@ export class PaymentsService {
     ) {}
 
     getPayments(): Promise<Payment[]> {
-        return this.paymentModel.find().exec();
+        return this.paymentModel.find();
     }
 
     getPaymentId(id: string): Promise<Payment> {

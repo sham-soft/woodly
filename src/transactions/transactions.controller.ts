@@ -31,7 +31,7 @@ export class TransactionsController {
     }
 
     @Post('confirm/')
-    confirmTransaction(@Body() paymentDto: TransactionConfirmDto): string {
+    confirmTransaction(@Body() paymentDto: TransactionConfirmDto): Promise<string> {
         return this.transactionsService.confirmTransaction(paymentDto);
     }
 }

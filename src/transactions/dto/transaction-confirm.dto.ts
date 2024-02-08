@@ -1,3 +1,3 @@
 export class TransactionConfirmDto {
-    readonly id: string;
+    readonly transactionId: string;
 }
