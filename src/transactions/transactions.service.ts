@@ -71,10 +71,6 @@ export class TransactionsService {
             const payload = {
                 transactionId: transaction._id,
                 paymentId: transaction.paymentId,
-                methodId: transaction.methodId,
-                phone: transaction.phone,
-                recipient: transaction.recipient,
-                name: transaction.name,
                 amount: transaction.amount,
                 paymentTime: currentDate,
             };
@@ -104,10 +100,6 @@ export class TransactionsService {
             const payload = {
                 transactionId: transactionCompleted.transactionId,
                 paymentId: transactionCompleted.paymentId,
-                methodId: transactionCompleted.methodId,
-                phone: transactionCompleted.phone,
-                recipient: transactionCompleted.recipient,
-                name: transactionCompleted.name,
                 amount: transactionCompleted.amount,
                 paymentTime: transactionCompleted.paymentTime,
             };

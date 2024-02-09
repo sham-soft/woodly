@@ -12,18 +12,6 @@ export class TransactionCompleted {
     paymentId: string;
 
     @Prop()
-    methodId: string;
-
-    @Prop()
-    phone: string;
-
-    @Prop()
-    recipient: string;
-
-    @Prop()
-    name: string;
-
-    @Prop()
     amount: string;
 
     @Prop()
