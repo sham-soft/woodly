@@ -8,7 +8,9 @@ async function bootstrap() {
     //     crossOriginEmbedderPolicy: false,
     //     crossOriginResourcePolicy: false,
     // }));
-    app.enableCors();
+    app.enableCors({
+        origin: true
+    })
     await app.listen(3000);
 }
 bootstrap();
