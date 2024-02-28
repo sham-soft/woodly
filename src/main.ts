@@ -9,9 +9,7 @@ async function bootstrap() {
     //     crossOriginResourcePolicy: false,
     // }));
     app.enableCors({
-        origin: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        credentials: true,
+        origin: "*",
     })
     await app.listen(3000);
 }
