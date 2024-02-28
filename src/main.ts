@@ -8,11 +8,7 @@ async function bootstrap() {
     //     crossOriginEmbedderPolicy: false,
     //     crossOriginResourcePolicy: false,
     // }));
-    app.enableCors({
-        origin: '*',
-        methods: 'GET, PUT, POST, DELETE',
-        allowedHeaders: 'Content-Type, Authorization',
-    });
+    app.enableCors();
     await app.listen(3000);
 }
 bootstrap();
