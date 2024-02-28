@@ -9,7 +9,14 @@ async function bootstrap() {
     //     crossOriginResourcePolicy: false,
     // }));
     app.enableCors({
-        origin: true
+        origin: function (origin, callback) {
+            const allowedOrigins = ['http://localhost:5173'];
+            if (allowedOrigins.indexOf(origin) !== -1) {
+              callback(null, true);
+            } else {
+              callback(new Error('Not allowed by CORS'));
+            }
+        },
     })
     await app.listen(3000);
 }
