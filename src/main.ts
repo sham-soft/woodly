@@ -4,7 +4,8 @@ import { AppModule } from './app.module';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.enableCors({
-        origin: ['http://localhost:5173/', 'https://woodly-azure.vercel.app', 'http://192.168.0.105:5173'],
+        origin: ['http://localhost:5173', 'https://woodly-azure.vercel.app', 'http://192.168.0.105:5173'],
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     });
     await app.listen(3000);
 }
