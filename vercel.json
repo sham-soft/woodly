@@ -1,5 +1,5 @@
 {
-    "version": 2,
+    "version": 3,
     "builds": [
         {
             "src": "src/main.ts",
@@ -9,6 +9,9 @@
     "routes": [
         {
             "src": "/(.*)",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
             "dest": "src/main.ts",
             "methods": [
                 "GET",
