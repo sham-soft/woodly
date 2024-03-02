@@ -57,12 +57,16 @@ export class CardsService {
             transactionsLimitPerDay: 1000000,
             paymentMin: 100,
             paymentMax: 1000000,
-            status: 1,
+            status: true,
         };
 
         const newCard = new this.cardModel(payload);
         newCard.save();
 
         return newCard;
+    }
+
+    changeStatusCard(cardId: number, status: boolean): Promise<Card> {
+        return this.cardModel.findOneAndUpdate({ cardId: cardId }, { $set: { status: status } },  { new: true });
     }
 }

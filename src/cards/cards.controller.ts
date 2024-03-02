@@ -5,10 +5,12 @@ import {
     Param,
     Query,
     Body,
+    Patch,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
+import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { Card } from './schemas/card.schema';
 
 @Controller('cards')
@@ -28,5 +30,15 @@ export class CardsController {
     @Post('create/')
     createCard(@Body() cardDto: CardCreateDto): Promise<Card | string> {
         return this.cardsService.createCard(cardDto);
+    }
+
+    @Patch('delete/')
+    deleteCard(@Body() cardDto: CardChangeStatusDto): Promise<Card> {
+        return this.cardsService.changeStatusCard(cardDto.cardId, false);
+    }
+
+    @Patch('recover/')
+    recoverCard(@Body() cardDto: CardChangeStatusDto): Promise<Card> {
+        return this.cardsService.changeStatusCard(cardDto.cardId, true);
     }
 }
