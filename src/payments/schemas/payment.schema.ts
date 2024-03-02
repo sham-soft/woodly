@@ -5,11 +5,41 @@ export type PaymentDocument = HydratedDocument<Payment>;
 
 @Schema()
 export class Payment {
-    @Prop()
-    _id?: string;
+    // @Prop()
+    // _id?: string;
 
     @Prop()
-    methodId: string;
+    title: string;
+
+    @Prop()
+    cardNumber: string;
+
+    @Prop()
+    fio: string;
+
+    @Prop()
+    bankType: number;
+
+    @Prop()
+    processMethod: number;
+
+    @Prop()
+    currency: number;
+    
+    @Prop()
+    deviceId: string;
+    
+    @Prop()
+    apiKey: string;
+
+    @Prop()
+    slotSim: number;
+
+    @Prop()
+    isQiwi: boolean;
+
+    @Prop()
+    isSbp: boolean;
 
     @Prop()
     phone: string;
@@ -18,7 +48,19 @@ export class Payment {
     recipient: string;
 
     @Prop()
-    name: string;
+    turnover: string;
+
+    @Prop()
+    transactionsLimitPerDay: string;
+
+    @Prop()
+    paymentMin: string;
+
+    @Prop()
+    paymentMax: string;
+
+    @Prop()
+    status: number;
 
     @Prop()
     amount?: string;
