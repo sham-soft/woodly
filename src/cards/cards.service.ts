@@ -1,0 +1,51 @@
+import { Model } from 'mongoose';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { CardCreateDto } from './dto/card-create.dto';
+import { Card } from './schemas/card.schema';
+
+@Injectable()
+export class CardsService {
+    constructor(
+        @InjectModel('cards') private cardModel: Model<Card>,
+    ) {}
+
+    getCards(): Promise<Card[]> {
+        return this.cardModel.find();
+    }
+
+    getCardId(id: string): Promise<Card> {
+        return this.cardModel.findOne({ _id: id });
+    }
+
+    async createCard(params: CardCreateDto): Promise<Card | string> {
+        const countCards = await this.cardModel.countDocuments();
+
+        const payload = {
+            title: params.title,
+            cardId: countCards,
+            cardNumber: params.cardNumber,
+            fio: params.fio,
+            bankType: params.bankType,
+            processMethod: params.processMethod,
+            currency: params.currency,
+            deviceId: params.deviceId,
+            apiKey: params.apiKey,
+            slotSim: params.slotSim,
+            isQiwi: params.isQiwi,
+            isSbp: params.isSbp,
+            phone: params.phone,
+            recipient: params.recipient,
+            turnover: 40000,
+            transactionsLimitPerDay: 1000000,
+            paymentMin: 100,
+            paymentMax: 1000000,
+            status: 1,
+        };
+
+        const newCard = new this.cardModel(payload);
+        newCard.save();
+
+        return newCard;
+    }
+}

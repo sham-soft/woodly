@@ -1,4 +1,4 @@
-export class PaymentCreateDto {
+export class CardCreateDto {
     readonly title: string;
     readonly cardNumber: string;
     readonly fio: string;
