@@ -1,6 +1,7 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { Card } from './schemas/card.schema';
 
@@ -10,8 +11,24 @@ export class CardsService {
         @InjectModel('cards') private cardModel: Model<Card>,
     ) {}
 
-    getCards(): Promise<Card[]> {
-        return this.cardModel.find();
+    async getCards(query: CardQueryDto) {
+        const limit = 50;
+        let skip = 0;
+
+        if (query.page > 1) {
+            skip = (query.page - 1) * 50;
+        }
+
+        const countCards = await this.cardModel.countDocuments();
+
+        const data = await this.cardModel.find().skip(skip).limit(limit);
+
+        return {
+            total: countCards,
+            page: query.page || 1,
+            size: data.length,
+            data: data,
+        };
     }
 
     getCardId(id: string): Promise<Card> {

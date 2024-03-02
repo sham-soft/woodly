@@ -3,9 +3,11 @@ import {
     Get,
     Post,
     Param,
+    Query,
     Body,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
+import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { Card } from './schemas/card.schema';
 
@@ -14,8 +16,8 @@ export class CardsController {
     constructor(private readonly cardsService: CardsService) {}
 
     @Get()
-    getCards(): Promise<Card[]> {
-        return this.cardsService.getCards();
+    getCards(@Query() cardQuery: CardQueryDto) {
+        return this.cardsService.getCards(cardQuery);
     }
 
     @Get(':id')
