@@ -9,8 +9,8 @@ import { CardsModule } from './cards/cards.module';
     imports: [
         CardsModule,
         // TransactionsModule,
-        MongooseModule.forRoot('mongodb://localhost:27017/woodly'),
-        // MongooseModule.forRoot('mongodb+srv://code-build:code-build@cluster0.3bdan.mongodb.net/woodly'),
+        // MongooseModule.forRoot('mongodb://localhost:27017/woodly'),
+        MongooseModule.forRoot('mongodb+srv://code-build:code-build@cluster0.3bdan.mongodb.net/woodly'),
     ],
     controllers: [AppController],
     providers: [AppService],
