@@ -32,13 +32,8 @@ export class CardsController {
         return this.cardsService.createCard(cardDto);
     }
 
-    @Patch('delete/')
-    deleteCard(@Body() cardDto: CardChangeStatusDto): Promise<Card> {
-        return this.cardsService.changeStatusCard(cardDto.cardId, false);
-    }
-
-    @Patch('recover/')
-    recoverCard(@Body() cardDto: CardChangeStatusDto): Promise<Card> {
-        return this.cardsService.changeStatusCard(cardDto.cardId, true);
+    @Patch('change-status/')
+    changeStatusCard(@Body() cardDto: CardChangeStatusDto): Promise<Card> {
+        return this.cardsService.changeStatusCard(cardDto);
     }
 }

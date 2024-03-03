@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
+import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { Card } from './schemas/card.schema';
 
 @Injectable()
@@ -66,7 +67,11 @@ export class CardsService {
         return newCard;
     }
 
-    changeStatusCard(cardId: number, status: boolean): Promise<Card> {
-        return this.cardModel.findOneAndUpdate({ cardId: cardId }, { $set: { status: status } },  { new: true });
+    changeStatusCard(params: CardChangeStatusDto): Promise<Card> {
+        return this.cardModel.findOneAndUpdate(
+            { cardId: params.cardId },
+            { $set: { status: params.status } }, 
+            { new: true }
+        );
     }
 }
