@@ -1,4 +1,7 @@
 export class CardQueryDto {
-    readonly status: string;
-    readonly page: number;
+    status: string;
+
+    cardNumber: string;
+
+    page: number;
 }

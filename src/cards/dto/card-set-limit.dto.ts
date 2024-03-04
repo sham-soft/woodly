@@ -1,7 +1,19 @@
+import { IsNotEmpty, IsNumber } from 'class-validator';
+
 export class CardSetLimitDto {
-    readonly cardId: number;
-    readonly turnover: number;
-    readonly transactionsLimitPerDay: number;
-    readonly paymentMin: number;
-    readonly paymentMax: number;
+    @IsNumber()
+    @IsNotEmpty()
+    cardId: number;
+
+    @IsNumber()
+    turnover: number;
+
+    @IsNumber()
+    transactionsLimitPerDay: number;
+
+    @IsNumber()
+    paymentMin: number;
+
+    @IsNumber()
+    paymentMax: number;
 }

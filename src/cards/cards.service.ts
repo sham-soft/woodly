@@ -15,21 +15,33 @@ export class CardsService {
     ) {}
 
     async getCards(query: CardQueryDto) {
-        let status = true;
         const limit = 50;
         let skip = 0;
+
+        type payloadType = {
+            status: boolean,
+            $text?: { $search: string },
+        }
+
+        const payload: payloadType = {
+            status: true,
+        };
 
         if (query.page > 1) {
             skip = (query.page - 1) * 50;
         }
 
         if (query.status === 'false') {
-            status = false;
+            payload.status = false;
         }
 
-        const countCards = await this.cardModel.countDocuments({ status });
+        if (query.cardNumber) {
+            payload.$text = { $search: query.cardNumber };
+        }
 
-        const data = await this.cardModel.find({ status }).skip(skip).limit(limit);
+        const countCards = await this.cardModel.countDocuments(payload);
+
+        const data = await this.cardModel.find(payload).skip(skip).limit(limit);
 
         return {
             total: countCards,
