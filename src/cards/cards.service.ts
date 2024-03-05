@@ -47,7 +47,7 @@ export class CardsService {
             total: countCards,
             page: query.page || 1,
             count: data.length,
-            data: data,
+            cards: data,
         };
     }
 
