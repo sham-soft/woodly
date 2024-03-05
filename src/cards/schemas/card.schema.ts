@@ -71,4 +71,3 @@ export class Card {
 
 export const CardSchema = SchemaFactory.createForClass(Card);
 CardSchema.index({ cardId: 1 }, { unique : true });
-CardSchema.index({ cardNumber: 'text' });

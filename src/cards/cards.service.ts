@@ -20,7 +20,7 @@ export class CardsService {
 
         type payloadType = {
             status: boolean,
-            $text?: { $search: string },
+            cardNumber?: { $regex: string },
         }
 
         const payload: payloadType = {
@@ -36,7 +36,7 @@ export class CardsService {
         }
 
         if (query.cardNumber) {
-            payload.$text = { $search: query.cardNumber };
+            payload.cardNumber = { $regex: query.cardNumber };
         }
 
         const countCards = await this.cardModel.countDocuments(payload);
