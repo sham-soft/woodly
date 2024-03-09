@@ -1,37 +1,38 @@
-// import {
-//     Controller,
-//     Get,
-//     Post,
-//     Body,
-// } from '@nestjs/common';
-// import { TransactionsService } from './transactions.service';
-// import { TransactionCreateDto } from './dto/transaction-create.dto';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    Post,
+    Body,
+} from '@nestjs/common';
+import { TransactionsService } from './transactions.service';
+import { TransactionQueryDto } from './dto/transaction.dto';
+import { TransactionCreateDto } from './dto/transaction-create.dto';
 // import { TransactionMakeDto } from './dto/transaction-make.dto';
-// import { TransactionConfirmDto } from './dto/transaction-confirm.dto';
-// import { Transaction } from './schemas/transaction.schema';
-// import { Payment } from '../payments/schemas/payment.schema';
+import { Transaction } from './schemas/transaction.schema';
 
-// @Controller('transactions')
-// export class TransactionsController {
-//     constructor(private readonly transactionsService: TransactionsService) {}
+@Controller('transactions')
+export class TransactionsController {
+    constructor(private readonly transactionsService: TransactionsService) {}
 
-//     @Get()
-//     getTransactions(): Promise<Transaction[]> {
-//         return this.transactionsService.getTransactions();
-//     }
+    @Get()
+    getTransactions(@Query() transactionQuery: TransactionQueryDto) {
+        return this.transactionsService.getTransactions(transactionQuery);
+    }
 
-//     @Post('create/')
-//     createTransaction(@Body() paymentDto: TransactionCreateDto): Promise<Payment | string> {
-//         return this.transactionsService.createTransaction(paymentDto);
-//     }
+    @Post('create/')
+    createTransaction(@Body() transactionDto: TransactionCreateDto): Promise<Transaction | string> {
+        return this.transactionsService.createTransaction(transactionDto);
+    }
 
-//     @Post('make/')
-//     makeTransaction(@Body() paymentDto: TransactionMakeDto): Promise<string> {
-//         return this.transactionsService.makeTransaction(paymentDto);
-//     }
+    // @Post('make/')
+    // makeTransaction(@Body() paymentDto: TransactionMakeDto): Promise<string> {
+    //     return this.transactionsService.makeTransaction(paymentDto);
+    // }
 
-//     @Post('confirm/')
-//     confirmTransaction(@Body() paymentDto: TransactionConfirmDto): Promise<string> {
-//         return this.transactionsService.confirmTransaction(paymentDto);
-//     }
-// }
+    @Get('confirm/:id')
+    confirmTransaction(@Param('id') id: string): Promise<string> {
+        return this.transactionsService.confirmTransaction(id);
+    }
+}

@@ -3,13 +3,32 @@ import { HydratedDocument } from 'mongoose';
 
 export type TransactionDocument = HydratedDocument<Transaction>;
 
-@Schema({ timestamps: true })
+// @Schema({ timestamps: true })
+@Schema()
 export class Transaction {
     @Prop()
-    paymentId: string;
+    transactionId: number;
+    
+    @Prop()
+    amount: number;
 
     @Prop()
-    methodId: string;
+    status: number;
+
+    @Prop()
+    dateCreate: string;
+
+    @Prop()
+    dateClose: string;
+
+    @Prop()
+    title: string;
+
+    @Prop()
+    cardId: number;
+
+    @Prop()
+    cardNumber: string;
 
     @Prop()
     phone: string;
@@ -18,11 +37,11 @@ export class Transaction {
     recipient: string;
 
     @Prop()
-    name: string;
+    fio: string;
 
     @Prop()
-    amount: string;
+    bankType: number;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
-TransactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 });
+// TransactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 });

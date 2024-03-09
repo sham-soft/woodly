@@ -1,115 +1,158 @@
-// import { Model } from 'mongoose';
-// import { Injectable, BadRequestException } from '@nestjs/common';
-// import { InjectModel } from '@nestjs/mongoose';
-// import { TransactionCreateDto } from './dto/transaction-create.dto';
+import { Model } from 'mongoose';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { TransactionQueryDto } from './dto/transaction.dto';
+import { TransactionCreateDto } from './dto/transaction-create.dto';
 // import { TransactionMakeDto } from './dto/transaction-make.dto';
-// import { TransactionConfirmDto } from './dto/transaction-confirm.dto';
-// import { Transaction } from './schemas/transaction.schema';
-// import { Payment } from '../payments/schemas/payment.schema';
-// import { TransactionCompleted } from './schemas/transaction-completed.schema';
-// import { TransactionHistory } from './schemas/transaction-history.schema';
+import { Transaction } from './schemas/transaction.schema';
+import { Card } from '../cards/schemas/card.schema';
 
-// @Injectable()
-// export class TransactionsService {
-//     constructor(
-//         @InjectModel('payments') private paymentModel: Model<Payment>,
-//         @InjectModel('transactions') private transactionModel: Model<Transaction>,
-//         @InjectModel('transactionsCompleted') private transactionCompletedModel: Model<TransactionCompleted>,
-//         @InjectModel('transactionsHistory') private transactionHistorydModel: Model<TransactionHistory>,
-//     ) {}
+@Injectable()
+export class TransactionsService {
+    constructor(
+        @InjectModel('cards') private cardModel: Model<Card>,
+        @InjectModel('transactions') private transactionModel: Model<Transaction>,
+    ) {}
 
-//     getTransactions(): Promise<Transaction[]> {
-//         return this.transactionModel.find();
-//     }
+    async getTransactions(query: TransactionQueryDto) {
+        const limit = 50;
+        let skip = 0;
 
-//     async createTransaction(params: TransactionCreateDto): Promise<Transaction | string> {
-//         const isExistAmount = await this.transactionModel.findOne({ amount: params.amount });
+        if (query.page > 1) {
+            skip = (query.page - 1) * 50;
+        }
 
-//         if (isExistAmount) {
-//             throw new BadRequestException('Операция с такой суммой уже в работе. Измените сумму!');
-//         }
+        type filtersType = {
+            status?: number,
+            $expr?: any,
+            $or?: any,
+        }
+        const filters: filtersType = {};
 
-//         const transactions = await this.transactionModel.find({ methodId: params.methodId });
-//         const idsPayment = transactions.map((payment) => payment.paymentId);
+        if (query.status) {
+            filters.status = query.status;
+        }
 
-//         let payment = await this.paymentModel.findOne({ _id: { $nin: idsPayment }, methodId: params.methodId });
+        if (query.cardId) {
+            filters.$expr = {
+                $regexMatch: {
+                   input: { $toString: '$cardId' }, 
+                   regex: query.cardId,
+                },
+            };
+        }
 
-//         if (!payment) {
-//             const paymentsRandom = await this.paymentModel.aggregate([
-//                 { $match: { methodId: params.methodId } },
-//                 { $sample: { size: 1 } },
-//             ]);
+        if (query.cardNumberAndTitle) {
+            filters.$or = [
+                { title: { $regex: query.cardNumberAndTitle } },
+                { cardNumber: { $regex: query.cardNumberAndTitle } },
+            ];
+        }
 
-//             payment = paymentsRandom[0];
-//         }
+        if (query.amount) {
+            filters.$expr = {
+                $regexMatch: {
+                   input: { $toString: '$amount' }, 
+                   regex: query.amount,
+                },
+            };
+        }
 
-//         if (payment) {
-//             const payload = {
-//                 paymentId: payment._id,
-//                 methodId: payment.methodId,
-//                 phone: payment.phone,
-//                 recipient: payment.recipient,
-//                 name: payment.name,
-//                 amount: params.amount,
-//             };
+        const countTransactions = await this.transactionModel.countDocuments(filters);
+        const data = await this.transactionModel.find(filters).skip(skip).limit(limit);
 
-//             const newTransaction = new this.transactionModel(payload);
-//             newTransaction.save();
+        return {
+            total: countTransactions,
+            page: query.page || 1,
+            count: data.length,
+            transactions: data,
+        };
+    }
+
+    async createTransaction(params: TransactionCreateDto): Promise<Transaction | string> {
+        const countTransactions = await this.transactionModel.countDocuments();
+        
+        const currentDate = new Date();
+        const nextDate = new Date();
+        nextDate.setTime(nextDate.getTime() + (4 * 60 * 1000));
+
+        const dateCreate = currentDate.toLocaleString( 'sv', { timeZoneName: 'short' } );
+        const dateClose = nextDate.toLocaleString( 'sv', { timeZoneName: 'short' } );
+
+        const transactions = await this.transactionModel.find({ amount: params.amount });
+        const idsCard = transactions.map((item) => item.cardId);
+
+        const filters: any = params.isSbp ? { isSbp: true } : { bankType: params.bankType };
+        filters.cardId = { $nin: idsCard };
+        const cards = await this.cardModel.aggregate([
+            { $match: filters },
+            { $sample: { size: 1 } },
+        ]);
+        const cardRandom = cards[0];
+
+        if (cardRandom) {
+            const payload = {
+                transactionId: countTransactions + 1,
+                amount: params.amount,
+                status: 1,
+                dateCreate: dateCreate,
+                dateClose: dateClose,
+                title: cardRandom.title,
+                cardId: cardRandom.cardId,
+                cardNumber: cardRandom.cardNumber,
+                phone: cardRandom.phone,
+                recipient: cardRandom.recipient,
+                fio: cardRandom.fio,
+                bankType: cardRandom.bankType,
+            };
     
-//             return newTransaction;
-//         }
+            const newTransaction = new this.transactionModel(payload);
+            newTransaction.save();
+    
+            return newTransaction;
+        }
 
-//         throw new BadRequestException('Неккоректный запрос');
-//     }
+        throw new BadRequestException('Нет свободных реквизитов.');
+    }
 
-//     async makeTransaction(params: TransactionMakeDto): Promise<string> {
-//         const transaction = await this.transactionModel.findOneAndDelete({ amount: params.amount });
+    async confirmTransaction(id: string): Promise<string> {
+        const transaction = await this.transactionModel.findOne({ transactionId: id });
 
-//         const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
+        if (transaction?.status === 4) {
+            return 'Платеж успешно зачислен';
+        }
 
-//         if (transaction) {
-//             const payload = {
-//                 transactionId: transaction._id,
-//                 paymentId: transaction.paymentId,
-//                 amount: transaction.amount,
-//                 paymentTime: currentDate,
-//             };
+        throw new BadRequestException('Время истекло или не удалось обработать ваш платеж');
+    }
 
-//             const newTransactionCompleted = new this.transactionCompletedModel(payload);
-//             newTransactionCompleted.save();
+    // async makeTransaction(params: TransactionMakeDto): Promise<string> {
+    //     const transaction = await this.transactionModel.findOneAndDelete({ amount: params.amount });
 
-//             return 'Операция успешно прошла!';
-//         }
+    //     const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
 
-//         const payload = {
-//             amount: params.amount,
-//             paymentTime: currentDate,
-//         };
+    //     if (transaction) {
+    //         const payload = {
+    //             transactionId: transaction._id,
+    //             paymentId: transaction.paymentId,
+    //             amount: transaction.amount,
+    //             paymentTime: currentDate,
+    //         };
 
-//         const newTransactionCompleted = new this.transactionCompletedModel(payload);
-//         newTransactionCompleted.save();
+    //         const newTransactionCompleted = new this.transactionCompletedModel(payload);
+    //         newTransactionCompleted.save();
+
+    //         return 'Операция успешно прошла!';
+    //     }
+
+    //     const payload = {
+    //         amount: params.amount,
+    //         paymentTime: currentDate,
+    //     };
+
+    //     const newTransactionCompleted = new this.transactionCompletedModel(payload);
+    //     newTransactionCompleted.save();
 
 
-//         throw new BadRequestException('Нет операции с такой суммой');
-//     }
-
-//     async confirmTransaction(params: TransactionConfirmDto): Promise<string> {
-//         const transactionCompleted = await this.transactionCompletedModel.findOneAndDelete({ transactionId: params.transactionId });
-
-//         if (transactionCompleted) {
-//             const payload = {
-//                 transactionId: transactionCompleted.transactionId,
-//                 paymentId: transactionCompleted.paymentId,
-//                 amount: transactionCompleted.amount,
-//                 paymentTime: transactionCompleted.paymentTime,
-//             };
-
-//             const newTransactionHistory = new this.transactionHistorydModel(payload);
-//             newTransactionHistory.save();
-
-//             return 'Платеж успешно зачислен';
-//         }
-
-//         throw new BadRequestException('Время истекло или не удалось обработать ваш платеж');
-//     }
-// }
+    //     throw new BadRequestException('Нет операции с такой суммой');
+    // }
+}
