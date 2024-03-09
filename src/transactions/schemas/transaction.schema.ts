@@ -41,6 +41,12 @@ export class Transaction {
 
     @Prop()
     bankType: number;
+
+    @Prop()
+    cardLastNumber: string;
+
+    @Prop()
+    paymentTime: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

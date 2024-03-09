@@ -4,12 +4,13 @@ import {
     Param,
     Query,
     Post,
+    Patch,
     Body,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
-// import { TransactionMakeDto } from './dto/transaction-make.dto';
+import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { Transaction } from './schemas/transaction.schema';
 
 @Controller('transactions')
@@ -26,10 +27,10 @@ export class TransactionsController {
         return this.transactionsService.createTransaction(transactionDto);
     }
 
-    // @Post('make/')
-    // makeTransaction(@Body() paymentDto: TransactionMakeDto): Promise<string> {
-    //     return this.transactionsService.makeTransaction(paymentDto);
-    // }
+    @Patch('make/')
+    makeTransaction(@Body() transactionDto: TransactionMakeDto): Promise<string> {
+        return this.transactionsService.makeTransaction(transactionDto);
+    }
 
     @Get('confirm/:id')
     confirmTransaction(@Param('id') id: string): Promise<string> {

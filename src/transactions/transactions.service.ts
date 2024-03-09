@@ -3,7 +3,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
-// import { TransactionMakeDto } from './dto/transaction-make.dto';
+import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { Transaction } from './schemas/transaction.schema';
 import { Card } from '../cards/schemas/card.schema';
 
@@ -104,6 +104,7 @@ export class TransactionsService {
                 recipient: cardRandom.recipient,
                 fio: cardRandom.fio,
                 bankType: cardRandom.bankType,
+                cardLastNumber: cardRandom.cardNumber.slice(-4),
             };
     
             const newTransaction = new this.transactionModel(payload);
@@ -115,6 +116,38 @@ export class TransactionsService {
         throw new BadRequestException('Нет свободных реквизитов.');
     }
 
+    async makeTransaction(params: TransactionMakeDto): Promise<string> {
+        const transaction = await this.transactionModel.findOne({
+            cardLastNumber: params.cardLastNumber,
+            amount: params.amount,
+            status: 1,
+        });
+
+        const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
+
+        if (transaction) {
+            const payload = {
+                status: 4,
+                paymentTime: currentDate,
+            };
+
+            await this.transactionModel.findOneAndUpdate({ transactionId: transaction.transactionId }, { $set: payload });
+            return 'Операция успешно прошла!';
+        }
+
+        const payload = {
+            cardLastNumber: params.cardLastNumber,
+            amount: params.amount,
+            paymentTime: currentDate,
+            status: 2,
+        };
+
+        const newTransactionCompleted = new this.transactionModel(payload);
+        newTransactionCompleted.save();
+
+        throw new BadRequestException('Операция с такой суммой не найдена');
+    }
+
     async confirmTransaction(id: string): Promise<string> {
         const transaction = await this.transactionModel.findOne({ transactionId: id });
 
@@ -124,35 +157,4 @@ export class TransactionsService {
 
         throw new BadRequestException('Время истекло или не удалось обработать ваш платеж');
     }
-
-    // async makeTransaction(params: TransactionMakeDto): Promise<string> {
-    //     const transaction = await this.transactionModel.findOneAndDelete({ amount: params.amount });
-
-    //     const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
-
-    //     if (transaction) {
-    //         const payload = {
-    //             transactionId: transaction._id,
-    //             paymentId: transaction.paymentId,
-    //             amount: transaction.amount,
-    //             paymentTime: currentDate,
-    //         };
-
-    //         const newTransactionCompleted = new this.transactionCompletedModel(payload);
-    //         newTransactionCompleted.save();
-
-    //         return 'Операция успешно прошла!';
-    //     }
-
-    //     const payload = {
-    //         amount: params.amount,
-    //         paymentTime: currentDate,
-    //     };
-
-    //     const newTransactionCompleted = new this.transactionCompletedModel(payload);
-    //     newTransactionCompleted.save();
-
-
-    //     throw new BadRequestException('Нет операции с такой суммой');
-    // }
 }

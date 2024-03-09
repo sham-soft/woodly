@@ -1,4 +1,10 @@
+import { IsNotEmpty, IsNumber } from 'class-validator';
+
 export class TransactionMakeDto {
-    readonly methodId: string;
-    readonly amount: string;
+    @IsNotEmpty()
+    cardLastNumber: string;
+
+    @IsNumber()
+    @IsNotEmpty()
+    amount: number;
 }
