@@ -70,8 +70,11 @@ export class TransactionsService {
     }
 
     async createTransaction(params: TransactionCreateDto): Promise<Transaction | string> {
-        const countTransactions = await this.transactionModel.countDocuments();
+        // Get max transactionId
+        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
+        const transactionId = sortTransactions[0]?.transactionId || 0;
         
+        // Get dates
         const currentDate = new Date();
         const nextDate = new Date();
         nextDate.setTime(nextDate.getTime() + (4 * 60 * 1000));
@@ -79,6 +82,7 @@ export class TransactionsService {
         const dateCreate = currentDate.toLocaleString( 'sv', { timeZoneName: 'short' } );
         const dateClose = nextDate.toLocaleString( 'sv', { timeZoneName: 'short' } );
 
+        // Get card
         const transactions = await this.transactionModel.find({ amount: params.amount });
         const idsCard = transactions.map((item) => item.cardId);
 
@@ -92,7 +96,7 @@ export class TransactionsService {
 
         if (cardRandom) {
             const payload = {
-                transactionId: countTransactions + 1,
+                transactionId: transactionId + 1,
                 amount: params.amount,
                 status: 1,
                 dateCreate: dateCreate,
@@ -104,7 +108,7 @@ export class TransactionsService {
                 recipient: cardRandom.recipient,
                 fio: cardRandom.fio,
                 bankType: cardRandom.bankType,
-                cardLastNumber: cardRandom.cardNumber.slice(-4),
+                cardLastNumber: cardRandom.cardLastNumber,
             };
     
             const newTransaction = new this.transactionModel(payload);
@@ -135,10 +139,11 @@ export class TransactionsService {
             return 'Операция успешно прошла!';
         }
 
-        const countTransactions = await this.transactionModel.countDocuments();
+        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
+        const transactionId = sortTransactions[0]?.transactionId || 0;
 
         const payload = {
-            transactionId: countTransactions + 1,
+            transactionId: transactionId + 1,
             cardLastNumber: params.cardLastNumber,
             amount: params.amount,
             paymentTime: currentDate,

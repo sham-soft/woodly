@@ -2,7 +2,6 @@ import {
     Controller,
     Get,
     Post,
-    Param,
     Query,
     Body,
     Patch,
@@ -22,11 +21,6 @@ export class CardsController {
     @Get()
     getCards(@Query() cardQuery: CardQueryDto) {
         return this.cardsService.getCards(cardQuery);
-    }
-
-    @Get(':id')
-    getCardId(@Param('id') id: string): Promise<Card> {
-        return this.cardsService.getCardId(id);
     }
 
     @Post('create/')

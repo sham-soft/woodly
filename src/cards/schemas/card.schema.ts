@@ -5,9 +5,6 @@ export type CardDocument = HydratedDocument<Card>;
 
 @Schema()
 export class Card {
-    // @Prop()
-    // _id?: string;
-
     @Prop()
     title: string;
 
@@ -65,8 +62,8 @@ export class Card {
     @Prop()
     cardId: number;
 
-    // @Prop()
-    // amount?: string;
+    @Prop()
+    cardLastNumber: string;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

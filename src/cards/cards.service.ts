@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
@@ -51,16 +51,13 @@ export class CardsService {
         };
     }
 
-    getCardId(id: string): Promise<Card> {
-        return this.cardModel.findOne({ _id: id });
-    }
-
     async createCard(params: CardCreateDto): Promise<Card> {
-        const countCards = await this.cardModel.countDocuments();
+        const sortCards = await this.cardModel.find().sort({ cardId: -1 }).limit(1);
+        const cardId = sortCards[0]?.cardId || 0;
 
         const payload = {
             title: params.title,
-            cardId: countCards,
+            cardId: cardId + 1,
             cardNumber: params.cardNumber,
             fio: params.fio,
             bankType: params.bankType,
@@ -78,7 +75,14 @@ export class CardsService {
             paymentMin: 100,
             paymentMax: 1000000,
             status: true,
+            cardLastNumber: params.cardNumber.slice(-4),
         };
+
+        const card = await this.cardModel.findOne({ cardLastNumber: payload.cardLastNumber });
+
+        if (card) {
+            throw new BadRequestException('Карта с такими цифрами на конце уже существует');
+        }
 
         const newCard = new this.cardModel(payload);
         newCard.save();
@@ -101,7 +105,14 @@ export class CardsService {
             isSbp: params.isSbp,
             phone: params.phone,
             recipient: params.recipient,
+            cardLastNumber: params.cardNumber.slice(-4),
         };
+
+        const card = await this.cardModel.findOne({ cardLastNumber: payload.cardLastNumber });
+
+        if (card) {
+            throw new BadRequestException('Карта с такими цифрами на конце уже существует');
+        }
 
         return this.cardModel.findOneAndUpdate(
             { cardId: params.cardId },
