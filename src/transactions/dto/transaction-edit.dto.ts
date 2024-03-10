@@ -1,13 +1,17 @@
-import { IsBoolean, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
 
 export class TransactionEditDto {
     @IsNumber()
     @IsNotEmpty()
     transactionId: number;
 
-    @IsBoolean()
+    @IsNumber()
+    @IsNotEmpty()
+    cardId: number;
+
+    @IsNumber()
     @IsOptional()
-    status: boolean;
+    status: number;
 
     @IsNumber()
     @IsOptional()

@@ -122,11 +122,8 @@ export class TransactionsService {
     }
 
     async editTransaction(params: TransactionEditDto): Promise<Transaction> {
-        // const transaction = await this.transactionModel.findOne({ amount: params.amount });
-        // const idsCard = transactions.map((item) => item.cardId);
-
         type payloadType = {
-            status?: boolean,
+            status?: number,
             amount?: number,
         }
         const payload: payloadType = {};
@@ -135,11 +132,17 @@ export class TransactionsService {
             payload.status = params.status;
         }
         if (params.amount) {
+            const transaction = await this.transactionModel.findOne({ cardId: params.cardId, amount: params.amount });
+
+            if (transaction) {
+                throw new BadRequestException('Операция с такой суммой и картой уже есть в работе');
+            }
+
             payload.amount = params.amount;
         }
 
-        return this.cardModel.findOneAndUpdate(
-            { cardId: params.transactionId },
+        return this.transactionModel.findOneAndUpdate(
+            { transactionId: params.transactionId },
             { $set: payload }, 
             { new: true }
         );
