@@ -135,7 +135,10 @@ export class TransactionsService {
             return 'Операция успешно прошла!';
         }
 
+        const countTransactions = await this.transactionModel.countDocuments();
+
         const payload = {
+            transactionId: countTransactions + 1,
             cardLastNumber: params.cardLastNumber,
             amount: params.amount,
             paymentTime: currentDate,
