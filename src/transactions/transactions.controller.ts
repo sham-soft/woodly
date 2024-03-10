@@ -10,6 +10,7 @@ import {
 import { TransactionsService } from './transactions.service';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
+import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { Transaction } from './schemas/transaction.schema';
 
@@ -25,6 +26,11 @@ export class TransactionsController {
     @Post('create/')
     createTransaction(@Body() transactionDto: TransactionCreateDto): Promise<Transaction | string> {
         return this.transactionsService.createTransaction(transactionDto);
+    }
+
+    @Patch('edit/')
+    editTransaction(@Body() transactionDto: TransactionEditDto): Promise<Transaction> {
+        return this.transactionsService.editTransaction(transactionDto);
     }
 
     @Patch('make/')

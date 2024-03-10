@@ -3,6 +3,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
+import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { Transaction } from './schemas/transaction.schema';
 import { Card } from '../cards/schemas/card.schema';
@@ -33,11 +34,11 @@ export class TransactionsService {
             filters.status = query.status;
         }
 
-        if (query.cardId) {
+        if (query.transactionId) {
             filters.$expr = {
                 $regexMatch: {
-                   input: { $toString: '$cardId' }, 
-                   regex: query.cardId,
+                   input: { $toString: '$transactionId' }, 
+                   regex: query.transactionId,
                 },
             };
         }
@@ -118,6 +119,30 @@ export class TransactionsService {
         }
 
         throw new BadRequestException('Нет свободных реквизитов.');
+    }
+
+    async editTransaction(params: TransactionEditDto): Promise<Transaction> {
+        // const transaction = await this.transactionModel.findOne({ amount: params.amount });
+        // const idsCard = transactions.map((item) => item.cardId);
+
+        type payloadType = {
+            status?: boolean,
+            amount?: number,
+        }
+        const payload: payloadType = {};
+
+        if (params.status) {
+            payload.status = params.status;
+        }
+        if (params.amount) {
+            payload.amount = params.amount;
+        }
+
+        return this.cardModel.findOneAndUpdate(
+            { cardId: params.transactionId },
+            { $set: payload }, 
+            { new: true }
+        );
     }
 
     async makeTransaction(params: TransactionMakeDto): Promise<string> {

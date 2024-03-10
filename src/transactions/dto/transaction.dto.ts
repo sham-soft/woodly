@@ -1,7 +1,7 @@
 export class TransactionQueryDto {
     status: number;
 
-    cardId: number;
+    transactionId: number;
 
     cardNumberAndTitle: string;
 

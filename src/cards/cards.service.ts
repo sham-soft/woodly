@@ -18,12 +18,12 @@ export class CardsService {
         const limit = 50;
         let skip = 0;
 
-        type payloadType = {
+        type filtersType = {
             status: boolean,
             cardNumber?: { $regex: string },
         }
 
-        const payload: payloadType = {
+        const filters: filtersType = {
             status: true,
         };
 
@@ -32,16 +32,16 @@ export class CardsService {
         }
 
         if (query.status === 'false') {
-            payload.status = false;
+            filters.status = false;
         }
 
         if (query.cardNumber) {
-            payload.cardNumber = { $regex: query.cardNumber };
+            filters.cardNumber = { $regex: query.cardNumber };
         }
 
-        const countCards = await this.cardModel.countDocuments(payload);
+        const countCards = await this.cardModel.countDocuments(filters);
 
-        const data = await this.cardModel.find(payload).skip(skip).limit(limit);
+        const data = await this.cardModel.find(filters).skip(skip).limit(limit);
 
         return {
             total: countCards,
