@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsNumber, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CardChangeStatusDto {
     @IsNumber()
     @IsNotEmpty()
     cardId: number;
 
-    @IsBoolean()
+    @IsNumber()
     @IsNotEmpty()
-    status: boolean;
+    status: number;
 }

@@ -57,7 +57,7 @@ export class Card {
     paymentMax: number;
 
     @Prop()
-    status: boolean;
+    status: number;
 
     @Prop()
     cardId: number;

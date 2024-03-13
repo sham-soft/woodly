@@ -7,6 +7,7 @@ import { CardEditDto } from './dto/card-edit.dto';
 import { CardSetLimitDto } from './dto/card-set-limit.dto';
 import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { Card } from './schemas/card.schema';
+import { CARD_STATUSES } from '../helpers/constants';
 
 @Injectable()
 export class CardsService {
@@ -19,20 +20,20 @@ export class CardsService {
         let skip = 0;
 
         type filtersType = {
-            status: boolean,
+            status: any,
             cardNumber?: { $regex: string },
         }
 
         const filters: filtersType = {
-            status: true,
+            status: { $nin: [CARD_STATUSES.Deleted] },
         };
 
         if (query.page > 1) {
             skip = (query.page - 1) * 50;
         }
 
-        if (query.status === 'false') {
-            filters.status = false;
+        if (query.status) {
+            filters.status = query.status;
         }
 
         if (query.cardNumber) {
@@ -74,7 +75,7 @@ export class CardsService {
             transactionsLimitPerDay: 1000000,
             paymentMin: 100,
             paymentMax: 1000000,
-            status: true,
+            status: CARD_STATUSES.Active,
             cardLastNumber: params.cardNumber.slice(-4),
         };
 

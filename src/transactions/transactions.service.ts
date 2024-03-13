@@ -7,6 +7,7 @@ import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { Transaction } from './schemas/transaction.schema';
 import { Card } from '../cards/schemas/card.schema';
+import { CARD_STATUSES } from '../helpers/constants';
 
 @Injectable()
 export class TransactionsService {
@@ -89,6 +90,7 @@ export class TransactionsService {
 
         const filters: any = params.isSbp ? { isSbp: true } : { bankType: params.bankType };
         filters.cardId = { $nin: idsCard };
+        filters.status = CARD_STATUSES.Active;
         const cards = await this.cardModel.aggregate([
             { $match: filters },
             { $sample: { size: 1 } },

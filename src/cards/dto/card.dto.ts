@@ -1,5 +1,5 @@
 export class CardQueryDto {
-    status: string;
+    status: number;
 
     cardNumber: string;
 
