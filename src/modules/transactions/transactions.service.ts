@@ -1,6 +1,7 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Config } from '@/modules/configs/schemas/config.schema';
 import { Card } from '@/modules/cards/schemas/card.schema';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '@/helpers/constants';
 import { TransactionQueryDto } from './dto/transaction.dto';
@@ -12,6 +13,7 @@ import { Transaction } from './schemas/transaction.schema';
 @Injectable()
 export class TransactionsService {
     constructor(
+        @InjectModel('configs') private configModel: Model<Config>,
         @InjectModel('cards') private cardModel: Model<Card>,
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
     ) {}
@@ -72,6 +74,12 @@ export class TransactionsService {
     }
 
     async createTransaction(params: TransactionCreateDto): Promise<Transaction | string> {
+        const config = await this.configModel.findOne({ name: 'IS_WORK_TRANSACTIONS' });
+
+        if (config?.value === 'false') {
+            throw new BadRequestException('На данный момент сделки отключены');
+        }
+
         // Get max transactionId
         const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
         const transactionId = sortTransactions[0]?.transactionId || 0;

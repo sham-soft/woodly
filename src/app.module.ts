@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigsModule } from '@/modules/configs/configs.module';
 import { CardsModule } from '@/modules/cards/cards.module';
 import { TransactionsModule } from '@/modules/transactions/transactions.module';
 import { AppController } from './app.controller';
@@ -7,6 +8,7 @@ import { AppService } from './app.service';
 
 @Module({
     imports: [
+        ConfigsModule,
         CardsModule,
         TransactionsModule,
         // MongooseModule.forRoot('mongodb://localhost:27017/woodly'),
