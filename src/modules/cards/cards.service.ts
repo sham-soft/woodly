@@ -1,13 +1,13 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { CARD_STATUSES } from '@/helpers/constants';
 import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { CardEditDto } from './dto/card-edit.dto';
 import { CardSetLimitDto } from './dto/card-set-limit.dto';
 import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { Card } from './schemas/card.schema';
-import { CARD_STATUSES } from '../helpers/constants';
 
 @Injectable()
 export class CardsService {

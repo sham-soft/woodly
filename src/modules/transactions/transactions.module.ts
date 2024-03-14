@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CardSchema } from '@/modules/cards/schemas/card.schema';
 import { TransactionsService } from './transactions.service';
 import { TransactionsController } from './transactions.controller';
-import { CardSchema } from '../cards/schemas/card.schema';
 import { TransactionSchema } from './schemas/transaction.schema';
 
 @Module({

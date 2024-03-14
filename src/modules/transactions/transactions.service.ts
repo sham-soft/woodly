@@ -1,13 +1,13 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Card } from '@/modules/cards/schemas/card.schema';
+import { CARD_STATUSES, TRANSACTION_STATUSES } from '@/helpers/constants';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { Transaction } from './schemas/transaction.schema';
-import { Card } from '../cards/schemas/card.schema';
-import { CARD_STATUSES } from '../helpers/constants';
 
 @Injectable()
 export class TransactionsService {
@@ -101,7 +101,7 @@ export class TransactionsService {
             const payload = {
                 transactionId: transactionId + 1,
                 amount: params.amount,
-                status: 1,
+                status: TRANSACTION_STATUSES.Active,
                 dateCreate: dateCreate,
                 dateClose: dateClose,
                 title: cardRandom.title,
@@ -154,14 +154,14 @@ export class TransactionsService {
         const transaction = await this.transactionModel.findOne({
             cardLastNumber: params.cardLastNumber,
             amount: params.amount,
-            status: 1,
+            status: TRANSACTION_STATUSES.Active,
         });
 
         const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
 
         if (transaction) {
             const payload = {
-                status: 4,
+                status: TRANSACTION_STATUSES.Successful,
                 paymentTime: currentDate,
             };
 
@@ -177,7 +177,7 @@ export class TransactionsService {
             cardLastNumber: params.cardLastNumber,
             amount: params.amount,
             paymentTime: currentDate,
-            status: 2,
+            status: TRANSACTION_STATUSES.Verification,
         };
 
         const newTransactionCompleted = new this.transactionModel(payload);
@@ -189,7 +189,7 @@ export class TransactionsService {
     async confirmTransaction(id: string): Promise<string> {
         const transaction = await this.transactionModel.findOne({ transactionId: id });
 
-        if (transaction?.status === 4) {
+        if (transaction?.status === TRANSACTION_STATUSES.Successful) {
             return 'Платеж успешно зачислен';
         }
 

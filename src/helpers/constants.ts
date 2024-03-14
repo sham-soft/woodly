@@ -3,3 +3,10 @@ export enum CARD_STATUSES {
     Inactive,
     Deleted,
 }
+
+export enum TRANSACTION_STATUSES {
+    Active = 1,
+    Verification,
+    Cancelled,
+    Successful,
+}

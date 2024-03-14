@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CardsModule } from '@/modules/cards/cards.module';
+import { TransactionsModule } from '@/modules/transactions/transactions.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CardsModule } from './cards/cards.module';
-import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
     imports: [
