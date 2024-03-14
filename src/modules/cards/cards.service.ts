@@ -55,6 +55,7 @@ export class CardsService {
     async createCard(params: CardCreateDto): Promise<Card> {
         const sortCards = await this.cardModel.find().sort({ cardId: -1 }).limit(1);
         const cardId = sortCards[0]?.cardId || 0;
+        const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
 
         const payload = {
             title: params.title,
@@ -71,8 +72,11 @@ export class CardsService {
             isSbp: params.isSbp,
             phone: params.phone,
             recipient: params.recipient,
-            turnover: 40000,
-            transactionsLimitPerDay: 1000000,
+            turnoverPaymentsPerDay: 0,
+            turnoverTransactionsPerDay: 0,
+            lastModifiedTurnover: currentDate,
+            paymentsLimitPerDay: 1000000,
+            transactionsLimitPerDay: 1000,
             paymentMin: 100,
             paymentMax: 1000000,
             status: CARD_STATUSES.Active,
@@ -124,7 +128,7 @@ export class CardsService {
 
     async setLimitCard(params: CardSetLimitDto): Promise<Card> {
         const payload = {
-            turnover: params.turnover,
+            paymentsLimitPerDay: params.paymentsLimitPerDay,
             transactionsLimitPerDay: params.transactionsLimitPerDay,
             paymentMin: params.paymentMin,
             paymentMax: params.paymentMax,

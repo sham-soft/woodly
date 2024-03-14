@@ -45,7 +45,16 @@ export class Card {
     recipient: string;
 
     @Prop()
-    turnover: number;
+    turnoverPaymentsPerDay: number;
+
+    @Prop()
+    turnoverTransactionsPerDay: number;
+
+    @Prop()
+    lastModifiedTurnover: string;
+
+    @Prop()
+    paymentsLimitPerDay: number;
 
     @Prop()
     transactionsLimitPerDay: number;

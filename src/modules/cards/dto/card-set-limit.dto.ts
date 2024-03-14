@@ -6,7 +6,7 @@ export class CardSetLimitDto {
     cardId: number;
 
     @IsNumber()
-    turnover: number;
+    paymentsLimitPerDay: number;
 
     @IsNumber()
     transactionsLimitPerDay: number;
