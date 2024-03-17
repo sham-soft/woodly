@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CARD_STATUSES } from '@/helpers/constants';
+import { CARD_STATUSES } from '../../helpers/constants';
 import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { CardEditDto } from './dto/card-edit.dto';

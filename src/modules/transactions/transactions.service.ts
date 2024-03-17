@@ -1,9 +1,9 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Config } from '@/modules/configs/schemas/config.schema';
-import { Card } from '@/modules/cards/schemas/card.schema';
-import { CARD_STATUSES, TRANSACTION_STATUSES } from '@/helpers/constants';
+import { Config } from '../configs/schemas/config.schema';
+import { Card } from '../cards/schemas/card.schema';
+import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';

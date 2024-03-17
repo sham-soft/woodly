@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigSchema } from '@/modules/configs/schemas/config.schema';
-import { CardSchema } from '@/modules/cards/schemas/card.schema';
+import { ConfigSchema } from '../configs/schemas/config.schema';
+import { CardSchema } from '../cards/schemas/card.schema';
 import { TransactionsService } from './transactions.service';
 import { TransactionsController } from './transactions.controller';
 import { TransactionSchema } from './schemas/transaction.schema';
