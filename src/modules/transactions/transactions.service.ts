@@ -1,11 +1,9 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Config } from '../configs/schemas/config.schema';
-import { Card } from '../cards/schemas/card.schema';
-import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
-import { getСurrentDateToString } from '../../helpers/date';
-import { MakeTransactionService } from './services/make-transaction.services';
+import { TRANSACTION_STATUSES } from '../../helpers/constants';
+import { MakeTransactionService } from './services/make-transaction.service';
+import { CreateTransactionService } from './services/create-transaction.service';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';
@@ -15,10 +13,9 @@ import { Transaction } from './schemas/transaction.schema';
 @Injectable()
 export class TransactionsService {
     constructor(
-        @InjectModel('configs') private configModel: Model<Config>,
-        @InjectModel('cards') private cardModel: Model<Card>,
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
         private readonly makeTransactionService: MakeTransactionService,
+        private readonly createTransactionService: CreateTransactionService,
     ) {}
 
     async getTransactions(query: TransactionQueryDto) {
@@ -77,60 +74,7 @@ export class TransactionsService {
     }
 
     async createTransaction(params: TransactionCreateDto): Promise<Transaction | string> {
-        const config = await this.configModel.findOne({ name: 'IS_WORK_TRANSACTIONS' });
-
-        if (config?.value === 'false') {
-            throw new BadRequestException('На данный момент сделки отключены');
-        }
-
-        // Get max transactionId
-        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
-        const transactionId = sortTransactions[0]?.transactionId || 0;
-        
-        // Get dates
-        const dateCreate = getСurrentDateToString();
-        
-        const nextDate = new Date();
-        nextDate.setTime(nextDate.getTime() + (4 * 60 * 1000));
-        const dateClose = nextDate.toLocaleString( 'sv', { timeZoneName: 'short' } );
-
-        // Get card
-        const transactions = await this.transactionModel.find({ status: TRANSACTION_STATUSES.Active, amount: params.amount });
-        const idsCard = transactions.map((item) => item.cardId);
-
-        const filters: any = params.isSbp ? { isSbp: true } : { bankType: params.bankType };
-        filters.cardId = { $nin: idsCard };
-        filters.status = CARD_STATUSES.Active;
-        const cards = await this.cardModel.aggregate([
-            { $match: filters },
-            { $sample: { size: 1 } },
-        ]);
-        const cardRandom = cards[0];
-
-        if (cardRandom) {
-            const payload = {
-                transactionId: transactionId + 1,
-                amount: params.amount,
-                status: TRANSACTION_STATUSES.Active,
-                dateCreate: dateCreate,
-                dateClose: dateClose,
-                title: cardRandom.title,
-                cardId: cardRandom.cardId,
-                cardNumber: cardRandom.cardNumber,
-                phone: cardRandom.phone,
-                recipient: cardRandom.recipient,
-                fio: cardRandom.fio,
-                bankType: cardRandom.bankType,
-                cardLastNumber: cardRandom.cardLastNumber,
-            };
-    
-            const newTransaction = new this.transactionModel(payload);
-            newTransaction.save();
-    
-            return newTransaction;
-        }
-
-        throw new BadRequestException('Нет свободных реквизитов.');
+        return this.createTransactionService.createTransaction(params);
     }
 
     async editTransaction(params: TransactionEditDto): Promise<Transaction> {

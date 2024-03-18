@@ -5,5 +5,9 @@ export function isToday(date: Date): boolean {
 }
 
 export function getСurrentDateToString(): string {
-    return  new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
+    return new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
+}
+
+export function convertDateToString(date: Date): string {
+    return date.toLocaleString( 'sv', { timeZoneName: 'short' } );
 }
