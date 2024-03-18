@@ -4,6 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Config } from '../configs/schemas/config.schema';
 import { Card } from '../cards/schemas/card.schema';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
+import { getСurrentDateToString } from '../../helpers/date';
+import { MakeTransactionService } from './services/make-transaction.services';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';
@@ -16,6 +18,7 @@ export class TransactionsService {
         @InjectModel('configs') private configModel: Model<Config>,
         @InjectModel('cards') private cardModel: Model<Card>,
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
+        private readonly makeTransactionService: MakeTransactionService,
     ) {}
 
     async getTransactions(query: TransactionQueryDto) {
@@ -85,15 +88,14 @@ export class TransactionsService {
         const transactionId = sortTransactions[0]?.transactionId || 0;
         
         // Get dates
-        const currentDate = new Date();
+        const dateCreate = getСurrentDateToString();
+        
         const nextDate = new Date();
         nextDate.setTime(nextDate.getTime() + (4 * 60 * 1000));
-
-        const dateCreate = currentDate.toLocaleString( 'sv', { timeZoneName: 'short' } );
         const dateClose = nextDate.toLocaleString( 'sv', { timeZoneName: 'short' } );
 
         // Get card
-        const transactions = await this.transactionModel.find({ amount: params.amount });
+        const transactions = await this.transactionModel.find({ status: TRANSACTION_STATUSES.Active, amount: params.amount });
         const idsCard = transactions.map((item) => item.cardId);
 
         const filters: any = params.isSbp ? { isSbp: true } : { bankType: params.bankType };
@@ -159,39 +161,7 @@ export class TransactionsService {
     }
 
     async makeTransaction(params: TransactionMakeDto): Promise<string> {
-        const transaction = await this.transactionModel.findOne({
-            cardLastNumber: params.cardLastNumber,
-            amount: params.amount,
-            status: TRANSACTION_STATUSES.Active,
-        });
-
-        const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
-
-        if (transaction) {
-            const payload = {
-                status: TRANSACTION_STATUSES.Successful,
-                paymentTime: currentDate,
-            };
-
-            await this.transactionModel.findOneAndUpdate({ transactionId: transaction.transactionId }, { $set: payload });
-            return 'Операция успешно прошла!';
-        }
-
-        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
-        const transactionId = sortTransactions[0]?.transactionId || 0;
-
-        const payload = {
-            transactionId: transactionId + 1,
-            cardLastNumber: params.cardLastNumber,
-            amount: params.amount,
-            paymentTime: currentDate,
-            status: TRANSACTION_STATUSES.Verification,
-        };
-
-        const newTransactionCompleted = new this.transactionModel(payload);
-        newTransactionCompleted.save();
-
-        throw new BadRequestException('Операция с такой суммой не найдена');
+       return this.makeTransactionService.makeTransaction(params);
     }
 
     async confirmTransaction(id: string): Promise<string> {
