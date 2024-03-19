@@ -111,7 +111,7 @@ export class CardsService {
             cardLastNumber: params.cardNumber.slice(-4),
         };
 
-        const card = await this.cardModel.findOne({ cardLastNumber: payload.cardLastNumber });
+        const card = await this.cardModel.findOne({ cardId: { $ne: params.cardId }, cardLastNumber: payload.cardLastNumber });
 
         if (card) {
             throw new BadRequestException('Карта с такими цифрами на конце уже существует');

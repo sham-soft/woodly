@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsString, Length, IsNumber, IsBoolean } from 'class-validator';
 
 export class CardEditDto {
     @IsNumber()
@@ -8,6 +8,7 @@ export class CardEditDto {
     @IsString()
     title: string;
 
+    @Length(16, 16)
     @IsString()
     @IsNotEmpty()
     cardNumber: string;
