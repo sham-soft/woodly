@@ -26,6 +26,7 @@ export class MakeTransactionService {
             const payloadTransaction = {
                 status: TRANSACTION_STATUSES.Successful,
                 paymentTime: getСurrentDateToString(),
+                message: params.message,
             };
 
             await this.transactionModel.findOneAndUpdate({ transactionId: transaction.transactionId }, { $set: payloadTransaction });
@@ -34,15 +35,15 @@ export class MakeTransactionService {
             return 'Операция успешно прошла!';
         }
 
-        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
-        const transactionId = sortTransactions[0]?.transactionId || 0;
+        const newTransactionId = await this.createNewId();
 
         const payload = {
-            transactionId: transactionId + 1,
+            transactionId: newTransactionId,
             cardLastNumber: params.cardLastNumber,
             amount: params.amount,
             paymentTime: getСurrentDateToString(),
             status: TRANSACTION_STATUSES.Verification,
+            message: params.message,
         };
 
         const newTransactionCompleted = new this.transactionModel(payload);
@@ -60,5 +61,12 @@ export class MakeTransactionService {
         };
         
         await this.cardModel.findOneAndUpdate({ cardId: card.cardId }, { $set: payload });
+    }
+
+    private async createNewId(): Promise<number> {
+        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
+        const lastTransactionId = sortTransactions[0]?.transactionId || 0;
+
+        return lastTransactionId + 1;
     }
 }

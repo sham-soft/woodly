@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class TransactionMakeDto {
     @IsNotEmpty()
@@ -7,4 +7,8 @@ export class TransactionMakeDto {
     @IsNumber()
     @IsNotEmpty()
     amount: number;
+
+    @IsString()
+    @IsNotEmpty()
+    message: string;
 }

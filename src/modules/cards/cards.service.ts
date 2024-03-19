@@ -1,18 +1,21 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CARD_STATUSES } from '../../helpers/constants';
+import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
 import { CardQueryDto } from './dto/card.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { CardEditDto } from './dto/card-edit.dto';
 import { CardSetLimitDto } from './dto/card-set-limit.dto';
 import { CardChangeStatusDto } from './dto/card-change-status.dto';
+import { CardTransactionsQueryDto } from './dto/card-transactions.dto';
 import { Card } from './schemas/card.schema';
+import { Transaction } from '../transactions/schemas/transaction.schema';
 
 @Injectable()
 export class CardsService {
     constructor(
         @InjectModel('cards') private cardModel: Model<Card>,
+        @InjectModel('transactions') private transactionModel: Model<Transaction>,
     ) {}
 
     async getCards(query: CardQueryDto) {
@@ -145,5 +148,30 @@ export class CardsService {
             { $set: { status: params.status } }, 
             { new: true }
         );
+    }
+
+    async getCardTransactions(id: number, query: CardTransactionsQueryDto) {
+        const limit = 50;
+        let skip = 0;
+
+        const filters = {
+            cardId: id,
+            status: TRANSACTION_STATUSES.Successful,
+        };
+
+        if (query.page > 1) {
+            skip = (query.page - 1) * 50;
+        }
+
+        const countTransactions = await this.transactionModel.countDocuments(filters);
+
+        const data = await this.transactionModel.find(filters).skip(skip).limit(limit);
+
+        return {
+            total: countTransactions,
+            page: query.page || 1,
+            count: data.length,
+            transactions: data,
+        };
     }
 }

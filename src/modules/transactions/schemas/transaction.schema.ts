@@ -47,6 +47,9 @@ export class Transaction {
 
     @Prop()
     paymentTime: string;
+
+    @Prop()
+    message: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
