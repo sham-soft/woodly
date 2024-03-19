@@ -55,7 +55,6 @@ export class CardsService {
     async createCard(params: CardCreateDto): Promise<Card> {
         const sortCards = await this.cardModel.find().sort({ cardId: -1 }).limit(1);
         const cardId = sortCards[0]?.cardId || 0;
-        const currentDate = new Date().toLocaleString( 'sv', { timeZoneName: 'short' } );
 
         const payload = {
             title: params.title,
@@ -74,7 +73,6 @@ export class CardsService {
             recipient: params.recipient,
             turnoverPaymentsPerDay: 0,
             turnoverTransactionsPerDay: 0,
-            lastModifiedTurnover: currentDate,
             paymentsLimitPerDay: 1000000,
             transactionsLimitPerDay: 1000,
             paymentMin: 100,

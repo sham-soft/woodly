@@ -51,9 +51,6 @@ export class Card {
     turnoverTransactionsPerDay: number;
 
     @Prop()
-    lastModifiedTurnover: string;
-
-    @Prop()
     paymentsLimitPerDay: number;
 
     @Prop()

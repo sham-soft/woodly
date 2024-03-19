@@ -3,7 +3,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Card } from '../../cards/schemas/card.schema';
 import { TRANSACTION_STATUSES } from '../../../helpers/constants';
-import { isToday, getСurrentDateToString } from '../../../helpers/date';
+import { getСurrentDateToString } from '../../../helpers/date';
 import { TransactionMakeDto } from '../dto/transaction-make.dto';
 import { Transaction } from '../schemas/transaction.schema';
 
@@ -19,6 +19,7 @@ export class MakeTransactionService {
             cardLastNumber: params.cardLastNumber,
             amount: params.amount,
             status: TRANSACTION_STATUSES.Active,
+            dateClose: { $gt: getСurrentDateToString() },
         });
 
         if (transaction) {
@@ -53,18 +54,9 @@ export class MakeTransactionService {
     private async updateCardTurnover(transaction: Transaction) {
         const card = await this.cardModel.findOne({ cardId: transaction.cardId });
 
-        let turnoverPaymentsPerDay = transaction.amount;
-        let turnoverTransactionsPerDay = 1;
-
-        if (isToday(new Date(card.lastModifiedTurnover))) {
-            turnoverPaymentsPerDay = turnoverPaymentsPerDay + card.turnoverPaymentsPerDay;
-            turnoverTransactionsPerDay = turnoverTransactionsPerDay + card.turnoverTransactionsPerDay;
-        }
-
         const payload = {
-            turnoverPaymentsPerDay,
-            turnoverTransactionsPerDay,
-            lastModifiedTurnover: getСurrentDateToString(),
+            turnoverPaymentsPerDay: card.turnoverPaymentsPerDay + transaction.amount,
+            turnoverTransactionsPerDay: card.turnoverTransactionsPerDay + 1,
         };
         
         await this.cardModel.findOneAndUpdate({ cardId: card.cardId }, { $set: payload });
