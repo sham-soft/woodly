@@ -78,6 +78,12 @@ export class CreateTransactionService {
         const filters: any = params.isSbp ? { isSbp: true } : { bankType: params.bankType };
         filters.cardId = { $nin: idsCard };
         filters.status = CARD_STATUSES.Active;
+        filters.$and = [
+            { $expr: { $gt: ['$paymentsLimitPerDay', '$turnoverPaymentsPerDay'] } },
+            { $expr: { $gt: ['$transactionsLimitPerDay', '$turnoverTransactionsPerDay'] } },
+        ];
+        filters.paymentMin = { $lte: params.amount };
+        filters.paymentMax = { $gte: params.amount };
 
         const cardsRandom = await this.cardModel.aggregate([{ $match: filters }, { $sample: { size: 1 } }]);
         return cardsRandom[0];
