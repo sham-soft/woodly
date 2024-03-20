@@ -6,6 +6,7 @@ import { TransactionSchema } from './schemas/transaction.schema';
 import { TransactionsService } from './transactions.service';
 import { MakeTransactionService } from './services/make-transaction.service';
 import { CreateTransactionService } from './services/create-transaction.service';
+import { ExportTransactionService } from './services/export-transaction.service';
 import { TransactionsController } from './transactions.controller';
 
 @Module({
@@ -18,6 +19,7 @@ import { TransactionsController } from './transactions.controller';
         TransactionsService,
         CreateTransactionService,
         MakeTransactionService,
+        ExportTransactionService,
     ],
     controllers: [TransactionsController],
 })

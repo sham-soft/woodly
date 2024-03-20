@@ -1,13 +1,16 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { StreamableFile } from '@nestjs/common';
 import { TRANSACTION_STATUSES } from '../../helpers/constants';
 import { MakeTransactionService } from './services/make-transaction.service';
 import { CreateTransactionService } from './services/create-transaction.service';
+import { ExportTransactionService } from './services/export-transaction.service';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
+import { TransactionExportQueryDto } from './dto/transaction-export.dto';
 import { Transaction } from './schemas/transaction.schema';
 
 @Injectable()
@@ -16,6 +19,7 @@ export class TransactionsService {
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
         private readonly makeTransactionService: MakeTransactionService,
         private readonly createTransactionService: CreateTransactionService,
+        private readonly exportTransactionService: ExportTransactionService,
     ) {}
 
     async getTransactions(query: TransactionQueryDto) {
@@ -68,7 +72,7 @@ export class TransactionsService {
         return {
             total: countTransactions,
             page: query.page || 1,
-            count: data.length,
+            limit: 50,
             transactions: data,
         };
     }
@@ -116,5 +120,9 @@ export class TransactionsService {
         }
 
         throw new BadRequestException('Время истекло или не удалось обработать ваш платеж');
+    }
+
+    async getTransactionsExport(query: TransactionExportQueryDto): Promise<StreamableFile> {
+        return this.exportTransactionService.getTransactionsExport(query);
     }
 }

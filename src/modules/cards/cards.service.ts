@@ -50,7 +50,7 @@ export class CardsService {
         return {
             total: countCards,
             page: query.page || 1,
-            count: data.length,
+            limit: 50,
             cards: data,
         };
     }
@@ -170,7 +170,7 @@ export class CardsService {
         return {
             total: countTransactions,
             page: query.page || 1,
-            count: data.length,
+            limit: 50,
             transactions: data,
         };
     }
