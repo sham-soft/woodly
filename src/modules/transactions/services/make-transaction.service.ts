@@ -2,8 +2,11 @@ import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Card } from '../../cards/schemas/card.schema';
+import { Autopayment } from '../../autopayments/schemas/autopayment.schema';
+import { Message } from '../../messages/schemas/message.schema';
 import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 import { getСurrentDateToString } from '../../../helpers/date';
+import { createId } from '../../../helpers/unique';
 import { TransactionMakeDto } from '../dto/transaction-make.dto';
 import { Transaction } from '../schemas/transaction.schema';
 
@@ -11,10 +14,16 @@ import { Transaction } from '../schemas/transaction.schema';
 export class MakeTransactionService {
     constructor(
         @InjectModel('cards') private cardModel: Model<Card>,
+        @InjectModel('autopayments') private autopaymentModel: Model<Autopayment>,
+        @InjectModel('messages') private messageModel: Model<Message>,
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
     ) {}
 
     async makeTransaction(params: TransactionMakeDto): Promise<string> {
+        if (!params.amount) {
+            await this.createMessage(params);
+        }
+
         const transaction = await this.transactionModel.findOne({
             cardLastNumber: params.cardLastNumber,
             amount: params.amount,
@@ -35,21 +44,7 @@ export class MakeTransactionService {
             return 'Операция успешно прошла!';
         }
 
-        const newTransactionId = await this.createNewId();
-
-        const payload = {
-            transactionId: newTransactionId,
-            cardLastNumber: params.cardLastNumber,
-            amount: params.amount,
-            paymentTime: getСurrentDateToString(),
-            status: TRANSACTION_STATUSES.Verification,
-            message: params.message,
-        };
-
-        const newTransactionCompleted = new this.transactionModel(payload);
-        newTransactionCompleted.save();
-
-        throw new BadRequestException('Операция с такой суммой не найдена');
+        await this.createAutopayment(params);
     }
 
     private async updateCardTurnover(transaction: Transaction) {
@@ -62,11 +57,48 @@ export class MakeTransactionService {
         
         await this.cardModel.findOneAndUpdate({ cardId: card.cardId }, { $set: payload });
     }
+    
+    private async createAutopayment(params: TransactionMakeDto): Promise<void> {
+        const newAutopaymentId = await createId(this.autopaymentModel, 'autopaymentId');
 
-    private async createNewId(): Promise<number> {
-        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
-        const lastTransactionId = sortTransactions[0]?.transactionId || 0;
+        const payload: Autopayment = {
+            autopaymentId: newAutopaymentId,
+            cardLastNumber: params.cardLastNumber,
+            amount: params.amount,
+            paymentTime: getСurrentDateToString(),
+            message: params.message,
+        };
 
-        return lastTransactionId + 1;
+        const transaction = await this.transactionModel.findOne({
+            cardLastNumber: params.cardLastNumber,
+            amount: params.amount,
+            status: TRANSACTION_STATUSES.Cancelled,
+        });
+
+        if (transaction) {
+            payload.transactionId = transaction.transactionId;
+        }
+
+        const newAutopayment = new this.autopaymentModel(payload);
+        newAutopayment.save();
+
+        throw new BadRequestException('Операция с такой суммой не найдена. Создан новый автоплатеж.');
+    }
+
+    private async createMessage(params: TransactionMakeDto): Promise<void> {
+        const newMessageId = await createId(this.messageModel, 'messageId');
+
+        const payload: Message = {
+            messageId: newMessageId,
+            cardLastNumber: params.cardLastNumber,
+            sender: '900',
+            dateCreate: getСurrentDateToString(),
+            message: params.message,
+        };
+
+        const newMessage = new this.messageModel(payload);
+        newMessage.save();
+
+        throw new BadRequestException('Операция с такой суммой не найдена. Создано новое общее СМС.');
     }
 }

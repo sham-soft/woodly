@@ -4,6 +4,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigsModule } from './modules/configs/configs.module';
 import { CardsModule } from './modules/cards/cards.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
+import { AutopaymentsModule } from './modules/autopayments/autopayments.module';
+import { MessagesModule } from './modules/messages/messages.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +15,8 @@ import { AppService } from './app.service';
         ConfigsModule,
         CardsModule,
         TransactionsModule,
+        AutopaymentsModule,
+        MessagesModule,
         JobsModule,
         ScheduleModule.forRoot(),
         // MongooseModule.forRoot('mongodb://localhost:27017/woodly'),
