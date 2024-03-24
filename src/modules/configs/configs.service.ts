@@ -24,7 +24,7 @@ export class ConfigsService {
         return this.configModel.findOneAndUpdate(
             { name: params.name },
             { $set: { value: params.value } }, 
-            { new: true }
+            { new: true, upsert: true }
         );
     }
 }
