@@ -10,3 +10,10 @@ export enum TRANSACTION_STATUSES {
     Cancelled,
     Successful,
 }
+
+export enum BALANCE_STATUSES {
+    Internal = 1,
+    Deposit,
+    Deduction,
+    Freeze,
+}
