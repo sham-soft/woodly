@@ -8,6 +8,7 @@ import { AutopaymentsModule } from './modules/autopayments/autopayments.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { BalanceModule } from './modules/balance/balance.module';
+import { UsersModule } from './modules/users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -20,6 +21,7 @@ import { AppService } from './app.service';
         MessagesModule,
         JobsModule,
         BalanceModule,
+        UsersModule,
         ScheduleModule.forRoot(),
         // MongooseModule.forRoot('mongodb://localhost:27017/woodly'),
         MongooseModule.forRoot('mongodb+srv://code-build:code-build@cluster0.3bdan.mongodb.net/woodly'),
