@@ -10,5 +10,6 @@ import { ConfigSchema } from './schemas/config.schema';
     ])],
     providers: [ConfigsService],
     controllers: [ConfigsController],
+    exports: [ConfigsService],
 })
 export class ConfigsModule {}

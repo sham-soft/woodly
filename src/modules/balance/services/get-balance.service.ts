@@ -3,28 +3,38 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { HttpService } from '@nestjs/axios';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
+import { ConfigsService } from '../../configs/configs.service';
+import { getFixedFloat } from '../../../helpers/numbers';
+import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 
 @Injectable()
 export class GetBalanceService {
     constructor(
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
         private readonly httpService: HttpService,
+        private readonly configsService: ConfigsService,
     ) {}
 
     async getBalance() {
         const balanceData = await Promise.all([
             this.getWallet(),
             this.getRates(),
+            this.getAmountActiveTransactions(),
         ]);
 
         const wallet = balanceData[0];
         const rates = balanceData[1];
+        const amountActiveTransactions = balanceData[2];
+
+        const balanceRubWithPercent = getFixedFloat((wallet.quantity * rates.rateWithPercent), 2);
 
         return {
             tokenId: wallet.tokenId,
-            balanceUsdt: wallet.quantity, 
-            balanceRub: wallet.quantity * rates.rate, 
-            balanceRubWithPercent: wallet.quantity * rates.rateWithPercent, 
+            balanceUsdt: wallet.quantity,
+            balanceRub: getFixedFloat((wallet.quantity * rates.rate), 2),
+            balanceRubWithPercent: balanceRubWithPercent,
+            balanceRubFreeze: amountActiveTransactions,
+            balanceRubFreezeWithPercent: balanceRubWithPercent - amountActiveTransactions,
             ...rates,
         };
     }
@@ -40,27 +50,23 @@ export class GetBalanceService {
     }
 
     private async getRates() {
-        const body = {
-            tokenId: 'USDT',
-            currencyId: 'RUB',
-            payment: [],
-            side: '1',
-            size: '3',
-            page: '1',
-            amount:'300000',
-            authMaker: false,
-            canTrade: false,
-        };
-
-        const bybitData: any = await this.httpService.axiosRef.post('https://api2.bybit.com/fiat/otc/item/online', body);
-
-        const rate = Number(bybitData.data.result.items[2].price);
-        const percentOfRate = 2.5 * 100 / rate;
-        const rateWithPercent = parseFloat((rate + percentOfRate).toFixed(2));
+        const config = await this.configsService.getConfigs('RUBLE_RATE');
+        const rate = Number(config);
+        const percent = 2.5;
+        const percentOfRate = percent * 100 / rate;
+        const rateWithPercent = getFixedFloat((rate + percentOfRate), 2);
 
         return {
             rate,
             rateWithPercent,
         };
+    }
+
+    private async getAmountActiveTransactions(): Promise<number> {
+        const data = await this.transactionModel.find({ status: TRANSACTION_STATUSES.Active });
+
+        return data.reduce((prev, item) => {
+            return prev + item.amount;
+        }, 0);
     }
 }

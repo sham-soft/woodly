@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigsModule } from '../configs/configs.module';
 import { BalanceController } from './balance.controller';
 import { TransactionSchema } from '../transactions/schemas/transaction.schema';
 import { BalanceService } from './balance.service';
@@ -11,6 +12,7 @@ import { GetTransactionsService } from './services/get-transactions.service';
   imports: [
     MongooseModule.forFeature([{ name: 'transactions', schema: TransactionSchema, collection: 'transactions' }]),
     HttpModule,
+    ConfigsModule,
   ],
   providers: [
     BalanceService,
