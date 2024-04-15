@@ -7,6 +7,7 @@ import { TransactionSchema } from '../transactions/schemas/transaction.schema';
 import { BalanceService } from './balance.service';
 import { GetBalanceService } from './services/get-balance.service';
 import { GetTransactionsService } from './services/get-transactions.service';
+import { ExportTransactionsService } from './services/export-transactions.service';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { GetTransactionsService } from './services/get-transactions.service';
     BalanceService,
     GetBalanceService,
     GetTransactionsService,
+    ExportTransactionsService,
   ],
   controllers: [BalanceController],
 })
