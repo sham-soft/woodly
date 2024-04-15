@@ -3,7 +3,7 @@ import { IsBoolean, IsOptional, ValidateIf, IsNotEmpty, IsNumber } from 'class-v
 export class TransactionCreateDto {
     @IsBoolean()
     @IsOptional()
-    isSbp: boolean;
+    isSbp?: boolean;
 
     @IsNumber()
     @IsNotEmpty()

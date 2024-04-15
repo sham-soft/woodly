@@ -37,7 +37,7 @@ export class CardCreateDto {
     @IsBoolean()
     isSbp: boolean;
 
-    phone: string;
+    phone?: string;
 
-    recipient: string;
+    recipient?: string;
 }

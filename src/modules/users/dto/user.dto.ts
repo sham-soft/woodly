@@ -1,5 +1,5 @@
 export class UserQueryDto {
     cardLastNumber: string;
 
-    page: number;
+    page?: number;
 }

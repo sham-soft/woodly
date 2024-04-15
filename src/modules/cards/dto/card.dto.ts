@@ -1,7 +1,7 @@
 export class CardQueryDto {
-    status: number;
+    status?: number;
 
-    cardNumber: string;
+    cardNumber?: string;
 
-    page: number;
+    page?: number;
 }

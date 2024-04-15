@@ -150,12 +150,12 @@ export class CardsService {
         );
     }
 
-    async getCardTransactions(id: number, query: CardTransactionsQueryDto) {
+    async getCardTransactions(cardId: number, query: CardTransactionsQueryDto) {
         const limit = 50;
         let skip = 0;
 
         const filters = {
-            cardId: id,
+            cardId: cardId,
             status: TRANSACTION_STATUSES.Successful,
         };
 

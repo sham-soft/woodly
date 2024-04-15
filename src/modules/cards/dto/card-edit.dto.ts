@@ -41,7 +41,7 @@ export class CardEditDto {
     @IsBoolean()
     isSbp: boolean;
 
-    phone: string;
+    phone?: string;
 
-    recipient: string;
+    recipient?: string;
 }

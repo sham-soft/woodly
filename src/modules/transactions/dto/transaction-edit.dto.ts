@@ -11,9 +11,9 @@ export class TransactionEditDto {
 
     @IsNumber()
     @IsOptional()
-    status: number;
+    status?: number;
 
     @IsNumber()
     @IsOptional()
-    amount: number;
+    amount?: number;
 }

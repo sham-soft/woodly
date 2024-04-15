@@ -1,5 +1,5 @@
 export class AutopaymentQueryDto {
     cardLastNumber: string;
 
-    page: number;
+    page?: number;
 }

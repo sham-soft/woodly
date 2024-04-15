@@ -1,5 +1,5 @@
 export class MessageQueryDto {
     cardLastNumber: string;
 
-    page: number;
+    page?: number;
 }

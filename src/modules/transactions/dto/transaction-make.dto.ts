@@ -6,7 +6,7 @@ export class TransactionMakeDto {
 
     @IsNumber()
     @IsOptional()
-    amount: number;
+    amount?: number;
 
     @IsString()
     @IsNotEmpty()

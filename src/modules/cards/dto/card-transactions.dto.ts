@@ -1,3 +1,3 @@
 export class CardTransactionsQueryDto {
-    page: number;
+    page?: number;
 }

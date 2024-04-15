@@ -1,5 +1,5 @@
 export class BalanceTransactionsQueryDto {
-    status: number;
+    status?: number;
 
-    page: number;
+    page?: number;
 }
