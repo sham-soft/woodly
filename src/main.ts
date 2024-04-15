@@ -20,6 +20,7 @@ async function bootstrap() {
         .setTitle('Woodly')
         .setDescription('The woodly API description')
         .setVersion('1.0')
+        .addServer('https://woodly-azure.vercel.app/')
         .addServer('http://localhost:3000/')
         .build();
 
