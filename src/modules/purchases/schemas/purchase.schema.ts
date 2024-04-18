@@ -28,6 +28,12 @@ export class Purchase {
 
     @Prop()
     cardNumber: string;
+
+    @Prop()
+    status: number;
+
+    @Prop()
+    dateCreate: string;
 }
 
 export const PurchaseSchema = SchemaFactory.createForClass(Purchase);

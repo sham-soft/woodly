@@ -3,7 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
+import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
 import { Purchase } from './schemas/purchase.schema';
+import { PURCHASE_STATUSES } from '../../helpers/constants';
+import { getСurrentDateToString } from '../../helpers/date';
 
 @Injectable()
 export class PurchasesService {
@@ -37,6 +40,8 @@ export class PurchasesService {
 
         const payload = {
             purchaseId: purchaseId + 1,
+            status: PURCHASE_STATUSES.Available,
+            dateCreate: getСurrentDateToString(),
             ...params,
         };
 
@@ -44,5 +49,13 @@ export class PurchasesService {
         newPurchase.save();
 
         return newPurchase;
+    }
+
+    changeStatusCard(params: PurchaseChangeStatusDto): Promise<Purchase> {
+        return this.purchaseModel.findOneAndUpdate(
+            { purchaseId: params.purchaseId },
+            { $set: { status: params.status } }, 
+            { new: true }
+        );
     }
 }

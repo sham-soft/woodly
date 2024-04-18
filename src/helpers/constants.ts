@@ -17,3 +17,10 @@ export enum BALANCE_STATUSES {
     Deduction,
     Freeze,
 }
+
+export enum PURCHASE_STATUSES {
+    Available = 1,
+    Active,
+    Cancelled,
+    Successful,
+}

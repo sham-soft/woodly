@@ -4,11 +4,13 @@ import {
     Query,
     Post,
     Body,
+    Patch,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PurchasesService } from './purchases.service';
 import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
+import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
 import { Purchase } from './schemas/purchase.schema';
 
 @ApiTags('Purchases')
@@ -26,5 +28,18 @@ export class PurchasesController {
     @Post('create/')
     createCard(@Body() purchaseDto: PurchaseCreateDto): Promise<Purchase> {
         return this.purchasesService.createPurchase(purchaseDto);
+    }
+
+    @ApiOperation({
+        summary: 'Принять сделку. Отменить сделку. Подтвердить сделку',
+        description: `
+            - Чтобы принять сделку, нужно передать status = 2.
+            - Чтобы отменить сделку, нужно передать status = 3.
+            - Чтобы подтвердить сделку, нужно передать status = 4.
+        `,
+    })
+    @Patch('change-status/')
+    changeStatusCard(@Body() purchaseDto: PurchaseChangeStatusDto): Promise<Purchase> {
+        return this.purchasesService.changeStatusCard(purchaseDto);
     }
 }
