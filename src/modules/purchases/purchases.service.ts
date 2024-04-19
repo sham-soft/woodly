@@ -1,10 +1,12 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
+import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { Purchase } from './schemas/purchase.schema';
+import { ExportPurchasesService } from './services/export-purchases.service';
 import { PURCHASE_STATUSES } from '../../helpers/constants';
 import { getСurrentDateToString } from '../../helpers/date';
 
@@ -12,6 +14,7 @@ import { getСurrentDateToString } from '../../helpers/date';
 export class PurchasesService {
     constructor(
         @InjectModel('purchases') private purchaseModel: Model<Purchase>,
+        private readonly exportPurchasesService: ExportPurchasesService,
     ) {}
 
     async getPurchases(query: PurchaseQueryDto) {
@@ -57,5 +60,9 @@ export class PurchasesService {
             { $set: { status: params.status } }, 
             { new: true }
         );
+    }
+
+    async getPurchasesExport(query: PurchaseExportQueryDto): Promise<StreamableFile> {
+        return this.exportPurchasesService.getPurchasesExport(query);
     }
 }

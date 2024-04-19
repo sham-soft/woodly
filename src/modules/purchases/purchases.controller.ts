@@ -2,15 +2,18 @@ import {
     Controller,
     Get,
     Query,
+    Header,
     Post,
     Body,
     Patch,
+    StreamableFile,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PurchasesService } from './purchases.service';
 import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
+import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { Purchase } from './schemas/purchase.schema';
 
 @ApiTags('Purchases')
@@ -41,5 +44,12 @@ export class PurchasesController {
     @Patch('change-status/')
     changeStatusCard(@Body() purchaseDto: PurchaseChangeStatusDto): Promise<Purchase> {
         return this.purchasesService.changeStatusCard(purchaseDto);
+    }
+
+    @ApiOperation({ summary: 'Получение списка выплат в формате Excel' })
+    @Get('export/')
+    @Header('Content-Disposition', 'attachment; filename="Purchases.xlsx"')
+    getPurchasesExport(@Query() purchaseQuery: PurchaseExportQueryDto): Promise<StreamableFile> {
+        return this.purchasesService.getPurchasesExport(purchaseQuery);
     }
 }
