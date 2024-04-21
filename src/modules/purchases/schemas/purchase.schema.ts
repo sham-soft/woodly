@@ -18,7 +18,7 @@ export class Purchase {
     bankType: number;
 
     @Prop()
-    amount: string;
+    amount: number;
 
     @Prop()
     orderNumber: number;

@@ -9,6 +9,7 @@ import { Purchase } from './schemas/purchase.schema';
 import { ExportPurchasesService } from './services/export-purchases.service';
 import { PURCHASE_STATUSES } from '../../helpers/constants';
 import { getСurrentDateToString } from '../../helpers/date';
+import { getPagination, getFilters, FilterRules } from '../../helpers/filters';
 
 @Injectable()
 export class PurchasesService {
@@ -18,21 +19,26 @@ export class PurchasesService {
     ) {}
 
     async getPurchases(query: PurchaseQueryDto) {
-        const limit = 50;
-        let skip = 0;
+        const pagination = getPagination(query.page); 
 
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
+        const filters = getFilters(query, {
+            status: FilterRules.EQUAL,
+            purchaseId: FilterRules.REGEX_INTEGER,
+            paymentSystem: FilterRules.EQUAL_LIST,
+            cardNumber: FilterRules.REGEX_STRING,
+            amount: FilterRules.REGEX_INTEGER,
+            orderNumber: FilterRules.REGEX_STRING,
+            bankType: FilterRules.EQUAL,
+            cashbox: FilterRules.EQUAL,
+        });
 
-        const countPurchases = await this.purchaseModel.countDocuments();
-
-        const data = await this.purchaseModel.find().skip(skip).limit(limit);
+        const countPurchases = await this.purchaseModel.countDocuments(filters);
+        const data = await this.purchaseModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
             total: countPurchases,
-            page: query.page || 1,
-            limit: 50,
+            page: pagination.page,
+            limit: pagination.limit,
             purchases: data,
         };
     }
