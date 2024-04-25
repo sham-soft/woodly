@@ -27,13 +27,19 @@ export class Purchase {
     currency: number;
 
     @Prop()
-    cardNumber: string;
+    requisites: string;
 
     @Prop()
     status: number;
 
     @Prop()
     dateCreate: string;
+
+    @Prop()
+    dateClose: string;
+
+    @Prop()
+    debit: number;
 }
 
 export const PurchaseSchema = SchemaFactory.createForClass(Purchase);

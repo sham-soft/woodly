@@ -19,8 +19,8 @@ export class PurchaseCreateDto {
     @IsNumber()
     currency: number;
 
-    @Length(16, 16)
+    @Length(11, 16)
     @IsString()
     @IsNotEmpty()
-    cardNumber: string;
+    requisites: string;
 }

@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { HttpService } from '@nestjs/axios';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
 import { ConfigsService } from '../../configs/configs.service';
-import { getFixedFloat } from '../../../helpers/numbers';
+import { getFixedFloat, getSumWithPercent } from '../../../helpers/numbers';
 import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 
 @Injectable()
@@ -52,9 +52,7 @@ export class GetBalanceService {
     private async getRates() {
         const config = await this.configsService.getConfigs('RUBLE_RATE');
         const rate = Number(config);
-        const percent = 2.5;
-        const percentOfRate = percent * 100 / rate;
-        const rateWithPercent = getFixedFloat((rate + percentOfRate), 2);
+        const rateWithPercent = getSumWithPercent(2.5, rate);
 
         return {
             rate,

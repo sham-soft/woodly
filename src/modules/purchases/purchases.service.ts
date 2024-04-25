@@ -10,6 +10,7 @@ import { ExportPurchasesService } from './services/export-purchases.service';
 import { PURCHASE_STATUSES } from '../../helpers/constants';
 import { getСurrentDateToString } from '../../helpers/date';
 import { getPagination, getFilters, FilterRules } from '../../helpers/filters';
+import { getSumWithPercent } from '../../helpers/numbers';
 
 @Injectable()
 export class PurchasesService {
@@ -25,7 +26,7 @@ export class PurchasesService {
             status: FilterRules.EQUAL,
             purchaseId: FilterRules.REGEX_INTEGER,
             paymentSystem: FilterRules.EQUAL_LIST,
-            cardNumber: FilterRules.REGEX_STRING,
+            requisites: FilterRules.REGEX_STRING,
             amount: FilterRules.REGEX_INTEGER,
             orderNumber: FilterRules.REGEX_STRING,
             bankType: FilterRules.EQUAL,
@@ -46,11 +47,13 @@ export class PurchasesService {
     async createPurchase(params: PurchaseCreateDto): Promise<Purchase> {
         const sortPurchases = await this.purchaseModel.find().sort({ purchaseId: -1 }).limit(1);
         const purchaseId = sortPurchases[0]?.purchaseId || 0;
+        const debit = getSumWithPercent(4, params.amount);
 
         const payload = {
             purchaseId: purchaseId + 1,
             status: PURCHASE_STATUSES.Available,
             dateCreate: getСurrentDateToString(),
+            debit,
             ...params,
         };
 
@@ -61,9 +64,19 @@ export class PurchasesService {
     }
 
     changeStatusCard(params: PurchaseChangeStatusDto): Promise<Purchase> {
+        type PayloadType = {
+            status: number;
+            dateClose?: string;
+        }
+        const payload: PayloadType = { status: params.status };
+
+        if ([PURCHASE_STATUSES.Cancelled, PURCHASE_STATUSES.Successful].includes(params.status)) {
+            payload.dateClose = getСurrentDateToString();
+        }
+
         return this.purchaseModel.findOneAndUpdate(
             { purchaseId: params.purchaseId },
-            { $set: { status: params.status } }, 
+            { $set: payload }, 
             { new: true }
         );
     }

@@ -1,6 +1,9 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class PurchaseExportQueryDto {
+    @IsOptional()
+    cashboxes?: number[];
+
     @IsString()
     @IsNotEmpty()
     dateStart: string;

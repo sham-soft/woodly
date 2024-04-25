@@ -13,12 +13,16 @@ export class ExportPurchasesService {
     ) {}
 
     async getPurchasesExport(query: PurchaseExportQueryDto): Promise<StreamableFile> {
-        const filters = {
+        const filters: any = {
             dateCreate: {
                 $gt : query.dateStart,
                 $lt : query.dateEnd,
             },
         };
+
+        if (query.cashboxes) {
+            filters.cashbox = { $in: [...query.cashboxes] };
+        }
 
         const purchases = await this.purchaseModel.find(filters);
         
@@ -28,7 +32,7 @@ export class ExportPurchasesService {
             return [
                 item.purchaseId,
                 item.paymentSystem,
-                item.cardNumber,
+                item.requisites,
                 item.amount,
                 item.status,
                 item.dateCreate,

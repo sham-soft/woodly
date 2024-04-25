@@ -3,7 +3,7 @@ export class PurchaseQueryDto {
 
     paymentSystem?: number[];
 
-    cardNumber?: string;
+    requisites?: string;
 
     amount?: number;
 
