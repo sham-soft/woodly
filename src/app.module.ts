@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
-// import { AuthModule } from './modules/auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { AutopaymentsModule } from './modules/autopayments/autopayments.module';
 import { BalanceModule } from './modules/balance/balance.module';
 import { CardsModule } from './modules/cards/cards.module';
@@ -17,7 +17,7 @@ import { AppService } from './app.service';
 
 @Module({
     imports: [
-        // AuthModule,
+        AuthModule,
         AutopaymentsModule,
         BalanceModule,
         CardsModule,

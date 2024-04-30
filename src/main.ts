@@ -22,6 +22,8 @@ async function bootstrap() {
         .setVersion('1.0')
         .addServer('https://woodly-azure.vercel.app/')
         .addServer('http://localhost:3000/')
+        .addBearerAuth()
+        .addSecurityRequirements('bearer')
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
