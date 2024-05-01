@@ -10,6 +10,7 @@ import { ConfigsModule } from './modules/configs/configs.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
+import { ReferencesModule } from './modules/references/references.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { UsersModule } from './modules/users/users.module';
 import { AppController } from './app.controller';
@@ -26,6 +27,7 @@ import { AppService } from './app.service';
         JobsModule,
         MessagesModule,
         PurchasesModule,
+        ReferencesModule,
         TransactionsModule,
         UsersModule,
         ScheduleModule.forRoot(),

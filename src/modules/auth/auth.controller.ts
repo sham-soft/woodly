@@ -19,7 +19,7 @@ export class AuthController {
 
     @ApiOperation({ summary: 'Авторизация' })
     @HttpCode(HttpStatus.OK)
-    @Post('login')
+    @Post()
     signIn(@Body() signInDto: SignInDto) {
         return this.authService.signIn(signInDto.username, signInDto.password);
     }
