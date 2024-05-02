@@ -1,7 +1,11 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { UserQueryDto } from './dto/user.dto';
+import { UserCreateDto } from './dto/user-create.dto';
 import { User } from './schemas/user.schema';
+import { createId } from '../../helpers/unique';
+import { getPagination } from '../../helpers/filters';
 
 @Injectable()
 export class UsersService {
@@ -9,13 +13,37 @@ export class UsersService {
         @InjectModel('users') private userModel: Model<User>,
     ) {}
 
-    async getAllUsers(): Promise<User[]> {
-        return await this.userModel.find();
+    async getAllUsers(query: UserQueryDto) {
+        const pagination = getPagination(query.page); 
+
+        const countUsers = await this.userModel.countDocuments();
+        const data = await this.userModel.find().skip(pagination.skip).limit(pagination.limit);
+
+        return {
+            total: countUsers,
+            page: pagination.page,
+            limit: pagination.limit,
+            users: data,
+        };
     }
 
-    async getUser(name: string) {
-        const data = await this.userModel.findOne({ name });
+    async getUser(login: string): Promise<User> {
+        const data = await this.userModel.findOne({ login });
 
         return data;
+    }
+
+    async createUser(params: UserCreateDto): Promise<User> {
+        const newUserId = await createId(this.userModel, 'userId');
+
+        const payload = {
+            userId: newUserId,
+            ...params,
+        };
+
+        const newUser = new this.userModel(payload);
+        newUser.save();
+
+        return newUser;
     }
 }

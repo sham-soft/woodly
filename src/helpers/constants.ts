@@ -26,10 +26,21 @@ export enum PURCHASE_STATUSES {
 }
 
 export enum ROLES {
-    Admin = 1,
-    Operator,
-    Trader,
-    Merchant,
+    Admin = 'admin',
+    Operator = 'operator',
+    Trader = 'trader',
+    Merchant = 'merchant',
+}
+
+export enum PERMISSIONS {
+    Cards = 'cards',
+    Cashboxes = 'cashboxes',
+    Purchases = 'purchases',
+    Transactions = 'transactions',
+    Users = 'users',
+    Statistics = 'statistics',
+    Balance = 'balance',
+    Settings = 'settings',
 }
 
 export const jwtConstants = {

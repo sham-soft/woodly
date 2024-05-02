@@ -12,7 +12,7 @@ export class AuthService {
     ) {}
 
     async signIn(params: SignInDto): Promise<AccessToken> {
-        const user = await this.usersService.getUser(params.username);
+        const user = await this.usersService.getUser(params.login);
 
         if (user?.password !== params.password) {
           throw new UnauthorizedException();
@@ -20,8 +20,11 @@ export class AuthService {
 
         const payload = {
             sub: user.userId,
-            username: user.name,
-            roles: user.roles,
+            name: user.name,
+            login: user.login,
+            email: user.email,
+            role: user.role,
+            permissions: user.permissions,
         };
 
         return {

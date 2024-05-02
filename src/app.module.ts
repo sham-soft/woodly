@@ -41,11 +41,11 @@ import { RolesGuard } from './guards/roles.guard';
     providers: [
         AppService,
         {
-            provide: APP_GUARD, // Добавляем guard аутенфикации глобально
+            provide: APP_GUARD, // Добавляем guard аутенфикации, глобально
             useClass: AuthGuard,
         },
         {
-            provide: APP_GUARD,// Добавляем guard проверки ролей глобально
+            provide: APP_GUARD, // Добавляем guard проверки ролей, глобально
             useClass: RolesGuard,
         },
     ],
