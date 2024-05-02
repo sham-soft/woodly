@@ -25,6 +25,13 @@ export enum PURCHASE_STATUSES {
     Successful,
 }
 
+export enum ROLES {
+    Admin = 1,
+    Operator,
+    Trader,
+    Merchant,
+}
+
 export const jwtConstants = {
     secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };

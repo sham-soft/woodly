@@ -9,6 +9,10 @@ export class UsersService {
         @InjectModel('users') private userModel: Model<User>,
     ) {}
 
+    async getAllUsers(): Promise<User[]> {
+        return await this.userModel.find();
+    }
+
     async getUser(name: string) {
         const data = await this.userModel.findOne({ name });
 

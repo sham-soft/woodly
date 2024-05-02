@@ -3,31 +3,38 @@ import {
     Get,
     Post,
     Body,
-    HttpCode,
-    HttpStatus,
-    UseGuards,
+    Request,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { AuthGuard } from './auth.guard';
-import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
+import { AuthService } from './auth.service';
+import { User } from '../users/schemas/user.schema';
+import { AccessToken } from './types/auth.type';
+import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @ApiOperation({ summary: 'Авторизация' })
-    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary: 'Авторизация',
+        description: `
+            - Аккаунт админа - [Roma, 123]
+            - Аккаунт оператора - [Shamil, 123]
+            - Аккаунт трейдера - [Dima, 123]
+            - Аккаунт мерчанта - [Sasha, 123]
+        `,
+    })
+    @Public()
     @Post()
-    signIn(@Body() signInDto: SignInDto) {
-        return this.authService.signIn(signInDto.username, signInDto.password);
+    signIn(@Body() signInDto: SignInDto): Promise<AccessToken> {
+        return this.authService.signIn(signInDto);
     }
 
-    @ApiOperation({ summary: 'Получение данных пользователя' })
-    @UseGuards(AuthGuard)
-    @Get('user')
-    getUser(): string {
-        return 'asdasd';
+    @ApiOperation({ summary: 'Получение данных профиля' })
+    @Get('profile')
+    getUser(@Request() req: any): Promise<User> {
+        return req.user;
     }
 }
