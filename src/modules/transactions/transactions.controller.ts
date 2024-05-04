@@ -17,6 +17,7 @@ import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { TransactionExportQueryDto } from './dto/transaction-export.dto';
 import { Transaction } from './schemas/transaction.schema';
+import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('Transactions')
 @Controller('transactions')
@@ -33,6 +34,7 @@ export class TransactionsController {
         summary: 'Создание сделки и получение реквизитов оплаты (для лендинга)',
         description: 'bankType можно не передавать, если передано поле isSbp',
     })
+    @Public()
     @Post('create/')
     createTransaction(@Body() transactionDto: TransactionCreateDto): Promise<Transaction | string> {
         return this.transactionsService.createTransaction(transactionDto);
@@ -55,12 +57,14 @@ export class TransactionsController {
         summary: 'Подтверждение сделки чат-ботом (для чат-бота)',
         description: 'Отправление данных чат-ботом в сервис, после получения платежа на телефон',
     })
+    @Public()
     @Patch('make/')
     makeTransaction(@Body() transactionDto: TransactionMakeDto): Promise<string> {
         return this.transactionsService.makeTransaction(transactionDto);
     }
 
     @ApiOperation({ summary: 'Проверка статуса сделки (для лендинга)' })
+    @Public()
     @Get('confirm/:id')
     confirmTransaction(@Param('id') id: string): Promise<string> {
         return this.transactionsService.confirmTransaction(id);
