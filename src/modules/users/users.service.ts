@@ -63,4 +63,12 @@ export class UsersService {
 
         return user;
     }
+
+    async deleteUser(id: number): Promise<void> {
+        const result = await this.userModel.deleteOne({ userId: id });
+
+        if (!result.deletedCount) {
+            throw new BadRequestException('Пользователя с таким id не существует');
+        }
+    }
 }

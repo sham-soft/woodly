@@ -2,8 +2,11 @@ import {
     Controller,
     Get,
     Query,
+    Param,
     Post,
     Body,
+    Patch,
+    Delete,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UserQueryDto } from './dto/user.dto';
@@ -54,8 +57,15 @@ export class UsersController {
 
     @ApiOperation({ summary: 'Редактирование пользователя' })
     @RequireRoles(ROLES.Admin)
-    @Post('edit/')
+    @Patch('edit/')
     editUser(@Body() userDto: UserEditDto): Promise<User> {
         return this.usersService.editUser(userDto);
+    }
+
+    @ApiOperation({ summary: 'Удаление пользователя' })
+    @RequireRoles(ROLES.Admin)
+    @Delete('delete/:id')
+    deleteUser(@Param('id') id: number): Promise<void> {
+        return this.usersService.deleteUser(id);
     }
 }
