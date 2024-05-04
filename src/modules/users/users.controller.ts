@@ -28,6 +28,12 @@ export class UsersController {
     @ApiOperation({
         summary: 'Создание пользователя',
         description: `
+            Значения для role:
+            - admin
+            - operator
+            - trader
+            - merchant
+
             Значения для permissions:
             - cards - Мои карты;
             - cashboxes - Кассы;
