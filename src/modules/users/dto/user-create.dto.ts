@@ -1,5 +1,6 @@
-import { IsString, IsArray, IsEmail, Length, IsIn } from 'class-validator';
-import { ROLES } from '../../../helpers/constants';
+import { IsString, IsEmail, Length, IsIn } from 'class-validator';
+import { IsInArray } from '../../../validations/is-in-array.validation';
+import { ROLES, PERMISSIONS } from '../../../helpers/constants';
 
 export class UserCreateDto {
     @IsString()
@@ -19,6 +20,6 @@ export class UserCreateDto {
     @IsIn(Object.values(ROLES))
     role: string;
 
-    @IsArray()
+    @IsInArray(Object.values(PERMISSIONS))
     permissions: string[];
 }
