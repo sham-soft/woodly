@@ -1,8 +1,9 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserQueryDto } from './dto/user.dto';
 import { UserCreateDto } from './dto/user-create.dto';
+import { UserEditDto } from './dto/user-edit.dto';
 import { User } from './schemas/user.schema';
 import { createId } from '../../helpers/unique';
 import { getPagination } from '../../helpers/filters';
@@ -45,5 +46,21 @@ export class UsersService {
         newUser.save();
 
         return newUser;
+    }
+
+    async editUser(params: UserEditDto): Promise<User> {
+        const { userId, ...restParams } = params;
+
+        const user = await this.userModel.findOneAndUpdate(
+            { userId: userId },
+            { $set: restParams }, 
+            { new: true }
+        );
+
+        if (!user) {
+            throw new BadRequestException('Пользователя с таким id не существует');
+        }
+
+        return user;
     }
 }

@@ -8,6 +8,7 @@ import {
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UserQueryDto } from './dto/user.dto';
 import { UserCreateDto } from './dto/user-create.dto';
+import { UserEditDto } from './dto/user-edit.dto';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
 import { RequireRoles } from '../../decorators/roles.decorator';
@@ -49,5 +50,12 @@ export class UsersController {
     @Post('create/')
     createUser(@Body() userDto: UserCreateDto): Promise<User> {
         return this.usersService.createUser(userDto);
+    }
+
+    @ApiOperation({ summary: 'Редактирование пользователя' })
+    @RequireRoles(ROLES.Admin)
+    @Post('edit/')
+    editUser(@Body() userDto: UserEditDto): Promise<User> {
+        return this.usersService.editUser(userDto);
     }
 }
