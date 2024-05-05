@@ -27,7 +27,7 @@ export class GetTransactionsService {
             skip = (query.page - 1) * 50;
         }
 
-        switch (query.status) {
+        switch (Number(query.status)) {
             case BALANCE_STATUSES.Deposit:
                 transactions = await this.getTronscanTransactions(skip, limit);
                 break;
