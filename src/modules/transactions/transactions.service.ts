@@ -2,16 +2,18 @@ import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { StreamableFile } from '@nestjs/common';
-import { TRANSACTION_STATUSES } from '../../helpers/constants';
+import { TransactionQueryDto } from './dto/transaction.dto';
+import { TransactionEditDto } from './dto/transaction-edit.dto';
+import { TransactionMakeDto } from './dto/transaction-make.dto';
+import { TransactionCreateDto } from './dto/transaction-create.dto';
+import { TransactionExportQueryDto } from './dto/transaction-export.dto';
+import { Transaction } from './schemas/transaction.schema';
 import { MakeTransactionService } from './services/make-transaction.service';
 import { CreateTransactionService } from './services/create-transaction.service';
 import { ExportTransactionService } from './services/export-transaction.service';
-import { TransactionQueryDto } from './dto/transaction.dto';
-import { TransactionCreateDto } from './dto/transaction-create.dto';
-import { TransactionEditDto } from './dto/transaction-edit.dto';
-import { TransactionMakeDto } from './dto/transaction-make.dto';
-import { TransactionExportQueryDto } from './dto/transaction-export.dto';
-import { Transaction } from './schemas/transaction.schema';
+import { getPagination } from '../../helpers/pagination';
+import { TRANSACTION_STATUSES } from '../../helpers/constants';
+import { getFilters, FilterRules } from '../../helpers/filters';
 
 @Injectable()
 export class TransactionsService {
@@ -23,56 +25,27 @@ export class TransactionsService {
     ) {}
 
     async getTransactions(query: TransactionQueryDto) {
-        const limit = 50;
-        let skip = 0;
+        const pagination = getPagination(query.page);
 
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
-
-        type filtersType = {
-            status?: number,
-            $expr?: any,
-            $or?: any,
-        }
-        const filters: filtersType = {};
-
-        if (query.status) {
-            filters.status = query.status;
-        }
-
-        if (query.transactionId) {
-            filters.$expr = {
-                $regexMatch: {
-                   input: { $toString: '$transactionId' }, 
-                   regex: query.transactionId,
-                },
-            };
-        }
-
-        if (query.cardNumberAndTitle) {
-            filters.$or = [
-                { title: { $regex: query.cardNumberAndTitle } },
-                { cardNumber: { $regex: query.cardNumberAndTitle } },
-            ];
-        }
-
-        if (query.amount) {
-            filters.$expr = {
-                $regexMatch: {
-                   input: { $toString: '$amount' }, 
-                   regex: query.amount,
-                },
-            };
-        }
+        const filters = getFilters(query, {
+            transactionId: FilterRules.REGEX_INTEGER,
+            status: FilterRules.EQUAL,
+            title: FilterRules.REGEX_STRING_OR,
+            cardNumber: FilterRules.REGEX_STRING_OR,
+            amount: FilterRules.REGEX_INTEGER,
+            orderNumber: FilterRules.REGEX_INTEGER,
+            clientNumber: FilterRules.REGEX_STRING,
+            cashbox: FilterRules.EQUAL,
+            dateEnd: FilterRules.CREATE_LT,
+        });
 
         const countTransactions = await this.transactionModel.countDocuments(filters);
-        const data = await this.transactionModel.find(filters).skip(skip).limit(limit);
+        const data = await this.transactionModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
             total: countTransactions,
-            page: query.page || 1,
-            limit: 50,
+            page: pagination.page,
+            limit: pagination.limit,
             transactions: data,
         };
     }

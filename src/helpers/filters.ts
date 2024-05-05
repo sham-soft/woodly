@@ -1,31 +1,11 @@
-interface PaginationType {
-    limit: number,
-    skip: number,
-    page: number,
-}
-
 export enum FilterRules {
     EQUAL = 'equal',
     EQUAL_LIST = 'equalList',
     REGEX_STRING = 'regexString',
     REGEX_STRING_OR = 'regexStringOr',
     REGEX_INTEGER = 'regexInteger',
-}
-
-export function getPagination(page: number): PaginationType {
-    const limit = 50;
-    let skip = 0;
-    page = Number(page);
-
-    if (page > 1) {
-        skip = (page - 1) * limit;
-    }
-
-    return {
-        limit,
-        skip,
-        page: page || 1,
-    };
+    CREATE_GT = 'createGt',
+    CREATE_LT = 'createLt',
 }
 
 export function getFilters(query: object, options: object): object {
@@ -67,6 +47,22 @@ export function getFilters(query: object, options: object): object {
                         regex: value,
                     },
                 });
+                break;
+
+            case FilterRules.CREATE_GT:
+                if (!filters.dateCreate) {
+                    filters.dateCreate = {};
+                }
+
+                filters.dateCreate.$gt = value;
+                break;
+
+            case FilterRules.CREATE_LT:
+                if (!filters.dateCreate) {
+                    filters.dateCreate = {};
+                }
+
+                filters.dateCreate.$lt = value;
                 break;
         }
     }

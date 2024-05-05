@@ -1,12 +1,13 @@
 import { Model } from 'mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Config } from '../../configs/schemas/config.schema';
+import { TransactionCreateDto } from '../dto/transaction-create.dto';
 import { Card } from '../../cards/schemas/card.schema';
+import { Transaction } from '../schemas/transaction.schema';
+import { Config } from '../../configs/schemas/config.schema';
+import { createId } from '../../../helpers/unique';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../../helpers/constants';
 import { getСurrentDateToString, convertDateToString } from '../../../helpers/date';
-import { TransactionCreateDto } from '../dto/transaction-create.dto';
-import { Transaction } from '../schemas/transaction.schema';
 
 @Injectable()
 export class CreateTransactionService {
@@ -22,11 +23,14 @@ export class CreateTransactionService {
         const card = await this.getCard(params);
 
         if (card) {
-            const newTransactionId = await this.createNewId();
+            const newTransactionId = await createId(this.transactionModel, 'transactionId');
 
             const payload = {
                 transactionId: newTransactionId,
                 amount: params.amount,
+                orderNumber: params.orderNumber,
+                cashbox: params.cashbox,
+                clientNumber: params.clientNumber,
                 status: TRANSACTION_STATUSES.Active,
                 dateCreate: getСurrentDateToString(),
                 dateClose: this.getDateClose(),
@@ -55,13 +59,6 @@ export class CreateTransactionService {
         if (config?.value === 'false') {
             throw new BadRequestException('На данный момент сделки отключены');
         }
-    }
-
-    private async createNewId(): Promise<number> {
-        const sortTransactions = await this.transactionModel.find().sort({ transactionId: -1 }).limit(1);
-        const lastTransactionId = sortTransactions[0]?.transactionId || 0;
-
-        return lastTransactionId + 1;
     }
 
     private getDateClose(): string {

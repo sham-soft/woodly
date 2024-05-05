@@ -7,10 +7,11 @@ import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
 import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { Purchase } from './schemas/purchase.schema';
 import { ExportPurchasesService } from './services/export-purchases.service';
-import { PURCHASE_STATUSES } from '../../helpers/constants';
-import { getСurrentDateToString } from '../../helpers/date';
-import { getPagination, getFilters, FilterRules } from '../../helpers/filters';
+import { getPagination } from '../../helpers/pagination';
 import { getSumWithPercent } from '../../helpers/numbers';
+import { getСurrentDateToString } from '../../helpers/date';
+import { PURCHASE_STATUSES } from '../../helpers/constants';
+import { getFilters, FilterRules } from '../../helpers/filters';
 
 @Injectable()
 export class PurchasesService {

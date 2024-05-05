@@ -1,6 +1,10 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumberString } from 'class-validator';
 
 export class TransactionExportQueryDto {
+    @IsNumberString()
+    @IsOptional()
+    cashbox?: number;
+
     @IsString()
     @IsNotEmpty()
     dateStart: string;
@@ -8,4 +12,8 @@ export class TransactionExportQueryDto {
     @IsString()
     @IsNotEmpty()
     dateEnd: string;
+
+    @IsNumberString()
+    @IsOptional()
+    status?: number;
 }

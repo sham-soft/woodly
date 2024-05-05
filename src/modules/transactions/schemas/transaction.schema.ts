@@ -50,7 +50,17 @@ export class Transaction {
 
     @Prop()
     message: string;
+
+    @Prop()
+    orderNumber: number;
+
+    @Prop()
+    cashbox: number;
+
+    @Prop()
+    clientNumber: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
+TransactionSchema.index({ transactionId: 1 }, { unique : true });
 // TransactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 });

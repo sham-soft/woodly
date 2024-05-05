@@ -1,6 +1,15 @@
-import { IsBoolean, IsOptional, ValidateIf, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsBoolean, IsOptional, ValidateIf, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class TransactionCreateDto {
+    @IsNumber()
+    orderNumber: number;
+
+    @IsNumber()
+    cashbox: number;
+
+    @IsString()
+    clientNumber: string;
+
     @IsBoolean()
     @IsOptional()
     isSbp?: boolean;

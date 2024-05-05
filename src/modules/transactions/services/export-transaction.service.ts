@@ -5,6 +5,7 @@ import { StreamableFile } from '@nestjs/common';
 import { utils, write } from 'xlsx';
 import { TransactionExportQueryDto } from '../dto/transaction-export.dto';
 import { Transaction } from '../schemas/transaction.schema';
+import { getFilters, FilterRules } from '../../../helpers/filters';
 
 @Injectable()
 export class ExportTransactionService {
@@ -13,12 +14,12 @@ export class ExportTransactionService {
     ) {}
 
     async getTransactionsExport(query: TransactionExportQueryDto): Promise<StreamableFile> {
-        const filters = {
-            dateCreate: {
-                $gt : query.dateStart,
-                $lt : query.dateEnd,
-            },
-        };
+        const filters = getFilters(query, {
+            cashbox: FilterRules.EQUAL,
+            dateStart: FilterRules.CREATE_GT,
+            dateEnd: FilterRules.CREATE_LT,
+            status: FilterRules.EQUAL,
+        });
 
         const transactions = await this.transactionModel.find(filters);
         

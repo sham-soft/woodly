@@ -6,7 +6,7 @@ import { UserCreateDto } from './dto/user-create.dto';
 import { UserEditDto } from './dto/user-edit.dto';
 import { User } from './schemas/user.schema';
 import { createId } from '../../helpers/unique';
-import { getPagination } from '../../helpers/filters';
+import { getPagination } from '../../helpers/pagination';
 
 @Injectable()
 export class UsersService {
