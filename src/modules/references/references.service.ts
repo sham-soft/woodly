@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
-import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Reference } from './schemas/reference.schema';
 
 @Injectable()

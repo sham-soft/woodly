@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
@@ -9,14 +10,13 @@ import {
     Body,
 } from '@nestjs/common';
 import { StreamableFile } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
+import { Transaction } from './schemas/transaction.schema';
 import { TransactionQueryDto } from './dto/transaction.dto';
-import { TransactionCreateDto } from './dto/transaction-create.dto';
-import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { TransactionExportQueryDto } from './dto/transaction-export.dto';
-import { Transaction } from './schemas/transaction.schema';
+import { TransactionEditDto } from './dto/transaction-edit.dto';
+import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('Transactions')
@@ -26,7 +26,7 @@ export class TransactionsController {
 
     @ApiOperation({ summary: 'Получение списка сделок' })
     @Get()
-    getTransactions(@Query() transactionQuery: TransactionQueryDto) {
+    getTransactions(@Query() transactionQuery: TransactionQueryDto): Promise<any> {
         return this.transactionsService.getTransactions(transactionQuery);
     }
     

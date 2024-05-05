@@ -1,7 +1,7 @@
 import { registerDecorator } from 'class-validator';
 
 export function IsInArray(allowValues: string[]) {
-    return function(object: object, propertyName: string) {
+    return function(object: object, propertyName: string): void {
         registerDecorator({
             name: 'isInArray',
             target: object.constructor,

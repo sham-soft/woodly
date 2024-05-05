@@ -1,14 +1,14 @@
 import { Model } from 'mongoose';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { Cron, CronExpression  } from '@nestjs/schedule';
+import { Transaction } from '../transactions/schemas/transaction.schema';
+import { ConfigDto } from '../configs/dto/config.dto';
+import { ConfigsService } from '../configs/configs.service';
+import { Card } from '../cards/schemas/card.schema';
 import { getСurrentDateToString } from '../../helpers/date';
 import { TRANSACTION_STATUSES } from '../../helpers/constants';
-import { Card } from '../cards/schemas/card.schema';
-import { Transaction } from '../transactions/schemas/transaction.schema';
-import { ConfigsService } from '../configs/configs.service';
-import { ConfigDto } from '../configs/dto/config.dto';
 
 @Injectable()
 export class JobsService {
@@ -20,7 +20,7 @@ export class JobsService {
     ) {}
 
     @Cron('0 */4 * * * *')
-    async updateActiveTransactions() {        
+    async updateActiveTransactions(): Promise<void> {        
         const filters = {
             status: TRANSACTION_STATUSES.Active,
             dateClose: { $lt: getСurrentDateToString() },
@@ -31,13 +31,13 @@ export class JobsService {
     }
 
     @Cron(CronExpression.EVERY_DAY_AT_1AM)
-    async updateTurnoverCards() {                
+    async updateTurnoverCards(): Promise<void> {                
         await this.cardModel.updateMany({ $set: { turnoverPaymentsPerDay: 0, turnoverTransactionsPerDay: 0 } });
         console.log('Called updateTurnoverCards every day');
     }
 
     @Cron(CronExpression.EVERY_10_MINUTES)
-    async updateRubleRate() {                
+    async updateRubleRate(): Promise<void> {                
         const body = {
             tokenId: 'USDT',
             currencyId: 'RUB',

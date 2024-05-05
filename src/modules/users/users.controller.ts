@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
@@ -8,14 +9,13 @@ import {
     Patch,
     Delete,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { UserQueryDto } from './dto/user.dto';
-import { UserCreateDto } from './dto/user-create.dto';
-import { UserEditDto } from './dto/user-edit.dto';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
-import { RequireRoles } from '../../decorators/roles.decorator';
+import { UserQueryDto } from './dto/user.dto';
+import { UserEditDto } from './dto/user-edit.dto';
+import { UserCreateDto } from './dto/user-create.dto';
 import { ROLES } from '../../helpers/constants';
+import { RequireRoles } from '../../decorators/roles.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -25,7 +25,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Получение списка всех пользователей' })
     @RequireRoles(ROLES.Admin)
     @Get()
-    getAllUsers(@Query() query: UserQueryDto) {
+    getAllUsers(@Query() query: UserQueryDto): Promise<any> {
         return this.usersService.getAllUsers(query);
     }
 

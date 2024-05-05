@@ -1,11 +1,11 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
     Param,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { ReferencesService } from './references.service';
 import { Reference } from './schemas/reference.schema';
+import { ReferencesService } from './references.service';
 
 @ApiTags('References')
 @Controller('references')

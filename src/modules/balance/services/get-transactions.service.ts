@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
 import { ConfigsService } from '../../configs/configs.service';
@@ -17,7 +17,7 @@ export class GetTransactionsService {
         private readonly configsService: ConfigsService,
     ) {}
 
-    async getTransactions(query: BalanceTransactionsQueryDto) {
+    async getTransactions(query: BalanceTransactionsQueryDto): Promise<any> {
         let transactions = [];
 
         let limit = 50;

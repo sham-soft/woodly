@@ -1,9 +1,9 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
     Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { MessagesService } from './messages.service';
 import { MessageQueryDto } from './dto/message.dto';
 
@@ -14,7 +14,7 @@ export class MessagesController {
 
     @ApiOperation({ summary: 'Получение списка общих смс по карте' })
     @Get()
-    getMessages(@Query() query: MessageQueryDto) {
+    getMessages(@Query() query: MessageQueryDto): Promise<any> {
         return this.messagesService.getMessages(query);
     }
 }

@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
@@ -5,10 +6,9 @@ import {
     Patch,
     Body,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { ConfigsService } from './configs.service';
-import { ConfigDto } from './dto/config.dto';
 import { Config } from './schemas/config.schema';
+import { ConfigDto } from './dto/config.dto';
+import { ConfigsService } from './configs.service';
 
 @ApiTags('Configs')
 @Controller('configs')

@@ -1,15 +1,15 @@
+import { utils, write } from 'xlsx';
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable } from '@nestjs/common';
 import { StreamableFile } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { utils, write } from 'xlsx';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
 import { ConfigsService } from '../../configs/configs.service';
 import { convertDateToString } from '../../../helpers/date';
 import { TRANSACTION_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
-import type { BalanceExportQueryDto } from '../dto/balance-export.dto';
 import type { BalanceTransaction } from '../types/balance-transaction.type';
+import type { BalanceExportQueryDto } from '../dto/balance-export.dto';
 
 @Injectable()
 export class ExportTransactionsService {
@@ -31,15 +31,13 @@ export class ExportTransactionsService {
 
         const headers = ['ID платежа', 'Тип операции', 'Сумма', 'Валюта', 'Курс'];
 
-        const values = sortedTransactions.map((item) => {
-            return [
-                item.transactionId,
-                item.status,
-                item.amount,
-                'Рубль',
-                rate,
-            ];
-        });
+        const values = sortedTransactions.map((item) => [
+            item.transactionId,
+            item.status,
+            item.amount,
+            'Рубль',
+            rate,
+        ]);
 
         const ws = utils.aoa_to_sheet([headers, ...values]);
         ws['!cols'] = [ { wch: 70 }, { wch: 25 }, { wch: 20 }, { wch: 10 }, { wch: 10 } ]; 

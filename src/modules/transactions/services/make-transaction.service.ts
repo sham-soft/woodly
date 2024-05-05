@@ -1,14 +1,14 @@
 import { Model } from 'mongoose';
-import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { Transaction } from '../schemas/transaction.schema';
+import { TransactionMakeDto } from '../dto/transaction-make.dto';
+import { Message } from '../../messages/schemas/message.schema';
 import { Card } from '../../cards/schemas/card.schema';
 import { Autopayment } from '../../autopayments/schemas/autopayment.schema';
-import { Message } from '../../messages/schemas/message.schema';
-import { TRANSACTION_STATUSES } from '../../../helpers/constants';
-import { getСurrentDateToString } from '../../../helpers/date';
 import { createId } from '../../../helpers/unique';
-import { TransactionMakeDto } from '../dto/transaction-make.dto';
-import { Transaction } from '../schemas/transaction.schema';
+import { getСurrentDateToString } from '../../../helpers/date';
+import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 
 @Injectable()
 export class MakeTransactionService {
@@ -47,7 +47,7 @@ export class MakeTransactionService {
         await this.createAutopayment(params);
     }
 
-    private async updateCardTurnover(transaction: Transaction) {
+    private async updateCardTurnover(transaction: Transaction): Promise<void> {
         const card = await this.cardModel.findOne({ cardId: transaction.cardId });
 
         const payload = {

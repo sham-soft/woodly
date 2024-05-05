@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
@@ -5,11 +6,10 @@ import {
     Body,
     Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { AccessToken } from './types/auth.type';
 import { SignInDto } from './dto/sign-in.dto';
 import { AuthService } from './auth.service';
 import { User } from '../users/schemas/user.schema';
-import { AccessToken } from './types/auth.type';
 import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('Auth')

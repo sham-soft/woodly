@@ -1,9 +1,9 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable } from '@nestjs/common';
+import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
-import { Cashbox } from './schemas/cashbox.schema';
 
 @Injectable()
 export class CashboxesService {
@@ -11,7 +11,7 @@ export class CashboxesService {
         @InjectModel('cashboxes') private cashboxModel: Model<Cashbox>,
     ) {}
 
-    async getCashboxes(query: CashboxQueryDto) {
+    async getCashboxes(query: CashboxQueryDto): Promise<any> {
         const limit = 50;
         let skip = 0;
 

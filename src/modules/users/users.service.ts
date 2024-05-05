@@ -1,10 +1,10 @@
 import { Model } from 'mongoose';
-import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserQueryDto } from './dto/user.dto';
-import { UserCreateDto } from './dto/user-create.dto';
-import { UserEditDto } from './dto/user-edit.dto';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { User } from './schemas/user.schema';
+import { UserQueryDto } from './dto/user.dto';
+import { UserEditDto } from './dto/user-edit.dto';
+import { UserCreateDto } from './dto/user-create.dto';
 import { createId } from '../../helpers/unique';
 import { getPagination } from '../../helpers/pagination';
 
@@ -14,7 +14,7 @@ export class UsersService {
         @InjectModel('users') private userModel: Model<User>,
     ) {}
 
-    async getAllUsers(query: UserQueryDto) {
+    async getAllUsers(query: UserQueryDto): Promise<any> {
         const pagination = getPagination(query.page); 
 
         const countUsers = await this.userModel.countDocuments();

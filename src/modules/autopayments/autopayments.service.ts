@@ -1,8 +1,8 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AutopaymentQueryDto } from './dto/autopayment.dto';
+import { Injectable } from '@nestjs/common';
 import { Autopayment } from './schemas/autopayment.schema';
+import { AutopaymentQueryDto } from './dto/autopayment.dto';
 
 @Injectable()
 export class AutopaymentsService {
@@ -10,7 +10,7 @@ export class AutopaymentsService {
         @InjectModel('autopayments') private autopaymentModel: Model<Autopayment>,
     ) {}
 
-    async getAutopayments(query: AutopaymentQueryDto) {
+    async getAutopayments(query: AutopaymentQueryDto): Promise<any> {
         const limit = 50;
         let skip = 0;
 

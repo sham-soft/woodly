@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
@@ -5,10 +6,9 @@ import {
     Query,
     StreamableFile,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { BalanceService } from './balance.service';
 import { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
 import { BalanceExportQueryDto } from './dto/balance-export.dto';
+import { BalanceService } from './balance.service';
 
 @ApiTags('Balance')
 @Controller('balance')
@@ -17,13 +17,13 @@ export class BalanceController {
 
     @ApiOperation({ summary: 'Получения баланса' })
     @Get()
-    getBalance() {
+    getBalance(): Promise<any> {
         return this.balanceService.getBalance();
     }
 
     @ApiOperation({ summary: 'Получения списка операций для раздела баланса' })
     @Get('transactions')
-    getTransactions(@Query() transactionQuery: BalanceTransactionsQueryDto) {
+    getTransactions(@Query() transactionQuery: BalanceTransactionsQueryDto): Promise<any> {
         return this.balanceService.getTransactions(transactionQuery);
     }
 

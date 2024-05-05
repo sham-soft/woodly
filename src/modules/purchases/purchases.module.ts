@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PurchasesService } from './purchases.service';
+import { Module } from '@nestjs/common';
 import { ExportPurchasesService } from './services/export-purchases.service';
-import { PurchasesController } from './purchases.controller';
 import { PurchaseSchema } from './schemas/purchase.schema';
+import { PurchasesService } from './purchases.service';
+import { PurchasesController } from './purchases.controller';
 
 @Module({
     imports: [MongooseModule.forFeature([

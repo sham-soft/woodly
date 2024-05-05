@@ -1,17 +1,17 @@
 import { Model } from 'mongoose';
-import { Injectable, StreamableFile } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, StreamableFile } from '@nestjs/common';
+import { ExportPurchasesService } from './services/export-purchases.service';
+import { Purchase } from './schemas/purchase.schema';
 import { PurchaseQueryDto } from './dto/purchase.dto';
+import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
-import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
-import { Purchase } from './schemas/purchase.schema';
-import { ExportPurchasesService } from './services/export-purchases.service';
 import { getPagination } from '../../helpers/pagination';
 import { getSumWithPercent } from '../../helpers/numbers';
+import { getFilters, FilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
 import { PURCHASE_STATUSES } from '../../helpers/constants';
-import { getFilters, FilterRules } from '../../helpers/filters';
 
 @Injectable()
 export class PurchasesService {
@@ -20,7 +20,7 @@ export class PurchasesService {
         private readonly exportPurchasesService: ExportPurchasesService,
     ) {}
 
-    async getPurchases(query: PurchaseQueryDto) {
+    async getPurchases(query: PurchaseQueryDto): Promise<any> {
         const pagination = getPagination(query.page); 
 
         const filters = getFilters(query, {

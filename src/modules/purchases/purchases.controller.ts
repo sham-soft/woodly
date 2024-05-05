@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
@@ -8,13 +9,12 @@ import {
     Patch,
     StreamableFile,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Purchase } from './schemas/purchase.schema';
 import { PurchasesService } from './purchases.service';
 import { PurchaseQueryDto } from './dto/purchase.dto';
+import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
-import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
-import { Purchase } from './schemas/purchase.schema';
 
 @ApiTags('Purchases')
 @Controller('purchases')
@@ -23,7 +23,7 @@ export class PurchasesController {
 
     @ApiOperation({ summary: 'Получение списка выплат' })
     @Get()
-    getPurchases(@Query() query: PurchaseQueryDto) {
+    getPurchases(@Query() query: PurchaseQueryDto): Promise<any> {
         return this.purchasesService.getPurchases(query);
     }
 

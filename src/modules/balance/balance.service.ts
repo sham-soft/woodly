@@ -1,6 +1,6 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { GetBalanceService } from './services/get-balance.service';
 import { GetTransactionsService } from './services/get-transactions.service';
+import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
 import type { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
 import type { BalanceExportQueryDto } from './dto/balance-export.dto';
@@ -13,11 +13,11 @@ export class BalanceService {
         private readonly exportTransactionsService: ExportTransactionsService,
     ) {}
 
-    async getBalance() {
+    async getBalance(): Promise<any> {
         return this.getBalanceService.getBalance();
     }
 
-    async getTransactions(query: BalanceTransactionsQueryDto) {
+    async getTransactions(query: BalanceTransactionsQueryDto): Promise<any> {
         return this.getTransactionsService.getTransactions(query);
     }
 

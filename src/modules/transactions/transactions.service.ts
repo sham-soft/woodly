@@ -1,19 +1,19 @@
 import { Model } from 'mongoose';
-import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { StreamableFile } from '@nestjs/common';
-import { TransactionQueryDto } from './dto/transaction.dto';
-import { TransactionEditDto } from './dto/transaction-edit.dto';
-import { TransactionMakeDto } from './dto/transaction-make.dto';
-import { TransactionCreateDto } from './dto/transaction-create.dto';
-import { TransactionExportQueryDto } from './dto/transaction-export.dto';
-import { Transaction } from './schemas/transaction.schema';
 import { MakeTransactionService } from './services/make-transaction.service';
-import { CreateTransactionService } from './services/create-transaction.service';
 import { ExportTransactionService } from './services/export-transaction.service';
+import { CreateTransactionService } from './services/create-transaction.service';
+import { Transaction } from './schemas/transaction.schema';
+import { TransactionQueryDto } from './dto/transaction.dto';
+import { TransactionMakeDto } from './dto/transaction-make.dto';
+import { TransactionExportQueryDto } from './dto/transaction-export.dto';
+import { TransactionEditDto } from './dto/transaction-edit.dto';
+import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { getPagination } from '../../helpers/pagination';
-import { TRANSACTION_STATUSES } from '../../helpers/constants';
 import { getFilters, FilterRules } from '../../helpers/filters';
+import { TRANSACTION_STATUSES } from '../../helpers/constants';
 
 @Injectable()
 export class TransactionsService {
@@ -24,7 +24,7 @@ export class TransactionsService {
         private readonly exportTransactionService: ExportTransactionService,
     ) {}
 
-    async getTransactions(query: TransactionQueryDto) {
+    async getTransactions(query: TransactionQueryDto): Promise<any> {
         const pagination = getPagination(query.page);
 
         const filters = getFilters(query, {
@@ -82,7 +82,7 @@ export class TransactionsService {
     }
 
     async makeTransaction(params: TransactionMakeDto): Promise<string> {
-       return this.makeTransactionService.makeTransaction(params);
+        return this.makeTransactionService.makeTransaction(params);
     }
 
     async confirmTransaction(id: string): Promise<string> {

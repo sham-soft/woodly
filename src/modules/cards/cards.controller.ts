@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
@@ -7,15 +8,14 @@ import {
     Body,
     Patch,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { CardsService } from './cards.service';
-import { CardQueryDto } from './dto/card.dto';
-import { CardCreateDto } from './dto/card-create.dto';
-import { CardEditDto } from './dto/card-edit.dto';
-import { CardSetLimitDto } from './dto/card-set-limit.dto';
-import { CardChangeStatusDto } from './dto/card-change-status.dto';
-import { CardTransactionsQueryDto } from './dto/card-transactions.dto';
 import { Card } from './schemas/card.schema';
+import { CardQueryDto } from './dto/card.dto';
+import { CardTransactionsQueryDto } from './dto/card-transactions.dto';
+import { CardSetLimitDto } from './dto/card-set-limit.dto';
+import { CardEditDto } from './dto/card-edit.dto';
+import { CardCreateDto } from './dto/card-create.dto';
+import { CardChangeStatusDto } from './dto/card-change-status.dto';
+import { CardsService } from './cards.service';
 
 @ApiTags('Cards')
 @Controller('cards')
@@ -24,7 +24,7 @@ export class CardsController {
 
     @ApiOperation({ summary: 'Получение списка карт' })
     @Get()
-    getCards(@Query() cardQuery: CardQueryDto) {
+    getCards(@Query() cardQuery: CardQueryDto): Promise<any> {
         return this.cardsService.getCards(cardQuery);
     }
     
@@ -62,7 +62,7 @@ export class CardsController {
 
     @ApiOperation({ summary: 'Получение сделок по определенной карте' })
     @Get(':id/transactions/')
-    getCardTransactions(@Param('id') id: number, @Query() cardQuery: CardTransactionsQueryDto) {
+    getCardTransactions(@Param('id') id: number, @Query() cardQuery: CardTransactionsQueryDto): Promise<any> {
         return this.cardsService.getCardTransactions(id, cardQuery);
     }
 }

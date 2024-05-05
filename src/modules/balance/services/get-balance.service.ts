@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
 import { ConfigsService } from '../../configs/configs.service';
@@ -15,7 +15,7 @@ export class GetBalanceService {
         private readonly configsService: ConfigsService,
     ) {}
 
-    async getBalance() {
+    async getBalance(): Promise<any> {
         const balanceData = await Promise.all([
             this.getWallet(),
             this.getRates(),
@@ -39,7 +39,7 @@ export class GetBalanceService {
         };
     }
 
-    private async getWallet() {
+    private async getWallet(): Promise<any> {
         const params = {
             address: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
             token: 'Tether USD',
@@ -49,7 +49,7 @@ export class GetBalanceService {
         return wallet.data.data[0];
     }
 
-    private async getRates() {
+    private async getRates(): Promise<any> {
         const config = await this.configsService.getConfigs('RUBLE_RATE');
         const rate = Number(config);
         const rateWithPercent = getSumWithPercent(2.5, rate);
@@ -63,8 +63,6 @@ export class GetBalanceService {
     private async getAmountActiveTransactions(): Promise<number> {
         const data = await this.transactionModel.find({ status: TRANSACTION_STATUSES.Active });
 
-        return data.reduce((prev, item) => {
-            return prev + item.amount;
-        }, 0);
+        return data.reduce((prev, item) => prev + item.amount, 0);
     }
 }

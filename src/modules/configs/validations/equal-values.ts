@@ -1,7 +1,7 @@
 import { registerDecorator, ValidationArguments } from 'class-validator';
 
 export function EqualValues() {
-    return function(object: object, propertyName: string) {
+    return function(object: object, propertyName: string): void {
         registerDecorator({
             name: 'equalValues',
             target: object.constructor,

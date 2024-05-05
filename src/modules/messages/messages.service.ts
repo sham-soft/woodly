@@ -1,8 +1,8 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { MessageQueryDto } from './dto/message.dto';
+import { Injectable } from '@nestjs/common';
 import { Message } from './schemas/message.schema';
+import { MessageQueryDto } from './dto/message.dto';
 
 @Injectable()
 export class MessagesService {
@@ -10,7 +10,7 @@ export class MessagesService {
         @InjectModel('messages') private messageModel: Model<Message>,
     ) {}
 
-    async getMessages(query: MessageQueryDto) {
+    async getMessages(query: MessageQueryDto): Promise<any> {
         const limit = 50;
         let skip = 0;
 

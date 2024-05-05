@@ -1,11 +1,11 @@
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
     Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { AutopaymentsService } from './autopayments.service';
 import { AutopaymentQueryDto } from './dto/autopayment.dto';
+import { AutopaymentsService } from './autopayments.service';
 
 @ApiTags('Autopayments')
 @Controller('autopayments')
@@ -14,7 +14,7 @@ export class AutopaymentsController {
 
     @ApiOperation({ summary: 'Получение списка автоплатежей карты' })
     @Get()
-    getAutopayments(@Query() query: AutopaymentQueryDto) {
+    getAutopayments(@Query() query: AutopaymentQueryDto): Promise<any> {
         return this.autopaymentsService.getAutopayments(query);
     }
 }
