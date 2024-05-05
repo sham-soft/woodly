@@ -1,4 +1,5 @@
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
     Controller,
     Get,
@@ -8,13 +9,20 @@ import {
     Body,
     Patch,
     StreamableFile,
+    UseInterceptors,
+    UploadedFile,
+    ParseFilePipe,
+    MaxFileSizeValidator,
+    FileTypeValidator,
 } from '@nestjs/common';
 import { Purchase } from './schemas/purchase.schema';
 import { PurchasesService } from './purchases.service';
 import { PurchaseQueryDto } from './dto/purchase.dto';
+import { PurchaseUploadDto } from './dto/purchase-upload.dto';
 import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
+import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('Purchases')
 @Controller('purchases')
@@ -51,5 +59,21 @@ export class PurchasesController {
     @Header('Content-Disposition', 'attachment; filename="Purchases.xlsx"')
     getPurchasesExport(@Query() purchaseQuery: PurchaseExportQueryDto): Promise<StreamableFile> {
         return this.purchasesService.getPurchasesExport(purchaseQuery);
+    }
+
+    @ApiOperation({ summary: 'Прикрепление чека' })
+    @Public() // TODO - убрать публичный доступ
+    @ApiConsumes('multipart/form-data')
+    @Post('upload/')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadFile(@Body() data: PurchaseUploadDto, @UploadedFile(
+        new ParseFilePipe({
+            validators: [
+                new MaxFileSizeValidator({ maxSize: 1000000 }),
+                new FileTypeValidator({ fileType: new RegExp('.jpeg|.png') }),
+            ],
+        }),
+    ) file: Express.Multer.File): Promise<void> {
+        return this.purchasesService.uploadFile(data.purchaseId, file);
     }
 }

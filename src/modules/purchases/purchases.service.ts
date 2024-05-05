@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { Injectable, StreamableFile, BadRequestException } from '@nestjs/common';
 import { ExportPurchasesService } from './services/export-purchases.service';
 import { Purchase } from './schemas/purchase.schema';
 import { PurchaseQueryDto } from './dto/purchase.dto';
@@ -84,5 +84,23 @@ export class PurchasesService {
 
     async getPurchasesExport(query: PurchaseExportQueryDto): Promise<StreamableFile> {
         return this.exportPurchasesService.getPurchasesExport(query);
+    }
+
+    async uploadFile(purchaseId: number, file: Express.Multer.File): Promise<void> {
+        console.log(file);
+
+        const payload = {
+            receipt: 'https://s8.hostingkartinok.com/uploads/images/2015/10/b38ff4bc9f2809eb2cbb00981e00d57e.jpeg',
+        };
+
+        const purchase = await this.purchaseModel.findOneAndUpdate(
+            { purchaseId: purchaseId },
+            { $set: payload }, 
+            { new: true }
+        );
+
+        if (!purchase) {
+            throw new BadRequestException('Выплаты с таким id не существует');
+        }
     }
 }

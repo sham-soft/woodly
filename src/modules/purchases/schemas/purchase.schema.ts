@@ -40,6 +40,9 @@ export class Purchase {
 
     @Prop()
     debit: number;
+
+    @Prop()
+    receipt: string;
 }
 
 export const PurchaseSchema = SchemaFactory.createForClass(Purchase);
