@@ -4,8 +4,10 @@ import { Injectable } from '@nestjs/common';
 import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
+import { CashboxChangeStatusDto } from './dto/cashbox-change-status.dto';
 import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
+import { CASHBOX_STATUSES } from '../../helpers/constants';
 import { ROLES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
 import type { CustomRequest } from '../../types/custom-request.type';
@@ -38,6 +40,7 @@ export class CashboxesService {
         const payload = {
             cashboxId: newCashboxId,
             creator: user.userId,
+            status: CASHBOX_STATUSES.Active,
             ...params,
         };
 
@@ -45,5 +48,13 @@ export class CashboxesService {
         newCashbox.save();
 
         return newCashbox;
+    }
+
+    changeStatusCard(params: CashboxChangeStatusDto): Promise<Cashbox> {
+        return this.cashboxModel.findOneAndUpdate(
+            { cashboxId: params.cashboxId },
+            { $set: { status: params.status } }, 
+            { new: true }
+        );
     }
 }

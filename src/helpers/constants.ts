@@ -25,6 +25,11 @@ export enum PURCHASE_STATUSES {
     Successful,
 }
 
+export enum CASHBOX_STATUSES {
+    Active = 1,
+    Inactive,
+}
+
 export enum ROLES {
     Admin = 'admin',
     Operator = 'operator',
