@@ -5,6 +5,7 @@ import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
 import { getPagination } from '../../helpers/pagination';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
 export class CashboxesService {
@@ -12,17 +13,17 @@ export class CashboxesService {
         @InjectModel('cashboxes') private cashboxModel: Model<Cashbox>,
     ) {}
 
-    async getCashboxes(query: CashboxQueryDto): Promise<any> {
+    async getCashboxes(query: CashboxQueryDto): Promise<PaginatedList<Cashbox>> {
         const pagination = getPagination(query.page);
 
-        const count = await this.cashboxModel.countDocuments();
+        const total = await this.cashboxModel.countDocuments();
         const data = await this.cashboxModel.find().skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: count,
             page: pagination.page,
             limit: pagination.limit,
-            cashboxes: data,
+            total,
+            data,
         };
     }
 

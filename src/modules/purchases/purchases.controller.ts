@@ -23,6 +23,7 @@ import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
 import { Public } from '../../decorators/public.decorator';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Purchases')
 @Controller('purchases')
@@ -31,7 +32,7 @@ export class PurchasesController {
 
     @ApiOperation({ summary: 'Получение списка выплат' })
     @Get()
-    getPurchases(@Query() query: PurchaseQueryDto): Promise<any> {
+    getPurchases(@Query() query: PurchaseQueryDto): Promise<PaginatedList<Purchase>> {
         return this.purchasesService.getPurchases(query);
     }
 

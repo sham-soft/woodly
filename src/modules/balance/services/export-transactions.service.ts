@@ -19,7 +19,7 @@ export class ExportTransactionsService {
         private readonly configsService: ConfigsService,
     ) {}
 
-    async getTransactionsExport(query: BalanceExportQueryDto): Promise<any> {
+    async getTransactionsExport(query: BalanceExportQueryDto): Promise<StreamableFile> {
         const rate = await this.configsService.getConfigs('RUBLE_RATE');
 
         const transactions = await Promise.all([

@@ -12,6 +12,7 @@ import { Transaction } from '../transactions/schemas/transaction.schema';
 import { getPagination } from '../../helpers/pagination';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
 export class CardsService {
@@ -20,7 +21,7 @@ export class CardsService {
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
     ) {}
 
-    async getCards(query: CardQueryDto): Promise<any> {
+    async getCards(query: CardQueryDto): Promise<PaginatedList<Card>> {
         const pagination = getPagination(query.page);
 
         const extraFilters = getQueryFilters(query, {
@@ -32,14 +33,14 @@ export class CardsService {
             ...extraFilters,
         };
 
-        const count = await this.cardModel.countDocuments(filters);
+        const total = await this.cardModel.countDocuments(filters);
         const data = await this.cardModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: count,
             page: pagination.page,
             limit: pagination.limit,
-            cards: data,
+            total,
+            data,
         };
     }
 
@@ -138,7 +139,7 @@ export class CardsService {
         );
     }
 
-    async getCardTransactions(cardId: number, query: CardTransactionsQueryDto): Promise<any> {
+    async getCardTransactions(cardId: number, query: CardTransactionsQueryDto): Promise<PaginatedList<Transaction>> {
         const pagination = getPagination(query.page);
 
         const filters = {
@@ -146,14 +147,14 @@ export class CardsService {
             status: TRANSACTION_STATUSES.Successful,
         };
 
-        const count = await this.transactionModel.countDocuments(filters);
+        const total = await this.transactionModel.countDocuments(filters);
         const data = await this.transactionModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: count,
             page: pagination.page,
             limit: pagination.limit,
-            transactions: data,
+            total,
+            data,
         };
     }
 }

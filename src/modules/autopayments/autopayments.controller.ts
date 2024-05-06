@@ -4,8 +4,10 @@ import {
     Get,
     Query,
 } from '@nestjs/common';
+import { Autopayment } from './schemas/autopayment.schema';
 import { AutopaymentQueryDto } from './dto/autopayment.dto';
 import { AutopaymentsService } from './autopayments.service';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Autopayments')
 @Controller('autopayments')
@@ -14,7 +16,7 @@ export class AutopaymentsController {
 
     @ApiOperation({ summary: 'Получение списка автоплатежей карты' })
     @Get()
-    getAutopayments(@Query() query: AutopaymentQueryDto): Promise<any> {
+    getAutopayments(@Query() query: AutopaymentQueryDto): Promise<PaginatedList<Autopayment>> {
         return this.autopaymentsService.getAutopayments(query);
     }
 }

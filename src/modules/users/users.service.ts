@@ -7,6 +7,7 @@ import { UserEditDto } from './dto/user-edit.dto';
 import { UserCreateDto } from './dto/user-create.dto';
 import { createId } from '../../helpers/unique';
 import { getPagination } from '../../helpers/pagination';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
 export class UsersService {
@@ -14,17 +15,17 @@ export class UsersService {
         @InjectModel('users') private userModel: Model<User>,
     ) {}
 
-    async getAllUsers(query: UserQueryDto): Promise<any> {
+    async getAllUsers(query: UserQueryDto): Promise<PaginatedList<User>> {
         const pagination = getPagination(query.page); 
 
-        const countUsers = await this.userModel.countDocuments();
+        const total = await this.userModel.countDocuments();
         const data = await this.userModel.find().skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countUsers,
             page: pagination.page,
             limit: pagination.limit,
-            users: data,
+            total,
+            data,
         };
     }
 

@@ -16,6 +16,8 @@ import { CardEditDto } from './dto/card-edit.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { CardsService } from './cards.service';
+import { Transaction } from '../transactions/schemas/transaction.schema';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Cards')
 @Controller('cards')
@@ -24,7 +26,7 @@ export class CardsController {
 
     @ApiOperation({ summary: 'Получение списка карт' })
     @Get()
-    getCards(@Query() cardQuery: CardQueryDto): Promise<any> {
+    getCards(@Query() cardQuery: CardQueryDto): Promise<PaginatedList<Card>> {
         return this.cardsService.getCards(cardQuery);
     }
     
@@ -62,7 +64,7 @@ export class CardsController {
 
     @ApiOperation({ summary: 'Получение сделок по определенной карте' })
     @Get(':id/transactions/')
-    getCardTransactions(@Param('id') id: number, @Query() cardQuery: CardTransactionsQueryDto): Promise<any> {
+    getCardTransactions(@Param('id') id: number, @Query() cardQuery: CardTransactionsQueryDto): Promise<PaginatedList<Transaction>> {
         return this.cardsService.getCardTransactions(id, cardQuery);
     }
 }

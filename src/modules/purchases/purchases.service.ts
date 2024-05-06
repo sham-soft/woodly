@@ -12,6 +12,7 @@ import { getSumWithPercent } from '../../helpers/numbers';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
 import { PURCHASE_STATUSES } from '../../helpers/constants';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
 export class PurchasesService {
@@ -20,7 +21,7 @@ export class PurchasesService {
         private readonly exportPurchasesService: ExportPurchasesService,
     ) {}
 
-    async getPurchases(query: PurchaseQueryDto): Promise<any> {
+    async getPurchases(query: PurchaseQueryDto): Promise<PaginatedList<Purchase>> {
         const pagination = getPagination(query.page); 
 
         const filters = getQueryFilters(query, {
@@ -34,14 +35,14 @@ export class PurchasesService {
             cashbox: QueryFilterRules.EQUAL,
         });
 
-        const countPurchases = await this.purchaseModel.countDocuments(filters);
+        const total = await this.purchaseModel.countDocuments(filters);
         const data = await this.purchaseModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countPurchases,
             page: pagination.page,
             limit: pagination.limit,
-            purchases: data,
+            total,
+            data,
         };
     }
 

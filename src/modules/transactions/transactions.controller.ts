@@ -18,6 +18,7 @@ import { TransactionExportQueryDto } from './dto/transaction-export.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { Public } from '../../decorators/public.decorator';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Transactions')
 @Controller('transactions')
@@ -26,7 +27,7 @@ export class TransactionsController {
 
     @ApiOperation({ summary: 'Получение списка сделок' })
     @Get()
-    getTransactions(@Query() transactionQuery: TransactionQueryDto): Promise<any> {
+    getTransactions(@Query() transactionQuery: TransactionQueryDto): Promise<PaginatedList<Transaction>> {
         return this.transactionsService.getTransactions(transactionQuery);
     }
     

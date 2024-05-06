@@ -16,6 +16,7 @@ import { UserEditDto } from './dto/user-edit.dto';
 import { UserCreateDto } from './dto/user-create.dto';
 import { ROLES } from '../../helpers/constants';
 import { RequireRoles } from '../../decorators/roles.decorator';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Users')
 @Controller('users')
@@ -25,7 +26,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Получение списка всех пользователей' })
     @RequireRoles(ROLES.Admin)
     @Get()
-    getAllUsers(@Query() query: UserQueryDto): Promise<any> {
+    getAllUsers(@Query() query: UserQueryDto): Promise<PaginatedList<User>> {
         return this.usersService.getAllUsers(query);
     }
 

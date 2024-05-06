@@ -14,6 +14,7 @@ import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { getPagination } from '../../helpers/pagination';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { TRANSACTION_STATUSES } from '../../helpers/constants';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
 export class TransactionsService {
@@ -24,7 +25,7 @@ export class TransactionsService {
         private readonly exportTransactionService: ExportTransactionService,
     ) {}
 
-    async getTransactions(query: TransactionQueryDto): Promise<any> {
+    async getTransactions(query: TransactionQueryDto): Promise<PaginatedList<Transaction>> {
         const pagination = getPagination(query.page);
 
         const filters = getQueryFilters(query, {
@@ -39,14 +40,14 @@ export class TransactionsService {
             dateEnd: QueryFilterRules.CREATE_LT,
         });
 
-        const countTransactions = await this.transactionModel.countDocuments(filters);
+        const total = await this.transactionModel.countDocuments(filters);
         const data = await this.transactionModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countTransactions,
             page: pagination.page,
             limit: pagination.limit,
-            transactions: data,
+            total,
+            data,
         };
     }
 

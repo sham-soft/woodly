@@ -5,6 +5,7 @@ import { Autopayment } from './schemas/autopayment.schema';
 import { AutopaymentQueryDto } from './dto/autopayment.dto';
 import { getPagination } from '../../helpers/pagination';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
 export class AutopaymentsService {
@@ -12,21 +13,21 @@ export class AutopaymentsService {
         @InjectModel('autopayments') private autopaymentModel: Model<Autopayment>,
     ) {}
 
-    async getAutopayments(query: AutopaymentQueryDto): Promise<any> {
+    async getAutopayments(query: AutopaymentQueryDto): Promise<PaginatedList<Autopayment>> {
         const pagination = getPagination(query.page);
 
         const filters = getQueryFilters(query, {
             cardLastNumber: QueryFilterRules.EQUAL,
         });
 
-        const count = await this.autopaymentModel.countDocuments(filters);
+        const total = await this.autopaymentModel.countDocuments(filters);
         const data = await this.autopaymentModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: count,
             page: pagination.page,
             limit: pagination.limit,
-            autopayments: data,
+            total,
+            data,
         };
     }
 }

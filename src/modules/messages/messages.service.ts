@@ -5,6 +5,7 @@ import { Message } from './schemas/message.schema';
 import { MessageQueryDto } from './dto/message.dto';
 import { getPagination } from '../../helpers/pagination';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
 export class MessagesService {
@@ -12,21 +13,21 @@ export class MessagesService {
         @InjectModel('messages') private messageModel: Model<Message>,
     ) {}
 
-    async getMessages(query: MessageQueryDto): Promise<any> {
+    async getMessages(query: MessageQueryDto): Promise<PaginatedList<Message>> {
         const pagination = getPagination(query.page);
 
         const filters = getQueryFilters(query, {
             cardLastNumber: QueryFilterRules.EQUAL,
         });
 
-        const count = await this.messageModel.countDocuments(filters);
+        const total = await this.messageModel.countDocuments(filters);
         const data = await this.messageModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: count,
             page: pagination.page,
             limit: pagination.limit,
-            messages: data,
+            total,
+            data,
         };
     }
 }

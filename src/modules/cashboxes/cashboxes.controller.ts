@@ -10,6 +10,7 @@ import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
 import { CashboxesService } from './cashboxes.service';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Cashboxes')
 @Controller('cashboxes')
@@ -18,7 +19,7 @@ export class CashboxesController {
 
     @ApiOperation({ summary: 'Получение списка касс' })
     @Get()
-    getCashboxes(@Query() query: CashboxQueryDto): Promise<any> {
+    getCashboxes(@Query() query: CashboxQueryDto): Promise<PaginatedList<Cashbox>> {
         return this.cashboxesService.getCashboxes(query);
     }
 
