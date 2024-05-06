@@ -28,6 +28,9 @@ export class Cashbox {
 
     @Prop()
     commissionPayer: string;
+
+    @Prop()
+    creator: number;
 }
 
 export const CashboxSchema = SchemaFactory.createForClass(Cashbox);

@@ -9,8 +9,8 @@ import {
 import { AccessToken } from './types/auth.type';
 import { SignInDto } from './dto/sign-in.dto';
 import { AuthService } from './auth.service';
-import { User } from '../users/schemas/user.schema';
 import { Public } from '../../decorators/public.decorator';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -34,7 +34,7 @@ export class AuthController {
 
     @ApiOperation({ summary: 'Получение данных профиля' })
     @Get('profile')
-    getUser(@Request() req: any): Promise<User> {
+    getUser(@Request() req: CustomRequest): CustomRequest['user'] {
         return req.user;
     }
 }

@@ -4,8 +4,11 @@ import { Injectable } from '@nestjs/common';
 import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
+import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
+import { ROLES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @Injectable()
 export class CashboxesService {
@@ -13,11 +16,13 @@ export class CashboxesService {
         @InjectModel('cashboxes') private cashboxModel: Model<Cashbox>,
     ) {}
 
-    async getCashboxes(query: CashboxQueryDto): Promise<PaginatedList<Cashbox>> {
+    async getCashboxes(query: CashboxQueryDto, user: CustomRequest['user']): Promise<PaginatedList<Cashbox>> {
         const pagination = getPagination(query.page);
 
-        const total = await this.cashboxModel.countDocuments();
-        const data = await this.cashboxModel.find().skip(pagination.skip).limit(pagination.limit);
+        const filters = user.role === ROLES.Merchant ? { creator: user.userId } : {};
+
+        const total = await this.cashboxModel.countDocuments(filters);
+        const data = await this.cashboxModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
             page: pagination.page,
@@ -27,12 +32,12 @@ export class CashboxesService {
         };
     }
 
-    async createCashbox(params: CashboxCreateDto): Promise<Cashbox> {
-        const sortCashboxes = await this.cashboxModel.find().sort({ cashboxId: -1 }).limit(1);
-        const cashboxId = sortCashboxes[0]?.cashboxId || 0;
+    async createCashbox(params: CashboxCreateDto, user: CustomRequest['user']): Promise<Cashbox> {
+        const newCashboxId = await createId(this.cashboxModel, 'cashboxId');
 
         const payload = {
-            cashboxId: cashboxId + 1,
+            cashboxId: newCashboxId,
+            creator: user.userId,
             ...params,
         };
 
