@@ -9,7 +9,7 @@ import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
 import { getPagination } from '../../helpers/pagination';
 import { getSumWithPercent } from '../../helpers/numbers';
-import { getFilters, FilterRules } from '../../helpers/filters';
+import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
 import { PURCHASE_STATUSES } from '../../helpers/constants';
 
@@ -23,15 +23,15 @@ export class PurchasesService {
     async getPurchases(query: PurchaseQueryDto): Promise<any> {
         const pagination = getPagination(query.page); 
 
-        const filters = getFilters(query, {
-            status: FilterRules.EQUAL,
-            purchaseId: FilterRules.REGEX_INTEGER,
-            paymentSystem: FilterRules.EQUAL_LIST,
-            requisites: FilterRules.REGEX_STRING,
-            amount: FilterRules.REGEX_INTEGER,
-            orderNumber: FilterRules.REGEX_STRING,
-            bankType: FilterRules.EQUAL,
-            cashbox: FilterRules.EQUAL,
+        const filters = getQueryFilters(query, {
+            status: QueryFilterRules.EQUAL,
+            purchaseId: QueryFilterRules.REGEX_INTEGER,
+            paymentSystem: QueryFilterRules.EQUAL_LIST,
+            requisites: QueryFilterRules.REGEX_STRING,
+            amount: QueryFilterRules.REGEX_INTEGER,
+            orderNumber: QueryFilterRules.REGEX_STRING,
+            bankType: QueryFilterRules.EQUAL,
+            cashbox: QueryFilterRules.EQUAL,
         });
 
         const countPurchases = await this.purchaseModel.countDocuments(filters);

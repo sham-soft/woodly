@@ -1,4 +1,4 @@
-export enum FilterRules {
+export enum QueryFilterRules {
     EQUAL = 'equal',
     EQUAL_LIST = 'equalList',
     REGEX_STRING = 'regexString',
@@ -8,7 +8,7 @@ export enum FilterRules {
     CREATE_LT = 'createLt',
 }
 
-export function getFilters(query: object, options: object): object {
+export function getQueryFilters(query: object, options: object): object {
     const filters: any = {};
 
     for (const key in query) {
@@ -16,19 +16,19 @@ export function getFilters(query: object, options: object): object {
         const value = query[key];
 
         switch (rule) {
-            case FilterRules.EQUAL:
+            case QueryFilterRules.EQUAL:
                 filters[key] = value;
                 break;
 
-            case FilterRules.EQUAL_LIST:
+            case QueryFilterRules.EQUAL_LIST:
                 filters[key] = { $in: value };
                 break;
 
-            case FilterRules.REGEX_STRING:
+            case QueryFilterRules.REGEX_STRING:
                 filters[key] = { $regex: value };
                 break;
 
-            case FilterRules.REGEX_STRING_OR:
+            case QueryFilterRules.REGEX_STRING_OR:
                 if (!filters.$or) {
                     filters.$or = [];
                 }
@@ -36,7 +36,7 @@ export function getFilters(query: object, options: object): object {
                 filters.$or.push({ [key]: { $regex: value } });
                 break;
 
-            case FilterRules.REGEX_INTEGER:
+            case QueryFilterRules.REGEX_INTEGER:
                 if (!filters.$expr?.$and) {
                     filters.$expr = { $and: [] };
                 }
@@ -49,7 +49,7 @@ export function getFilters(query: object, options: object): object {
                 });
                 break;
 
-            case FilterRules.CREATE_GT:
+            case QueryFilterRules.CREATE_GT:
                 if (!filters.dateCreate) {
                     filters.dateCreate = {};
                 }
@@ -57,7 +57,7 @@ export function getFilters(query: object, options: object): object {
                 filters.dateCreate.$gt = value;
                 break;
 
-            case FilterRules.CREATE_LT:
+            case QueryFilterRules.CREATE_LT:
                 if (!filters.dateCreate) {
                     filters.dateCreate = {};
                 }

@@ -9,6 +9,8 @@ import { CardEditDto } from './dto/card-edit.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { Transaction } from '../transactions/schemas/transaction.schema';
+import { getPagination } from '../../helpers/pagination';
+import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
 
 @Injectable()
@@ -19,38 +21,24 @@ export class CardsService {
     ) {}
 
     async getCards(query: CardQueryDto): Promise<any> {
-        const limit = 50;
-        let skip = 0;
+        const pagination = getPagination(query.page);
 
-        type filtersType = {
-            status: any,
-            cardNumber?: { $regex: string },
-        }
-
-        const filters: filtersType = {
+        const extraFilters = getQueryFilters(query, {
+            status: QueryFilterRules.EQUAL,
+            cardNumber: QueryFilterRules.REGEX_STRING,
+        });
+        const filters = {
             status: { $nin: [CARD_STATUSES.Deleted] },
+            ...extraFilters,
         };
 
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
-
-        if (query.status) {
-            filters.status = query.status;
-        }
-
-        if (query.cardNumber) {
-            filters.cardNumber = { $regex: query.cardNumber };
-        }
-
-        const countCards = await this.cardModel.countDocuments(filters);
-
-        const data = await this.cardModel.find(filters).skip(skip).limit(limit);
+        const count = await this.cardModel.countDocuments(filters);
+        const data = await this.cardModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countCards,
-            page: query.page || 1,
-            limit: 50,
+            total: count,
+            page: pagination.page,
+            limit: pagination.limit,
             cards: data,
         };
     }
@@ -151,26 +139,20 @@ export class CardsService {
     }
 
     async getCardTransactions(cardId: number, query: CardTransactionsQueryDto): Promise<any> {
-        const limit = 50;
-        let skip = 0;
+        const pagination = getPagination(query.page);
 
         const filters = {
             cardId: cardId,
             status: TRANSACTION_STATUSES.Successful,
         };
 
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
-
-        const countTransactions = await this.transactionModel.countDocuments(filters);
-
-        const data = await this.transactionModel.find(filters).skip(skip).limit(limit);
+        const count = await this.transactionModel.countDocuments(filters);
+        const data = await this.transactionModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countTransactions,
-            page: query.page || 1,
-            limit: 50,
+            total: count,
+            page: pagination.page,
+            limit: pagination.limit,
             transactions: data,
         };
     }

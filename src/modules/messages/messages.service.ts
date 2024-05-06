@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Message } from './schemas/message.schema';
 import { MessageQueryDto } from './dto/message.dto';
+import { getPagination } from '../../helpers/pagination';
+import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 
 @Injectable()
 export class MessagesService {
@@ -11,25 +13,19 @@ export class MessagesService {
     ) {}
 
     async getMessages(query: MessageQueryDto): Promise<any> {
-        const limit = 50;
-        let skip = 0;
+        const pagination = getPagination(query.page);
 
-        const filters = {
-            cardLastNumber: query.cardLastNumber,
-        };
+        const filters = getQueryFilters(query, {
+            cardLastNumber: QueryFilterRules.EQUAL,
+        });
 
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
-
-        const countMessages = await this.messageModel.countDocuments(filters);
-
-        const data = await this.messageModel.find(filters).skip(skip).limit(limit);
+        const count = await this.messageModel.countDocuments(filters);
+        const data = await this.messageModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countMessages,
-            page: query.page || 1,
-            limit: 50,
+            total: count,
+            page: pagination.page,
+            limit: pagination.limit,
             messages: data,
         };
     }

@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
+import { getPagination } from '../../helpers/pagination';
 
 @Injectable()
 export class CashboxesService {
@@ -12,21 +13,15 @@ export class CashboxesService {
     ) {}
 
     async getCashboxes(query: CashboxQueryDto): Promise<any> {
-        const limit = 50;
-        let skip = 0;
+        const pagination = getPagination(query.page);
 
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
-
-        const countCashboxes = await this.cashboxModel.countDocuments();
-
-        const data = await this.cashboxModel.find().skip(skip).limit(limit);
+        const count = await this.cashboxModel.countDocuments();
+        const data = await this.cashboxModel.find().skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countCashboxes,
-            page: query.page || 1,
-            limit: 50,
+            total: count,
+            page: pagination.page,
+            limit: pagination.limit,
             cashboxes: data,
         };
     }

@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Autopayment } from './schemas/autopayment.schema';
 import { AutopaymentQueryDto } from './dto/autopayment.dto';
+import { getPagination } from '../../helpers/pagination';
+import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 
 @Injectable()
 export class AutopaymentsService {
@@ -11,25 +13,19 @@ export class AutopaymentsService {
     ) {}
 
     async getAutopayments(query: AutopaymentQueryDto): Promise<any> {
-        const limit = 50;
-        let skip = 0;
+        const pagination = getPagination(query.page);
 
-        const filters = {
-            cardLastNumber: query.cardLastNumber,
-        };
+        const filters = getQueryFilters(query, {
+            cardLastNumber: QueryFilterRules.EQUAL,
+        });
 
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
-
-        const countAutopayments = await this.autopaymentModel.countDocuments(filters);
-
-        const data = await this.autopaymentModel.find(filters).skip(skip).limit(limit);
+        const count = await this.autopaymentModel.countDocuments(filters);
+        const data = await this.autopaymentModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
-            total: countAutopayments,
-            page: query.page || 1,
-            limit: 50,
+            total: count,
+            page: pagination.page,
+            limit: pagination.limit,
             autopayments: data,
         };
     }

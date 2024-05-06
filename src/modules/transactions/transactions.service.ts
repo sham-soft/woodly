@@ -12,7 +12,7 @@ import { TransactionExportQueryDto } from './dto/transaction-export.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { getPagination } from '../../helpers/pagination';
-import { getFilters, FilterRules } from '../../helpers/filters';
+import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { TRANSACTION_STATUSES } from '../../helpers/constants';
 
 @Injectable()
@@ -27,16 +27,16 @@ export class TransactionsService {
     async getTransactions(query: TransactionQueryDto): Promise<any> {
         const pagination = getPagination(query.page);
 
-        const filters = getFilters(query, {
-            transactionId: FilterRules.REGEX_INTEGER,
-            status: FilterRules.EQUAL,
-            title: FilterRules.REGEX_STRING_OR,
-            cardNumber: FilterRules.REGEX_STRING_OR,
-            amount: FilterRules.REGEX_INTEGER,
-            orderNumber: FilterRules.REGEX_INTEGER,
-            clientNumber: FilterRules.REGEX_STRING,
-            cashbox: FilterRules.EQUAL,
-            dateEnd: FilterRules.CREATE_LT,
+        const filters = getQueryFilters(query, {
+            transactionId: QueryFilterRules.REGEX_INTEGER,
+            status: QueryFilterRules.EQUAL,
+            title: QueryFilterRules.REGEX_STRING_OR,
+            cardNumber: QueryFilterRules.REGEX_STRING_OR,
+            amount: QueryFilterRules.REGEX_INTEGER,
+            orderNumber: QueryFilterRules.REGEX_INTEGER,
+            clientNumber: QueryFilterRules.REGEX_STRING,
+            cashbox: QueryFilterRules.EQUAL,
+            dateEnd: QueryFilterRules.CREATE_LT,
         });
 
         const countTransactions = await this.transactionModel.countDocuments(filters);
