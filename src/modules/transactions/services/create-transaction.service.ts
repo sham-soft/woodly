@@ -6,6 +6,7 @@ import { TransactionCreateDto } from '../dto/transaction-create.dto';
 import { Config } from '../../configs/schemas/config.schema';
 import { Card } from '../../cards/schemas/card.schema';
 import { createId } from '../../../helpers/unique';
+import { getPercentOfValue, getSumWithoutPercent } from '../../../helpers/numbers';
 import { getСurrentDateToString, convertDateToString } from '../../../helpers/date';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../../helpers/constants';
 
@@ -28,6 +29,8 @@ export class CreateTransactionService {
             const payload = {
                 transactionId: newTransactionId,
                 amount: params.amount,
+                commission: getPercentOfValue(2.5, params.amount),
+                amountMinusCommission: getSumWithoutPercent(2.5, params.amount),
                 orderNumber: params.orderNumber,
                 cashbox: params.cashbox,
                 clientNumber: params.clientNumber,
@@ -41,6 +44,7 @@ export class CreateTransactionService {
                 recipient: card.recipient,
                 fio: card.fio,
                 bankType: card.bankType,
+                isSbp: params.isSbp || false,
                 cardLastNumber: card.cardLastNumber,
             };
     

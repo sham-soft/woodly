@@ -13,6 +13,12 @@ export class Transaction {
     amount: number;
 
     @Prop()
+    commission: number;
+
+    @Prop()
+    amountMinusCommission: number;
+
+    @Prop()
     status: number;
 
     @Prop()
@@ -41,6 +47,9 @@ export class Transaction {
 
     @Prop()
     bankType: number;
+
+    @Prop()
+    isSbp: boolean;
 
     @Prop()
     cardLastNumber: string;
