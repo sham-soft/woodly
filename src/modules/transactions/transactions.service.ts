@@ -55,38 +55,11 @@ export class TransactionsService {
         return this.createTransactionService.createTransaction(params);
     }
 
-    async editTransaction(params: TransactionEditDto): Promise<Transaction> {
-        type payloadType = {
-            status?: number,
-            amount?: number,
-        }
-        const payload: payloadType = {};
-
-        if (params.status) {
-            payload.status = params.status;
-        }
-        if (params.amount) {
-            const transaction = await this.transactionModel.findOne({ cardId: params.cardId, amount: params.amount });
-
-            if (transaction) {
-                throw new BadRequestException('Операция с такой суммой и картой уже есть в работе');
-            }
-
-            payload.amount = params.amount;
-        }
-
-        return this.transactionModel.findOneAndUpdate(
-            { transactionId: params.transactionId },
-            { $set: payload }, 
-            { new: true }
-        );
-    }
-
     async makeTransaction(params: TransactionMakeDto): Promise<string> {
         return this.makeTransactionService.makeTransaction(params);
     }
 
-    async confirmTransaction(id: string): Promise<string> {
+    async checkStatusTransaction(id: string): Promise<string> {
         const transaction = await this.transactionModel.findOne({ transactionId: id });
 
         if (transaction?.status === TRANSACTION_STATUSES.Successful) {
@@ -94,6 +67,36 @@ export class TransactionsService {
         }
 
         throw new BadRequestException('Время истекло или не удалось обработать ваш платеж');
+    }
+
+    async editTransaction(params: TransactionEditDto): Promise<Transaction> {
+        const transaction = await this.transactionModel.findOne({ cardId: params.cardId, amount: params.amount });
+
+        if (transaction) {
+            throw new BadRequestException('Операция с такой суммой и картой уже есть в работе');
+        }
+
+        return this.transactionModel.findOneAndUpdate(
+            { transactionId: params.transactionId },
+            { $set: { amount: params.amount } }, 
+            { new: true }
+        );
+    }
+
+    async confirmTransaction(id: number): Promise<Transaction> {
+        return this.transactionModel.findOneAndUpdate(
+            { transactionId: id },
+            { $set: { status: TRANSACTION_STATUSES.Successful } }, 
+            { new: true }
+        );
+    }
+
+    async cancelTransaction(id: number): Promise<Transaction> {
+        return this.transactionModel.findOneAndUpdate(
+            { transactionId: id },
+            { $set: { status: TRANSACTION_STATUSES.Cancelled } }, 
+            { new: true }
+        );
     }
 
     async getTransactionsExport(query: TransactionExportQueryDto): Promise<StreamableFile> {
