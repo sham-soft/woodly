@@ -8,6 +8,7 @@ import { convertDateToString } from '../../../helpers/date';
 import { TRANSACTION_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
 import type { BalanceTransaction } from '../types/balance-transaction.type';
 import type { BalanceTransactionsQueryDto } from '../dto/balance-transactions.dto';
+import type { PaginatedList } from '../../../types/paginated-list.type';
 
 @Injectable()
 export class GetTransactionsService {
@@ -17,7 +18,7 @@ export class GetTransactionsService {
         private readonly configsService: ConfigsService,
     ) {}
 
-    async getTransactions(query: BalanceTransactionsQueryDto): Promise<any> {
+    async getTransactions(query: BalanceTransactionsQueryDto): Promise<PaginatedList<BalanceTransaction>> {
         let transactions = [];
 
         let limit = 50;
@@ -49,10 +50,10 @@ export class GetTransactionsService {
         const sortedTransactions = this.getSortedTransactions(transactions.flat());
 
         return {
-            total: sortedTransactions.length,
             page: query.page || 1,
             limit: 50,
-            transactions: sortedTransactions,
+            total: sortedTransactions.length,
+            data: sortedTransactions,
         };
     }
 

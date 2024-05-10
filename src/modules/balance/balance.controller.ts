@@ -9,6 +9,8 @@ import {
 import { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
 import { BalanceExportQueryDto } from './dto/balance-export.dto';
 import { BalanceService } from './balance.service';
+import type { PaginatedList } from '../../types/paginated-list.type';
+import type { BalanceTransaction } from './types/balance-transaction.type';
 
 @ApiTags('Balance')
 @Controller('balance')
@@ -17,7 +19,7 @@ export class BalanceController {
 
     @ApiOperation({ summary: 'Получения баланса' })
     @Get()
-    getBalance(): Promise<any> {
+    getBalance(): Promise<PaginatedList<BalanceTransaction>> {
         return this.balanceService.getBalance();
     }
 

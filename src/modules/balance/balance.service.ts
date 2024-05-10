@@ -2,6 +2,8 @@ import { Injectable, StreamableFile } from '@nestjs/common';
 import { GetTransactionsService } from './services/get-transactions.service';
 import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
+import type { PaginatedList } from '../../types/paginated-list.type';
+import type { BalanceTransaction } from './types/balance-transaction.type';
 import type { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
 import type { BalanceExportQueryDto } from './dto/balance-export.dto';
 
@@ -13,7 +15,7 @@ export class BalanceService {
         private readonly exportTransactionsService: ExportTransactionsService,
     ) {}
 
-    async getBalance(): Promise<any> {
+    async getBalance(): Promise<PaginatedList<BalanceTransaction>> {
         return this.getBalanceService.getBalance();
     }
 
