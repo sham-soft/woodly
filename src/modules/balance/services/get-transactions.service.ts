@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
 import { ConfigsService } from '../../configs/configs.service';
+import { getPagination } from '../../../helpers/pagination';
 import { convertDateToString } from '../../../helpers/date';
 import { TRANSACTION_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
 import type { BalanceTransaction } from '../types/balance-transaction.type';
@@ -19,50 +20,54 @@ export class GetTransactionsService {
     ) {}
 
     async getTransactions(query: BalanceTransactionsQueryDto): Promise<PaginatedList<BalanceTransaction>> {
+        const pagination = getPagination(query.page);
+        let total = 0;
         let transactions = [];
 
-        let limit = 50;
-        let skip = 0;
-
-        if (query.page > 1) {
-            skip = (query.page - 1) * 50;
-        }
-
         switch (Number(query.status)) {
-            case BALANCE_STATUSES.Deposit:
-                transactions = await this.getTronscanTransactions(skip, limit);
+            case BALANCE_STATUSES.Internal:
+                total = 0;
+                transactions = [];
                 break;
+
+            case BALANCE_STATUSES.Deposit:
+                total = await this.getTronscanCount();
+                transactions = await this.getTronscanTransactions(pagination.skip, pagination.limit);
+                break;
+
             case BALANCE_STATUSES.Deduction:
             case BALANCE_STATUSES.Freeze:
-                transactions = await this.getWoodlyTransactions([query.status], skip, limit);
-                break;
-            default:
-                skip = skip / 2;
-                limit = limit / 2;
+                const status = Number(query.status) === BALANCE_STATUSES.Deduction ?
+                    TRANSACTION_STATUSES.Successful : TRANSACTION_STATUSES.Active;
+                const filters = { status };
 
-                transactions = await Promise.all([
-                    this.getTronscanTransactions(skip, limit),
-                    this.getWoodlyTransactions([TRANSACTION_STATUSES.Active, TRANSACTION_STATUSES.Successful], skip, limit),
-                ]);
+                total = await this.transactionModel.countDocuments(filters);
+                transactions = await this.getWoodlyTransactions(filters, pagination.skip, pagination.limit);
                 break;
+
+            default:
+            {
+                const filters = {
+                    status: { $in: [TRANSACTION_STATUSES.Active, TRANSACTION_STATUSES.Successful] },
+                };
+
+                total = await this.transactionModel.countDocuments(filters);
+                transactions = await this.getWoodlyTransactions(filters, pagination.skip, pagination.limit);
+                break;
+            }
         }
 
-        const sortedTransactions = this.getSortedTransactions(transactions.flat());
-
         return {
-            page: query.page || 1,
-            limit: 50,
-            total: sortedTransactions.length,
-            data: sortedTransactions,
+            page: pagination.page,
+            limit: pagination.limit,
+            total,
+            data: transactions,
         };
     }
 
-    private async getWoodlyTransactions(statuses: number[], skip: number, limit: number): Promise<BalanceTransaction[]> {
-        const filters = {
-            status: { $in: statuses },
-        };
-
+    private async getWoodlyTransactions(filters: unknown, skip: number, limit: number): Promise<BalanceTransaction[]> {
         const data = await this.transactionModel.find(filters).skip(skip).limit(limit);
+
         return data.map(item => ({
             transactionId: item.transactionId,
             status: item.status === TRANSACTION_STATUSES.Active ? BALANCE_STATUSES.Freeze : BALANCE_STATUSES.Deduction,
@@ -73,54 +78,34 @@ export class GetTransactionsService {
 
     private async getTronscanTransactions(skip: number, limit: number): Promise<BalanceTransaction[]> {
         const rate = await this.configsService.getConfigs('RUBLE_RATE');
-        const decimals = 1000000;
+        const DECIMALS = 1000000;
 
         const params = {
-            address: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
-            trc20Id: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
-            direction: 0,
-            limit: limit,
+            relatedAddress: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
+            limit,
             start: skip,
+            sort: '-timestamp',
+            count: 'true',
+            filterTokenValue: 0,
         };
 
-        const wallet = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/transfer/trc20', { params });
-        return wallet.data.data.map(item => ({
-            transactionId: item.hash,
+        const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
+
+        return tronscan.data.token_transfers.map((item: any) => ({
+            transactionId: item.transaction_id,
             status: BALANCE_STATUSES.Deposit,
-            amount: (item.amount / decimals) * Number(rate),
-            date: convertDateToString(new Date(item.block_timestamp)),
+            amount: (item.quant / DECIMALS) * Number(rate),
+            date: convertDateToString(new Date(item.block_ts)),
         }));
     }
 
-    private getSortedTransactions(transactions: BalanceTransaction[]): BalanceTransaction[] {
-        return transactions.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+    private async getTronscanCount(): Promise<number> {
+        const params = {
+            limit: 0,
+            relatedAddress: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
+        };
+
+        const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
+        return tronscan.data.total;
     }
-
-    // TO-DO - код для лучшей пагинации
-    // private async getSkipsForTransactions(page: number): Promise<number> {
-    //     let skipTronscan = (page - 1) * 25;
-    //     let skipWoodly = skipTronscan;
-
-    //     const countFilters = {
-    //         status: { $in: [TRANSACTION_STATUSES.Active, TRANSACTION_STATUSES.Successful] },
-    //     };
-    //     const countWoodlyTransactions = await this.transactionModel.countDocuments(countFilters);
-
-    //     if (countWoodlyTransactions >= skipWoodly) {
-    //         skipTronscan = (page - 1) * 50;
-    //     }
-
-    //     const params = {
-    //         address: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
-    //     };
-
-    //     const wallet: any = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/accountv2', { params });
-    //     const countTronscanTransactions = wallet.transactions;
-
-    //     if (countTronscanTransactions >= skipTronscan) {
-    //         skipWoodly = (page - 1) * 50;
-    //     }
-
-    //     return 0;
-    // }
 }
