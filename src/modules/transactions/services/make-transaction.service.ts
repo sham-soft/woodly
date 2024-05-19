@@ -48,7 +48,7 @@ export class MakeTransactionService {
     }
 
     private async updateCardTurnover(transaction: Transaction): Promise<void> {
-        const card = await this.cardModel.findOne({ cardId: transaction.cardId });
+        const card = await this.cardModel.findOne({ cardId: transaction.card.cardId });
 
         const payload = {
             turnoverPaymentsPerDay: card.turnoverPaymentsPerDay + transaction.amount,

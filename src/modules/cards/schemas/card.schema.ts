@@ -21,7 +21,7 @@ export class Card {
     processMethod: number;
 
     @Prop()
-    currency: number;
+    currency: string;
     
     @Prop()
     deviceId: string;
@@ -31,9 +31,6 @@ export class Card {
 
     @Prop()
     slotSim: number;
-
-    @Prop()
-    isQiwi: boolean;
 
     @Prop()
     isSbp: boolean;

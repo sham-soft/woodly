@@ -5,16 +5,20 @@ import { StreamableFile } from '@nestjs/common';
 import { MakeTransactionService } from './services/make-transaction.service';
 import { ExportTransactionService } from './services/export-transaction.service';
 import { CreateTransactionService } from './services/create-transaction.service';
+import { ActivateTransactionService } from './services/activate-transaction.service';
 import { Transaction } from './schemas/transaction.schema';
 import { TransactionQueryDto } from './dto/transaction.dto';
 import { TransactionMakeDto } from './dto/transaction-make.dto';
 import { TransactionExportQueryDto } from './dto/transaction-export.dto';
 import { TransactionEditDto } from './dto/transaction-edit.dto';
 import { TransactionCreateDto } from './dto/transaction-create.dto';
+import { TransactionActivateDto } from './dto/transaction-activate.dto';
 import { getPagination } from '../../helpers/pagination';
-import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
+import { getFilters, FilterRules } from '../../helpers/filters';
 import { TRANSACTION_STATUSES } from '../../helpers/constants';
+import { ROLES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @Injectable()
 export class TransactionsService {
@@ -23,22 +27,28 @@ export class TransactionsService {
         private readonly makeTransactionService: MakeTransactionService,
         private readonly createTransactionService: CreateTransactionService,
         private readonly exportTransactionService: ExportTransactionService,
+        private readonly activateTransactionService: ActivateTransactionService,
     ) {}
 
-    async getTransactions(query: TransactionQueryDto): Promise<PaginatedList<Transaction>> {
+    async getTransactions(query: TransactionQueryDto, user: CustomRequest['user']): Promise<PaginatedList<Transaction>> {
         const pagination = getPagination(query.page);
 
-        const filters = getQueryFilters(query, {
-            transactionId: QueryFilterRules.REGEX_INTEGER,
-            status: QueryFilterRules.EQUAL,
-            title: QueryFilterRules.REGEX_STRING_OR,
-            cardNumber: QueryFilterRules.REGEX_STRING_OR,
-            amount: QueryFilterRules.REGEX_INTEGER,
-            orderNumber: QueryFilterRules.REGEX_INTEGER,
-            clientNumber: QueryFilterRules.REGEX_STRING,
-            cashbox: QueryFilterRules.EQUAL,
-            dateEnd: QueryFilterRules.CREATE_LT,
+        const extraFilters = getFilters({
+            transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            status: { rule: FilterRules.EQUAL, value: query.status },
+            amount: { rule: FilterRules.REGEX_INTEGER, value: query.amount },
+            orderNumber: { rule: FilterRules.REGEX_INTEGER, value: query.orderNumber },
+            clientNumber: { rule: FilterRules.REGEX_STRING, value: query.clientNumber },
+            cashbox: { rule: FilterRules.EQUAL, value: query.cashbox },
+            dateCreate: { rule: FilterRules.LT, value: query.dateEnd },
+            'card.title': { rule: FilterRules.REGEX_STRING_OR, value: query.title },
+            'card.cardNumber': { rule: FilterRules.REGEX_STRING_OR, value: query.cardNumber },
         });
+
+        const filters = {
+            status: { $nin: user.role === ROLES.Trader ? [TRANSACTION_STATUSES.Created] : [] },
+            ...extraFilters,
+        };
 
         const total = await this.transactionModel.countDocuments(filters);
         const data = await this.transactionModel.find(filters).skip(pagination.skip).limit(pagination.limit);
@@ -51,8 +61,12 @@ export class TransactionsService {
         };
     }
 
-    async createTransaction(params: TransactionCreateDto): Promise<Transaction | string> {
+    async createTransaction(params: TransactionCreateDto): Promise<Transaction> {
         return this.createTransactionService.createTransaction(params);
+    }
+
+    async activateTransaction(params: TransactionActivateDto): Promise<Transaction | string> {
+        return this.activateTransactionService.activateTransaction(params);
     }
 
     async makeTransaction(params: TransactionMakeDto): Promise<string> {

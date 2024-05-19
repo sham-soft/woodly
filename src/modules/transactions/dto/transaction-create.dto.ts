@@ -1,4 +1,6 @@
-import { IsBoolean, IsOptional, ValidateIf, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsIn, IsNumber, IsString } from 'class-validator';
+import { getEnumIntValues } from '../../../helpers/enum';
+import { PAYMENT_SYSTEMS, CURRENCIES } from '../../../helpers/constants';
 
 export class TransactionCreateDto {
     @IsNumber()
@@ -7,19 +9,17 @@ export class TransactionCreateDto {
     @IsNumber()
     cashbox: number;
 
+    @IsNumber()
+    @IsIn(getEnumIntValues(PAYMENT_SYSTEMS))
+    paymentSystem: number;
+
+    @IsString()
+    @IsIn(Object.values(CURRENCIES))
+    currency: string;
+
+    @IsNumber()
+    amount: number;
+
     @IsString()
     clientNumber: string;
-
-    @IsBoolean()
-    @IsOptional()
-    isSbp?: boolean;
-
-    @IsNumber()
-    @IsNotEmpty()
-    @ValidateIf(params => !params.isSbp)
-    bankType: number;
-
-    @IsNumber()
-    @IsNotEmpty()
-    amount: number;
 }

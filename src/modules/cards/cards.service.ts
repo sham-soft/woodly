@@ -59,7 +59,6 @@ export class CardsService {
             deviceId: params.deviceId,
             apiKey: params.apiKey,
             slotSim: params.slotSim,
-            isQiwi: params.isQiwi,
             isSbp: params.isSbp,
             phone: params.phone,
             recipient: params.recipient,

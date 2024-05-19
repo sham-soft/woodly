@@ -5,7 +5,8 @@ export enum CARD_STATUSES {
 }
 
 export enum TRANSACTION_STATUSES {
-    Active = 1,
+    Created = 1,
+    Active,
     Verification,
     Cancelled,
     Successful,
@@ -28,6 +29,22 @@ export enum PURCHASE_STATUSES {
 export enum CASHBOX_STATUSES {
     Active = 1,
     Inactive,
+}
+
+export enum PAYMENT_SYSTEMS {
+    Card = 1,
+    SBP,
+}
+
+export enum CURRENCIES {
+    Rub = 'rub',
+    Kzt = 'kzt',
+}
+
+export enum BANK_TYPES {
+    Sber = 1,
+    Tinkoff,
+    Rayfayzen,
 }
 
 export enum ROLES {

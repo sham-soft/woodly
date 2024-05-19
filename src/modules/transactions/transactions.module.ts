@@ -5,6 +5,7 @@ import { TransactionsController } from './transactions.controller';
 import { MakeTransactionService } from './services/make-transaction.service';
 import { ExportTransactionService } from './services/export-transaction.service';
 import { CreateTransactionService } from './services/create-transaction.service';
+import { ActivateTransactionService } from './services/activate-transaction.service';
 import { TransactionSchema } from './schemas/transaction.schema';
 import { MessageSchema } from '../messages/schemas/message.schema';
 import { ConfigSchema } from '../configs/schemas/config.schema';
@@ -22,6 +23,7 @@ import { AutopaymentSchema } from '../autopayments/schemas/autopayment.schema';
     providers: [
         TransactionsService,
         CreateTransactionService,
+        ActivateTransactionService,
         MakeTransactionService,
         ExportTransactionService,
     ],

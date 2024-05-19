@@ -1,5 +1,6 @@
 import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Card } from '../../cards/schemas/card.schema';
 
 export type TransactionDocument = HydratedDocument<Transaction>;
 
@@ -25,34 +26,13 @@ export class Transaction {
     dateCreate: string;
 
     @Prop()
+    dateActivate: string;
+
+    @Prop()
     dateClose: string;
 
     @Prop()
-    title: string;
-
-    @Prop()
-    cardId: number;
-
-    @Prop()
-    cardNumber: string;
-
-    @Prop()
-    phone: string;
-
-    @Prop()
-    recipient: string;
-
-    @Prop()
-    fio: string;
-
-    @Prop()
-    bankType: number;
-
-    @Prop()
-    isSbp: boolean;
-
-    @Prop()
-    cardLastNumber: string;
+    paymentSystem: number;
 
     @Prop()
     paymentTime: string;
@@ -68,6 +48,18 @@ export class Transaction {
 
     @Prop()
     clientNumber: string;
+
+    @Prop({ type: Card })
+    card: {
+        title: string,
+        cardId: number,
+        cardNumber: string,
+        phone: string,
+        recipient: string,
+        fio: string,
+        bankType: number,
+        cardLastNumber: string,
+    };
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

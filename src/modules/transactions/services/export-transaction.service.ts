@@ -27,8 +27,8 @@ export class ExportTransactionService {
 
         const values = transactions.map((item) => [
             item.transactionId,
-            item.title,
-            item.cardNumber,
+            item.card.title,
+            item.card.cardNumber,
             item.amount,
             item.status,
             item.dateCreate,
