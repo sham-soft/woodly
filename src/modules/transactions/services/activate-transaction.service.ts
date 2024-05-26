@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Transaction } from '../schemas/transaction.schema';
 import { TransactionActivateDto } from '../dto/transaction-activate.dto';
-import { Config } from '../../configs/schemas/config.schema';
+import { UsersService } from '../../users/users.service';
 import { Card } from '../../cards/schemas/card.schema';
 import { getСurrentDateToString, convertDateToString } from '../../../helpers/date';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../../helpers/constants';
@@ -11,15 +11,15 @@ import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../../helpers/constants'
 @Injectable()
 export class ActivateTransactionService {
     constructor(
-        @InjectModel('configs') private configModel: Model<Config>,
         @InjectModel('cards') private cardModel: Model<Card>,
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
+        private readonly usersService: UsersService,
     ) {}
 
     async activateTransaction(params: TransactionActivateDto): Promise<Transaction | string> {
-        await this.checkWorkTransactions();
-
         const card = await this.getCard(params);
+
+        await this.checkWorkTransactions(card);
 
         if (card) {
             const payload = {
@@ -48,10 +48,10 @@ export class ActivateTransactionService {
         throw new BadRequestException('Нет свободных реквизитов.');
     }
 
-    private async checkWorkTransactions(): Promise<void> {
-        const config = await this.configModel.findOne({ name: 'IS_WORK_TRANSACTIONS' });
+    private async checkWorkTransactions(card: Card): Promise<void> {
+        const user = await this.usersService.getUser(card.userId);
 
-        if (config?.value === 'false') {
+        if (!user.isWorkTransactions) {
             throw new BadRequestException('На данный момент сделки отключены');
         }
     }
@@ -65,6 +65,10 @@ export class ActivateTransactionService {
 
     private async getCard(params: TransactionActivateDto): Promise<Card> {
         const currentTransaction = await this.transactionModel.findOne({ transactionId: params.transactionId });
+
+        if (!currentTransaction) {
+            throw new BadRequestException('На активной транзакции с id: ' + params.transactionId);
+        }
 
         const blockingTransactions = await this.transactionModel.find({
             status: TRANSACTION_STATUSES.Active,

@@ -19,12 +19,12 @@ import { RequireRoles } from '../../decorators/roles.decorator';
 import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Users')
+@RequireRoles(ROLES.Admin)
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @ApiOperation({ summary: 'Получение списка всех пользователей' })
-    @RequireRoles(ROLES.Admin)
     @Get()
     getAllUsers(@Query() query: UserQueryDto): Promise<PaginatedList<User>> {
         return this.usersService.getAllUsers(query);
@@ -50,21 +50,18 @@ export class UsersController {
             - settings - Настройки;
         `,
     })
-    @RequireRoles(ROLES.Admin)
     @Post('create/')
     createUser(@Body() userDto: UserCreateDto): Promise<User> {
         return this.usersService.createUser(userDto);
     }
 
     @ApiOperation({ summary: 'Редактирование пользователя' })
-    @RequireRoles(ROLES.Admin)
     @Patch('edit/')
     editUser(@Body() userDto: UserEditDto): Promise<User> {
         return this.usersService.editUser(userDto);
     }
 
     @ApiOperation({ summary: 'Удаление пользователя' })
-    @RequireRoles(ROLES.Admin)
     @Delete('delete/:id')
     deleteUser(@Param('id') id: number): Promise<void> {
         return this.usersService.deleteUser(id);

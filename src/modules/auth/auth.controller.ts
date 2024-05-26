@@ -3,12 +3,15 @@ import {
     Controller,
     Get,
     Post,
+    Patch,
     Body,
     Request,
 } from '@nestjs/common';
 import { AccessToken } from './types/auth.type';
 import { SignInDto } from './dto/sign-in.dto';
 import { AuthService } from './auth.service';
+import { ROLES } from '../../helpers/constants';
+import { RequireRoles } from '../../decorators/roles.decorator';
 import { Public } from '../../decorators/public.decorator';
 import type { CustomRequest } from '../../types/custom-request.type';
 
@@ -36,5 +39,19 @@ export class AuthController {
     @Get('profile')
     getUser(@Request() req: CustomRequest): CustomRequest['user'] {
         return req.user;
+    }
+
+    @ApiOperation({ summary: 'Получение статуса фалга сделки' })
+    @RequireRoles(ROLES.Trader)
+    @Get('transactions-flag')
+    getTransactionsFlag(@Request() req: CustomRequest): Promise<boolean> {
+        return this.authService.getTransactionsFlag(req.user.userId);
+    }
+
+    @ApiOperation({ summary: 'Включение/Отключение флага сделки' })
+    @RequireRoles(ROLES.Trader)
+    @Patch('switch-transactions-flag')
+    switchTransactionsFlag(@Request() req: CustomRequest): Promise<boolean> {
+        return this.authService.switchTransactionsFlag(req.user.userId);
     }
 }

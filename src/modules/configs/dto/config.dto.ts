@@ -1,5 +1,4 @@
 import { IsString, IsNotEmpty } from 'class-validator';
-import { EqualValues } from '../validations/equal-values';
 
 export class ConfigDto {
     @IsString()
@@ -8,6 +7,5 @@ export class ConfigDto {
 
     @IsString()
     @IsNotEmpty()
-    @EqualValues()
     value: string;
 }

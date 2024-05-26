@@ -44,7 +44,7 @@ export class CashboxesController {
         `,
     })
     @Patch('change-status/')
-    changeStatusCard(@Body() cardDto: CashboxChangeStatusDto): Promise<Cashbox> {
-        return this.cashboxesService.changeStatusCard(cardDto);
+    changeStatusCashbox(@Body() cardDto: CashboxChangeStatusDto): Promise<Cashbox> {
+        return this.cashboxesService.changeStatusCashbox(cardDto);
     }
 }

@@ -25,6 +25,9 @@ export class User {
 
     @Prop()
     permissions: string[];
+
+    @Prop()
+    isWorkTransactions: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

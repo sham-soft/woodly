@@ -1,8 +1,9 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Transaction } from '../schemas/transaction.schema';
 import { TransactionCreateDto } from '../dto/transaction-create.dto';
+import { Cashbox } from '../../cashboxes/schemas/cashbox.schema';
 import { createId } from '../../../helpers/unique';
 import { getPercentOfValue, getSumWithoutPercent } from '../../../helpers/numbers';
 import { getСurrentDateToString } from '../../../helpers/date';
@@ -12,9 +13,12 @@ import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 export class CreateTransactionService {
     constructor(
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
+        @InjectModel('cashboxes') private cashboxModel: Model<Cashbox>,
     ) {}
 
     async createTransaction(params: TransactionCreateDto): Promise<Transaction> {
+        await this.checkCashbox(params.cashbox);
+
         const newTransactionId = await createId(this.transactionModel, 'transactionId');
 
         const payload = {
@@ -30,5 +34,13 @@ export class CreateTransactionService {
         newTransaction.save();
 
         return newTransaction;
+    }
+
+    private async checkCashbox(cashboxId: number): Promise<void> {
+        const cashbox = await this.cashboxModel.findOne({ cashboxId });
+
+        if (!cashbox) {
+            throw new BadRequestException('Нет кассы с id: ' + cashboxId);
+        }
     }
 }

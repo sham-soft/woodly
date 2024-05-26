@@ -50,7 +50,7 @@ export class CashboxesService {
         return newCashbox;
     }
 
-    changeStatusCard(params: CashboxChangeStatusDto): Promise<Cashbox> {
+    changeStatusCashbox(params: CashboxChangeStatusDto): Promise<Cashbox> {
         return this.cashboxModel.findOneAndUpdate(
             { cashboxId: params.cashboxId },
             { $set: { status: params.status } }, 

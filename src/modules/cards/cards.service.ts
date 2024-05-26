@@ -13,6 +13,7 @@ import { getPagination } from '../../helpers/pagination';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @Injectable()
 export class CardsService {
@@ -44,7 +45,7 @@ export class CardsService {
         };
     }
 
-    async createCard(params: CardCreateDto): Promise<Card> {
+    async createCard(params: CardCreateDto, user: CustomRequest['user']): Promise<Card> {
         const sortCards = await this.cardModel.find().sort({ cardId: -1 }).limit(1);
         const cardId = sortCards[0]?.cardId || 0;
 
@@ -70,6 +71,7 @@ export class CardsService {
             paymentMax: 1000000,
             status: CARD_STATUSES.Active,
             cardLastNumber: params.cardNumber.slice(-4),
+            userId: user.userId,
         };
 
         const card = await this.cardModel.findOne({ cardLastNumber: payload.cardLastNumber });

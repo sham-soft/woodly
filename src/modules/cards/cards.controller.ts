@@ -7,6 +7,7 @@ import {
     Query,
     Body,
     Patch,
+    Request,
 } from '@nestjs/common';
 import { Card } from './schemas/card.schema';
 import { CardQueryDto } from './dto/card.dto';
@@ -17,9 +18,13 @@ import { CardCreateDto } from './dto/card-create.dto';
 import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { CardsService } from './cards.service';
 import { Transaction } from '../transactions/schemas/transaction.schema';
+import { ROLES } from '../../helpers/constants';
+import { RequireRoles } from '../../decorators/roles.decorator';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @ApiTags('Cards')
+@RequireRoles(ROLES.Trader)
 @Controller('cards')
 export class CardsController {
     constructor(private readonly cardsService: CardsService) {}
@@ -32,8 +37,8 @@ export class CardsController {
     
     @ApiOperation({ summary: 'Создание карты' })
     @Post('create/')
-    createCard(@Body() cardDto: CardCreateDto): Promise<Card> {
-        return this.cardsService.createCard(cardDto);
+    createCard(@Body() cardDto: CardCreateDto, @Request() req: CustomRequest): Promise<Card> {
+        return this.cardsService.createCard(cardDto, req.user);
     }
     
     @ApiOperation({ summary: 'Редактирование карты' })

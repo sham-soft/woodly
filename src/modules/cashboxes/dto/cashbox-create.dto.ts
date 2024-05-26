@@ -1,4 +1,6 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsIn } from 'class-validator';
+import { getEnumIntValues } from '../../../helpers/enum';
+import { COMISSION_PAYERS } from '../../../helpers/constants';
 
 export class CashboxCreateDto {
     @IsString()
@@ -20,6 +22,7 @@ export class CashboxCreateDto {
     notificationUrlPayOff: string;
 
     @IsNumber()
+    @IsIn(getEnumIntValues(COMISSION_PAYERS))
     commissionPayer: number;
 
     @IsString()

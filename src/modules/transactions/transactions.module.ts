@@ -7,19 +7,23 @@ import { ExportTransactionService } from './services/export-transaction.service'
 import { CreateTransactionService } from './services/create-transaction.service';
 import { ActivateTransactionService } from './services/activate-transaction.service';
 import { TransactionSchema } from './schemas/transaction.schema';
+import { UsersModule } from '../users/users.module';
 import { MessageSchema } from '../messages/schemas/message.schema';
-import { ConfigSchema } from '../configs/schemas/config.schema';
+import { CashboxSchema } from '../cashboxes/schemas/cashbox.schema';
 import { CardSchema } from '../cards/schemas/card.schema';
 import { AutopaymentSchema } from '../autopayments/schemas/autopayment.schema';
 
 @Module({
-    imports: [MongooseModule.forFeature([
-        { name: 'configs', schema: ConfigSchema, collection: 'configs' },
-        { name: 'cards', schema: CardSchema, collection: 'cards' },
-        { name: 'autopayments', schema: AutopaymentSchema, collection: 'autopayments' },
-        { name: 'messages', schema: MessageSchema, collection: 'messages' },
-        { name: 'transactions', schema: TransactionSchema, collection: 'transactions' },
-    ])],
+    imports: [
+        UsersModule,
+        MongooseModule.forFeature([
+            { name: 'cards', schema: CardSchema, collection: 'cards' },
+            { name: 'autopayments', schema: AutopaymentSchema, collection: 'autopayments' },
+            { name: 'messages', schema: MessageSchema, collection: 'messages' },
+            { name: 'cashboxes', schema: CashboxSchema, collection: 'cashboxes' },
+            { name: 'transactions', schema: TransactionSchema, collection: 'transactions' },
+        ]),
+    ],
     providers: [
         TransactionsService,
         CreateTransactionService,

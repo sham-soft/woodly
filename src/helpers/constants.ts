@@ -47,6 +47,23 @@ export enum BANK_TYPES {
     Rayfayzen,
 }
 
+export enum PROCESS_METHODS {
+    Sms = 1,
+    Gate,
+    Api,
+    Lk,
+}
+
+export enum SIM_SLOTS {
+    Sim1 = 1,
+    Sim2,
+}
+
+export enum COMISSION_PAYERS {
+    Shop = 1,
+    Recipient,
+}
+
 export enum ROLES {
     Admin = 'admin',
     Operator = 'operator',

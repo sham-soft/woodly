@@ -67,6 +67,9 @@ export class Card {
 
     @Prop()
     cardLastNumber: string;
+
+    @Prop()
+    userId: number;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

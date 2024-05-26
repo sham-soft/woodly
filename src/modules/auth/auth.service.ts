@@ -12,7 +12,7 @@ export class AuthService {
     ) {}
 
     async signIn(params: SignInDto): Promise<AccessToken> {
-        const user = await this.usersService.getUser(params.login);
+        const user = await this.usersService.getUserByLogin(params.login);
 
         if (user?.password !== params.password) {
             throw new UnauthorizedException();
@@ -31,5 +31,17 @@ export class AuthService {
         return {
             accessToken: await this.jwtService.signAsync(payload),
         };
+    }
+
+    async getTransactionsFlag(userId: number): Promise<boolean> {
+        const user = await this.usersService.getUser(userId);
+        return user.isWorkTransactions;
+    }
+
+    async switchTransactionsFlag(userId: number): Promise<boolean> {
+        const user = await this.usersService.getUser(userId);
+        const isWorkTransactions = !user.isWorkTransactions;
+        await this.usersService.switchTransactionsFlag(userId, isWorkTransactions);
+        return isWorkTransactions;
     }
 }

@@ -29,9 +29,18 @@ export class UsersService {
         };
     }
 
-    async getUser(login: string): Promise<User> {
-        const data = await this.userModel.findOne({ login });
+    async getUser(userId: number): Promise<User> {
+        const user = await this.userModel.findOne({ userId });
 
+        if (!user) {
+            throw new BadRequestException('Пользователя с таким id не существует');
+        }
+
+        return user;
+    }
+
+    async getUserByLogin(login: string): Promise<User> {
+        const data = await this.userModel.findOne({ login });
         return data;
     }
 
@@ -40,6 +49,7 @@ export class UsersService {
 
         const payload = {
             userId: newUserId,
+            isWorkTransactions: true,
             ...params,
         };
 
@@ -71,5 +81,12 @@ export class UsersService {
         if (!result.deletedCount) {
             throw new BadRequestException('Пользователя с таким id не существует');
         }
+    }
+
+    async switchTransactionsFlag(userId: number, value: boolean): Promise<void> {
+        await this.userModel.findOneAndUpdate(
+            { userId: userId },
+            { $set: { isWorkTransactions: value } }, 
+        );
     }
 }
