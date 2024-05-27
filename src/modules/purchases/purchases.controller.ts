@@ -5,9 +5,11 @@ import {
     Get,
     Query,
     Header,
+    Param,
     Post,
     Body,
     Patch,
+    Request,
     StreamableFile,
     UseInterceptors,
     UploadedFile,
@@ -21,9 +23,11 @@ import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseUploadDto } from './dto/purchase-upload.dto';
 import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
-import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
+import { ROLES } from '../../helpers/constants';
+import { RequireRoles } from '../../decorators/roles.decorator';
 import { Public } from '../../decorators/public.decorator';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @ApiTags('Purchases')
 @Controller('purchases')
@@ -42,17 +46,25 @@ export class PurchasesController {
         return this.purchasesService.createPurchase(purchaseDto);
     }
 
-    @ApiOperation({
-        summary: 'Принять сделку. Отменить сделку. Подтвердить сделку',
-        description: `
-            - Чтобы принять сделку, нужно передать status = 2.
-            - Чтобы отменить сделку, нужно передать status = 3.
-            - Чтобы подтвердить сделку, нужно передать status = 4.
-        `,
-    })
-    @Patch('change-status/')
-    changeStatusCard(@Body() purchaseDto: PurchaseChangeStatusDto): Promise<Purchase> {
-        return this.purchasesService.changeStatusCard(purchaseDto);
+    @ApiOperation({ summary: 'Принять сделку' })
+    @RequireRoles(ROLES.Trader)
+    @Patch('activate/:id')
+    activatePurchase(@Param('id') id: number, @Request() req: CustomRequest): Promise<void> {
+        return this.purchasesService.activatePurchase(id, req.user.userId);
+    }
+
+    @ApiOperation({ summary: 'Подтвердить сделку' })
+    @RequireRoles(ROLES.Admin, ROLES.Trader)
+    @Patch('confirm/:id')
+    confirmPurchase(@Param('id') id: number): Promise<void> {
+        return this.purchasesService.confirmPurchase(id);
+    }
+
+    @ApiOperation({ summary: 'Отменить сделку' })
+    @RequireRoles(ROLES.Admin, ROLES.Trader)
+    @Patch('cancel/:id')
+    cancelPurchase(@Param('id') id: number): Promise<void> {
+        return this.purchasesService.cancelPurchase(id);
     }
 
     @ApiOperation({ summary: 'Получение списка выплат в формате Excel' })

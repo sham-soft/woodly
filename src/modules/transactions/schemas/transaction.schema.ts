@@ -59,6 +59,7 @@ export class Transaction {
         fio: string,
         bankType: number,
         cardLastNumber: string,
+        userId: number,
     };
 }
 

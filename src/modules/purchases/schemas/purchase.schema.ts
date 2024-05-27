@@ -43,6 +43,9 @@ export class Purchase {
 
     @Prop()
     receipt: string;
+
+    @Prop()
+    traderId: number;
 }
 
 export const PurchaseSchema = SchemaFactory.createForClass(Purchase);

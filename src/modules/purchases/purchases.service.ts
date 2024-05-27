@@ -6,7 +6,6 @@ import { Purchase } from './schemas/purchase.schema';
 import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
-import { PurchaseChangeStatusDto } from './dto/purchase-change-status.dto';
 import { getPagination } from '../../helpers/pagination';
 import { getSumWithPercent } from '../../helpers/numbers';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
@@ -65,21 +64,24 @@ export class PurchasesService {
         return newPurchase;
     }
 
-    changeStatusCard(params: PurchaseChangeStatusDto): Promise<Purchase> {
-        type PayloadType = {
-            status: number;
-            dateClose?: string;
-        }
-        const payload: PayloadType = { status: params.status };
+    async activatePurchase(id: number, userId: number): Promise<void> {
+        this.purchaseModel.findOneAndUpdate(
+            { purchaseId: id },
+            { $set: { status: PURCHASE_STATUSES.Active, traderId: userId } }, 
+        );
+    }
 
-        if ([PURCHASE_STATUSES.Cancelled, PURCHASE_STATUSES.Successful].includes(params.status)) {
-            payload.dateClose = getСurrentDateToString();
-        }
+    async confirmPurchase(id: number): Promise<void> {
+        this.purchaseModel.findOneAndUpdate(
+            { purchaseId: id },
+            { $set: { status: PURCHASE_STATUSES.Successful, dateClose: getСurrentDateToString() } }, 
+        );
+    }
 
-        return this.purchaseModel.findOneAndUpdate(
-            { purchaseId: params.purchaseId },
-            { $set: payload }, 
-            { new: true }
+    async cancelPurchase(id: number): Promise<void> {
+        this.purchaseModel.findOneAndUpdate(
+            { purchaseId: id },
+            { $set: { status: PURCHASE_STATUSES.Cancelled, dateClose: getСurrentDateToString() } }, 
         );
     }
 

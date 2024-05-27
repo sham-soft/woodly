@@ -35,6 +35,7 @@ export class ActivateTransactionService {
                     fio: card.fio,
                     bankType: card.bankType,
                     cardLastNumber: card.cardLastNumber,
+                    userId: card.userId,
                 },
             };
 
