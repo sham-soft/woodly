@@ -1,13 +1,17 @@
-import { IsString, IsNumber, Length, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, Length, IsIn } from 'class-validator';
+import { getEnumIntValues } from '../../../helpers/enum';
+import { PAYMENT_SYSTEMS, BANK_TYPES, CURRENCIES } from '../../../helpers/constants';
 
 export class PurchaseCreateDto {
     @IsNumber()
     cashbox: number;
 
     @IsNumber()
+    @IsIn(getEnumIntValues(PAYMENT_SYSTEMS))
     paymentSystem: number;
 
     @IsNumber()
+    @IsIn(getEnumIntValues(BANK_TYPES))
     bankType: number;
 
     @IsNumber()
@@ -16,11 +20,11 @@ export class PurchaseCreateDto {
     @IsNumber()
     orderNumber: number;
 
-    @IsNumber()
-    currency: number;
+    @IsString()
+    @IsIn(Object.values(CURRENCIES))
+    currency: string;
 
     @Length(11, 16)
     @IsString()
-    @IsNotEmpty()
     requisites: string;
 }

@@ -42,8 +42,8 @@ export class PurchasesController {
 
     @ApiOperation({ summary: 'Создание выплаты' })
     @Post('create/')
-    createCard(@Body() purchaseDto: PurchaseCreateDto): Promise<Purchase> {
-        return this.purchasesService.createPurchase(purchaseDto);
+    createCard(@Body() purchaseDto: PurchaseCreateDto, @Request() req: CustomRequest): Promise<Purchase> {
+        return this.purchasesService.createPurchase(purchaseDto, req.user.userId);
     }
 
     @ApiOperation({ summary: 'Принять сделку' })

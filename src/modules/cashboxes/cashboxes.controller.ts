@@ -38,13 +38,13 @@ export class CashboxesController {
 
     @ApiOperation({ summary: 'Активация кассы' })
     @Patch('activate/:id')
-    activateCashbox(@Param('id') id: number): void {
+    activateCashbox(@Param('id') id: number): Promise<void> {
         return this.cashboxesService.activateCashbox(id);
     }
 
     @ApiOperation({ summary: 'Деактивация кассы' })
     @Patch('deactivate/:id')
-    deactivateCashbox(@Param('id') id: number): void {
+    deactivateCashbox(@Param('id') id: number): Promise<void> {
         return this.cashboxesService.deactivateCashbox(id);
     }
 }

@@ -24,7 +24,7 @@ export class Purchase {
     orderNumber: number;
 
     @Prop()
-    currency: number;
+    currency: string;
 
     @Prop()
     requisites: string;
@@ -45,7 +45,10 @@ export class Purchase {
     receipt: string;
 
     @Prop()
-    traderId: number;
+    creatorId: number;
+
+    @Prop()
+    buyerId: number;
 }
 
 export const PurchaseSchema = SchemaFactory.createForClass(Purchase);

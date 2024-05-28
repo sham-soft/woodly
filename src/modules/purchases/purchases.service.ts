@@ -6,6 +6,7 @@ import { Purchase } from './schemas/purchase.schema';
 import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
+import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
 import { getSumWithPercent } from '../../helpers/numbers';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
@@ -45,16 +46,16 @@ export class PurchasesService {
         };
     }
 
-    async createPurchase(params: PurchaseCreateDto): Promise<Purchase> {
-        const sortPurchases = await this.purchaseModel.find().sort({ purchaseId: -1 }).limit(1);
-        const purchaseId = sortPurchases[0]?.purchaseId || 0;
+    async createPurchase(params: PurchaseCreateDto, userId: number): Promise<Purchase> {
+        const newPurchaseId = await createId(this.purchaseModel, 'purchaseId');
         const debit = getSumWithPercent(4, params.amount);
 
         const payload = {
-            purchaseId: purchaseId + 1,
+            purchaseId: newPurchaseId,
             status: PURCHASE_STATUSES.Available,
             dateCreate: getСurrentDateToString(),
             debit,
+            creatorId: userId,
             ...params,
         };
 
@@ -65,21 +66,21 @@ export class PurchasesService {
     }
 
     async activatePurchase(id: number, userId: number): Promise<void> {
-        this.purchaseModel.findOneAndUpdate(
+        await this.purchaseModel.findOneAndUpdate(
             { purchaseId: id },
-            { $set: { status: PURCHASE_STATUSES.Active, traderId: userId } }, 
+            { $set: { status: PURCHASE_STATUSES.Active, buyerId: userId } }, 
         );
     }
 
     async confirmPurchase(id: number): Promise<void> {
-        this.purchaseModel.findOneAndUpdate(
+        await this.purchaseModel.findOneAndUpdate(
             { purchaseId: id },
             { $set: { status: PURCHASE_STATUSES.Successful, dateClose: getСurrentDateToString() } }, 
         );
     }
 
     async cancelPurchase(id: number): Promise<void> {
-        this.purchaseModel.findOneAndUpdate(
+        await this.purchaseModel.findOneAndUpdate(
             { purchaseId: id },
             { $set: { status: PURCHASE_STATUSES.Cancelled, dateClose: getСurrentDateToString() } }, 
         );

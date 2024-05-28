@@ -49,15 +49,15 @@ export class CashboxesService {
         return newCashbox;
     }
 
-    activateCashbox(id: number): void {
-        this.cashboxModel.findOneAndUpdate(
+    async activateCashbox(id: number): Promise<void> {
+        await this.cashboxModel.findOneAndUpdate(
             { cashboxId: id },
             { $set: { status: CASHBOX_STATUSES.Active } },
         );
     }
 
-    deactivateCashbox(id: number): void {
-        this.cashboxModel.findOneAndUpdate(
+    async deactivateCashbox(id: number): Promise<void>{
+        await this.cashboxModel.findOneAndUpdate(
             { cashboxId: id },
             { $set: { status: CASHBOX_STATUSES.Inactive } },
         );
