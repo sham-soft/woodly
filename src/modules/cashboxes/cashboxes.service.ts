@@ -4,7 +4,6 @@ import { Injectable } from '@nestjs/common';
 import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
-import { CashboxChangeStatusDto } from './dto/cashbox-change-status.dto';
 import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
 import { CASHBOX_STATUSES } from '../../helpers/constants';
@@ -21,7 +20,7 @@ export class CashboxesService {
     async getCashboxes(query: CashboxQueryDto, user: CustomRequest['user']): Promise<PaginatedList<Cashbox>> {
         const pagination = getPagination(query.page);
 
-        const filters = user.role === ROLES.Merchant ? { creator: user.userId } : {};
+        const filters = user.role === ROLES.Merchant ? { creatorId: user.userId } : {};
 
         const total = await this.cashboxModel.countDocuments(filters);
         const data = await this.cashboxModel.find(filters).skip(pagination.skip).limit(pagination.limit);
@@ -34,12 +33,12 @@ export class CashboxesService {
         };
     }
 
-    async createCashbox(params: CashboxCreateDto, user: CustomRequest['user']): Promise<Cashbox> {
+    async createCashbox(params: CashboxCreateDto, userId: number): Promise<Cashbox> {
         const newCashboxId = await createId(this.cashboxModel, 'cashboxId');
 
         const payload = {
             cashboxId: newCashboxId,
-            creator: user.userId,
+            creatorId: userId,
             status: CASHBOX_STATUSES.Active,
             ...params,
         };
@@ -50,11 +49,17 @@ export class CashboxesService {
         return newCashbox;
     }
 
-    changeStatusCashbox(params: CashboxChangeStatusDto): Promise<Cashbox> {
-        return this.cashboxModel.findOneAndUpdate(
-            { cashboxId: params.cashboxId },
-            { $set: { status: params.status } }, 
-            { new: true }
+    activateCashbox(id: number): void {
+        this.cashboxModel.findOneAndUpdate(
+            { cashboxId: id },
+            { $set: { status: CASHBOX_STATUSES.Active } },
+        );
+    }
+
+    deactivateCashbox(id: number): void {
+        this.cashboxModel.findOneAndUpdate(
+            { cashboxId: id },
+            { $set: { status: CASHBOX_STATUSES.Inactive } },
         );
     }
 }

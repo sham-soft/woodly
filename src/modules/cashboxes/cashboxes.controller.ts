@@ -5,13 +5,13 @@ import {
     Query,
     Post,
     Body,
+    Param,
     Patch,
     Request,
 } from '@nestjs/common';
 import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
-import { CashboxChangeStatusDto } from './dto/cashbox-change-status.dto';
 import { CashboxesService } from './cashboxes.service';
 import { ROLES } from '../../helpers/constants';
 import { RequireRoles } from '../../decorators/roles.decorator';
@@ -33,18 +33,18 @@ export class CashboxesController {
     @ApiOperation({ summary: 'Создание кассы' })
     @Post('create/')
     createCard(@Body() cashboxDto: CashboxCreateDto, @Request() req: CustomRequest): Promise<Cashbox> {
-        return this.cashboxesService.createCashbox(cashboxDto, req.user);
+        return this.cashboxesService.createCashbox(cashboxDto, req.user.userId);
     }
 
-    @ApiOperation({
-        summary: 'Активация кассы. Деактивация кассы.',
-        description: `
-            - Чтобы активировать кассу, нужно передать status = 1.
-            - Чтобы деактивировать карту, нужно передать status = 2.
-        `,
-    })
-    @Patch('change-status/')
-    changeStatusCashbox(@Body() cardDto: CashboxChangeStatusDto): Promise<Cashbox> {
-        return this.cashboxesService.changeStatusCashbox(cardDto);
+    @ApiOperation({ summary: 'Активация кассы' })
+    @Patch('activate/:id')
+    activateCashbox(@Param('id') id: number): void {
+        return this.cashboxesService.activateCashbox(id);
+    }
+
+    @ApiOperation({ summary: 'Деактивация кассы' })
+    @Patch('deactivate/:id')
+    deactivateCashbox(@Param('id') id: number): void {
+        return this.cashboxesService.deactivateCashbox(id);
     }
 }

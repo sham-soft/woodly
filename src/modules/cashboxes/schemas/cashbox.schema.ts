@@ -33,7 +33,7 @@ export class Cashbox {
     apiKey: string;
 
     @Prop()
-    creator: number;
+    creatorId: number;
 
     @Prop()
     status: number;
