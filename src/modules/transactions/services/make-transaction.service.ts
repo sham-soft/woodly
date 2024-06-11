@@ -25,7 +25,7 @@ export class MakeTransactionService {
         }
 
         const transaction = await this.transactionModel.findOne({
-            cardLastNumber: params.cardLastNumber,
+            'card.cardLastNumber': params.cardLastNumber,
             amount: params.amount,
             status: TRANSACTION_STATUSES.Active,
             dateClose: { $gt: getСurrentDateToString() },
