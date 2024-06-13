@@ -50,6 +50,7 @@ export class UsersService {
         const payload = {
             userId: newUserId,
             isWorkTransactions: true,
+            balance: 0,
             ...params,
         };
 

@@ -28,6 +28,9 @@ export class User {
 
     @Prop()
     isWorkTransactions: boolean;
+
+    @Prop()
+    balance: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

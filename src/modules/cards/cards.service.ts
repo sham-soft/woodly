@@ -7,7 +7,6 @@ import { CardTransactionsQueryDto } from './dto/card-transactions.dto';
 import { CardSetLimitDto } from './dto/card-set-limit.dto';
 import { CardEditDto } from './dto/card-edit.dto';
 import { CardCreateDto } from './dto/card-create.dto';
-import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { Transaction } from '../transactions/schemas/transaction.schema';
 import { getPagination } from '../../helpers/pagination';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
@@ -131,11 +130,24 @@ export class CardsService {
         );
     }
 
-    changeStatusCard(params: CardChangeStatusDto): Promise<Card> {
-        return this.cardModel.findOneAndUpdate(
-            { cardId: params.cardId },
-            { $set: { status: params.status } }, 
-            { new: true }
+    async activateCard(id: number): Promise<void> {
+        await this.cardModel.findOneAndUpdate(
+            { cardId: id },
+            { $set: { status: CARD_STATUSES.Active } }, 
+        );
+    }
+
+    async disableCard(id: number): Promise<void> {
+        await this.cardModel.findOneAndUpdate(
+            { cardId: id },
+            { $set: { status: CARD_STATUSES.Inactive } }, 
+        );
+    }
+
+    async deleteCard(id: number): Promise<void> {
+        await this.cardModel.findOneAndUpdate(
+            { cardId: id },
+            { $set: { status: CARD_STATUSES.Deleted } }, 
         );
     }
 

@@ -15,7 +15,6 @@ import { CardTransactionsQueryDto } from './dto/card-transactions.dto';
 import { CardSetLimitDto } from './dto/card-set-limit.dto';
 import { CardEditDto } from './dto/card-edit.dto';
 import { CardCreateDto } from './dto/card-create.dto';
-import { CardChangeStatusDto } from './dto/card-change-status.dto';
 import { CardsService } from './cards.service';
 import { Transaction } from '../transactions/schemas/transaction.schema';
 import { ROLES } from '../../helpers/constants';
@@ -53,18 +52,22 @@ export class CardsController {
         return this.cardsService.setLimitCard(cardDto);
     }
 
-    @ApiOperation({
-        summary: 'Активация карты. Отключение карты. Удаление карты. Восстановление карты',
-        description: `
-            - Чтобы активировать карту, нужно передать status = 1.
-            - Чтобы отключить карту, нужно передать status = 2.
-            - Чтобы удалить карту, нужно передать status = 3.
-            - Чтобы восстановить карту, нужно передать status = 1.
-        `,
-    })
-    @Patch('change-status/')
-    changeStatusCard(@Body() cardDto: CardChangeStatusDto): Promise<Card> {
-        return this.cardsService.changeStatusCard(cardDto);
+    @ApiOperation({ summary: 'Активация карты' })
+    @Patch('activate/:id')
+    activateCard(@Param('id') id: number): Promise<void> {
+        return this.cardsService.activateCard(id);
+    }
+
+    @ApiOperation({ summary: 'Отключение карты' })
+    @Patch('disable/:id')
+    disableCard(@Param('id') id: number): Promise<void> {
+        return this.cardsService.disableCard(id);
+    }
+
+    @ApiOperation({ summary: 'Удаление карты' })
+    @Patch('delete/:id')
+    deleteCard(@Param('id') id: number): Promise<void> {
+        return this.cardsService.deleteCard(id);
     }
 
     @ApiOperation({ summary: 'Получение сделок по определенной карте' })
