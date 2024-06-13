@@ -16,7 +16,6 @@ export class UserCreateDto {
     @IsString()
     password: string;
     
-    @IsString()
     @IsIn(Object.values(ROLES))
     role: string;
 

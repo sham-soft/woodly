@@ -1,4 +1,4 @@
-import { IsString, Length, IsNumber, IsBoolean, IsIn } from 'class-validator';
+import { IsString, Length, IsBoolean, IsIn } from 'class-validator';
 import { getEnumIntValues } from '../../../helpers/enum';
 import { BANK_TYPES, PROCESS_METHODS, SIM_SLOTS, CURRENCIES } from '../../../helpers/constants';
 
@@ -13,15 +13,12 @@ export class CardCreateDto {
     @IsString()
     fio: string;
 
-    @IsNumber()
     @IsIn(getEnumIntValues(BANK_TYPES))
     bankType: number;
 
-    @IsNumber()
     @IsIn(getEnumIntValues(PROCESS_METHODS))
     processMethod: number;
 
-    @IsString()
     @IsIn(Object.values(CURRENCIES))
     currency: string;
 
@@ -31,7 +28,6 @@ export class CardCreateDto {
     @IsString()
     apiKey: string;
 
-    @IsNumber()
     @IsIn(getEnumIntValues(SIM_SLOTS))
     slotSim: number;
 

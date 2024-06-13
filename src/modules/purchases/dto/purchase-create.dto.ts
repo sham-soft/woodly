@@ -6,11 +6,9 @@ export class PurchaseCreateDto {
     @IsNumber()
     cashbox: number;
 
-    @IsNumber()
     @IsIn(getEnumIntValues(PAYMENT_SYSTEMS))
     paymentSystem: number;
 
-    @IsNumber()
     @IsIn(getEnumIntValues(BANK_TYPES))
     bankType: number;
 
@@ -20,7 +18,6 @@ export class PurchaseCreateDto {
     @IsNumber()
     orderNumber: number;
 
-    @IsString()
     @IsIn(Object.values(CURRENCIES))
     currency: string;
 

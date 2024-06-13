@@ -9,11 +9,9 @@ export class TransactionCreateDto {
     @IsNumber()
     cashbox: number;
 
-    @IsNumber()
     @IsIn(getEnumIntValues(PAYMENT_SYSTEMS))
     paymentSystem: number;
 
-    @IsString()
     @IsIn(Object.values(CURRENCIES))
     currency: string;
 

@@ -9,7 +9,6 @@ export class TransactionActivateDto {
     @IsOptional()
     isSbp?: boolean;
 
-    @IsNumber()
     @IsIn([BANK_TYPES.Sber, BANK_TYPES.Tinkoff])
     @ValidateIf(params => !params.isSbp)
     bankType: number;

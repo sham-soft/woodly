@@ -16,7 +16,6 @@ export class UserEditDto {
     @IsString()
     password: string;
     
-    @IsString()
     @IsIn(Object.values(ROLES))
     role: string;
 }
