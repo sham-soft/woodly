@@ -1,9 +1,8 @@
-import { IsString, IsEmail, Length, IsIn, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsEmail, Length, IsIn, IsNumber } from 'class-validator';
 import { ROLES } from '../../../helpers/constants';
 
 export class UserEditDto {
     @IsNumber()
-    @IsNotEmpty()
     userId: number;
 
     @IsString()

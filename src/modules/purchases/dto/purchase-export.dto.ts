@@ -1,7 +1,6 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class PurchaseExportQueryDto {
-    @IsOptional()
     cashboxes?: number[];
 
     @IsString()

@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsOptional, IsNumber, IsString } from 'class-validator';
+import { IsOptional, IsNumber, IsString } from 'class-validator';
 
 export class TransactionMakeDto {
-    @IsNotEmpty()
+    @IsString()
     cardLastNumber: string;
 
     @IsNumber()
@@ -9,6 +9,5 @@ export class TransactionMakeDto {
     amount?: number;
 
     @IsString()
-    @IsNotEmpty()
     message: string;
 }

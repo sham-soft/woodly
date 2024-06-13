@@ -1,6 +1,6 @@
 import { registerDecorator } from 'class-validator';
 
-export function IsInArray(allowValues: string[]) {
+export function IsInArray<T = string>(allowValues: T[]) {
     return function(object: object, propertyName: string): void {
         registerDecorator({
             name: 'isInArray',
@@ -11,7 +11,8 @@ export function IsInArray(allowValues: string[]) {
             },
             validator: {
                 validate(values: any) {
-                    return values.every((value: string) => allowValues.includes(value));
+                    values = Array.isArray(values) ? values : [values];
+                    return values.every((value: T) => allowValues.includes(value));
                 },
             },
         });
