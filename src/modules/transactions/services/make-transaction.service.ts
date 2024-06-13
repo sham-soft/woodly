@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Transaction } from '../schemas/transaction.schema';
 import { TransactionMakeDto } from '../dto/transaction-make.dto';
+import { UsersService } from '../../users/users.service';
 import { Message } from '../../messages/schemas/message.schema';
 import { Card } from '../../cards/schemas/card.schema';
 import { Autopayment } from '../../autopayments/schemas/autopayment.schema';
@@ -17,6 +18,7 @@ export class MakeTransactionService {
         @InjectModel('autopayments') private autopaymentModel: Model<Autopayment>,
         @InjectModel('messages') private messageModel: Model<Message>,
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
+        private readonly usersService: UsersService,
     ) {}
 
     async makeTransaction(params: TransactionMakeDto): Promise<string> {
@@ -40,6 +42,8 @@ export class MakeTransactionService {
 
             await this.transactionModel.findOneAndUpdate({ transactionId: transaction.transactionId }, { $set: payloadTransaction });
             await this.updateCardTurnover(transaction);
+            // Обновление баланса трейдера. Списание
+            await this.usersService.updateBalance(transaction.card.creatorId, -params.amount);
 
             return 'Операция успешно прошла!';
         }

@@ -15,7 +15,6 @@ export class ExportTransactionService {
 
     async getTransactionsExport(query: TransactionExportQueryDto): Promise<StreamableFile> {
         const filters = getQueryFilters(query, {
-            cashbox: QueryFilterRules.EQUAL,
             dateStart: QueryFilterRules.CREATE_GT,
             dateEnd: QueryFilterRules.CREATE_LT,
             status: QueryFilterRules.EQUAL,

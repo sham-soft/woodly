@@ -19,7 +19,7 @@ export class TransactionQueryDto {
 
     clientNumber?: string;
 
-    cashbox?: number;
+    cashboxId?: number;
 
     dateEnd?: string;
 

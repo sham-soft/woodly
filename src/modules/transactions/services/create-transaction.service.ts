@@ -17,7 +17,7 @@ export class CreateTransactionService {
     ) {}
 
     async createTransaction(params: TransactionCreateDto): Promise<Transaction> {
-        await this.checkCashbox(params.cashbox);
+        const cashbox = await this.getCashbox(params.cashboxId);
 
         const newTransactionId = await createId(this.transactionModel, 'transactionId');
 
@@ -27,6 +27,10 @@ export class CreateTransactionService {
             amountMinusCommission: getSumWithoutPercent(2.5, params.amount),
             status: TRANSACTION_STATUSES.Created,
             dateCreate: getСurrentDateToString(),
+            cashbox: {
+                cashboxId: cashbox.cashboxId,
+                creatorId: cashbox.creatorId,
+            },
             ...params,
         };
 
@@ -36,11 +40,13 @@ export class CreateTransactionService {
         return newTransaction;
     }
 
-    private async checkCashbox(cashboxId: number): Promise<void> {
+    private async getCashbox(cashboxId: number): Promise<Cashbox> {
         const cashbox = await this.cashboxModel.findOne({ cashboxId });
 
         if (!cashbox) {
             throw new BadRequestException('Нет кассы с id: ' + cashboxId);
         }
+
+        return cashbox;
     }
 }

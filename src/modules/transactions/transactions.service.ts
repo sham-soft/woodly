@@ -39,7 +39,7 @@ export class TransactionsService {
             amount: { rule: FilterRules.REGEX_INTEGER, value: query.amount },
             orderNumber: { rule: FilterRules.REGEX_INTEGER, value: query.orderNumber },
             clientNumber: { rule: FilterRules.REGEX_STRING, value: query.clientNumber },
-            cashbox: { rule: FilterRules.EQUAL, value: query.cashbox },
+            'cashbox.cashboxId': { rule: FilterRules.EQUAL, value: query.cashboxId },
             dateCreate: { rule: FilterRules.LT, value: query.dateEnd },
             'card.title': { rule: FilterRules.REGEX_STRING_OR, value: query.title },
             'card.cardNumber': { rule: FilterRules.REGEX_STRING_OR, value: query.cardNumber },

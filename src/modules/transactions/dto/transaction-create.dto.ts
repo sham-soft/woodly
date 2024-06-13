@@ -7,7 +7,7 @@ export class TransactionCreateDto {
     orderNumber: number;
 
     @IsNumber()
-    cashbox: number;
+    cashboxId: number;
 
     @IsIn(getEnumIntValues(PAYMENT_SYSTEMS))
     paymentSystem: number;

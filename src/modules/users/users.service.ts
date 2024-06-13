@@ -90,4 +90,11 @@ export class UsersService {
             { $set: { isWorkTransactions: value } }, 
         );
     }
+
+    async updateBalance(userId: number, value: number): Promise<void> {
+        await this.userModel.findOneAndUpdate(
+            { userId: userId },
+            { $inc: { balance: value } }, 
+        );
+    }
 }
