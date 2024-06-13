@@ -37,7 +37,7 @@ export class CardsController {
     @ApiOperation({ summary: 'Создание карты' })
     @Post('create/')
     createCard(@Body() cardDto: CardCreateDto, @Request() req: CustomRequest): Promise<Card> {
-        return this.cardsService.createCard(cardDto, req.user);
+        return this.cardsService.createCard(cardDto, req.user.userId);
     }
     
     @ApiOperation({ summary: 'Редактирование карты' })

@@ -35,7 +35,7 @@ export class ActivateTransactionService {
                     fio: card.fio,
                     bankType: card.bankType,
                     cardLastNumber: card.cardLastNumber,
-                    userId: card.userId,
+                    creatorId: card.creatorId,
                 },
             };
 
@@ -50,7 +50,7 @@ export class ActivateTransactionService {
     }
 
     private async checkWorkTransactions(card: Card): Promise<void> {
-        const user = await this.usersService.getUser(card.userId);
+        const user = await this.usersService.getUser(card.creatorId);
 
         if (!user.isWorkTransactions) {
             throw new BadRequestException('На данный момент сделки отключены');

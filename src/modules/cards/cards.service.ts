@@ -8,11 +8,11 @@ import { CardSetLimitDto } from './dto/card-set-limit.dto';
 import { CardEditDto } from './dto/card-edit.dto';
 import { CardCreateDto } from './dto/card-create.dto';
 import { Transaction } from '../transactions/schemas/transaction.schema';
+import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
 import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
-import type { CustomRequest } from '../../types/custom-request.type';
 
 @Injectable()
 export class CardsService {
@@ -44,13 +44,12 @@ export class CardsService {
         };
     }
 
-    async createCard(params: CardCreateDto, user: CustomRequest['user']): Promise<Card> {
-        const sortCards = await this.cardModel.find().sort({ cardId: -1 }).limit(1);
-        const cardId = sortCards[0]?.cardId || 0;
+    async createCard(params: CardCreateDto, userId: number): Promise<Card> {
+        const newCardId = await createId(this.cardModel, 'cardId');
 
         const payload = {
             title: params.title,
-            cardId: cardId + 1,
+            cardId: newCardId,
             cardNumber: params.cardNumber,
             fio: params.fio,
             bankType: params.bankType,
@@ -70,7 +69,7 @@ export class CardsService {
             paymentMax: 1000000,
             status: CARD_STATUSES.Active,
             cardLastNumber: params.cardNumber.slice(-4),
-            userId: user.userId,
+            creatorId: userId,
         };
 
         const card = await this.cardModel.findOne({ cardLastNumber: payload.cardLastNumber });
