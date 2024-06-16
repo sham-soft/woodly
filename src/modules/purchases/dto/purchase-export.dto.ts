@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 
 export class PurchaseExportQueryDto {
-    cashboxes?: number[];
+    cashboxIds?: number[];
 
     @IsString()
     dateStart: string;

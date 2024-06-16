@@ -20,8 +20,8 @@ export class ExportPurchasesService {
             },
         };
 
-        if (query.cashboxes) {
-            filters.cashbox = { $in: [...query.cashboxes] };
+        if (query.cashboxIds) {
+            filters['cashbox.cashboxId'] = { $in: [...query.cashboxIds] };
         }
 
         const purchases = await this.purchaseModel.find(filters);

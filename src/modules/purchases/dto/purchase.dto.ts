@@ -20,7 +20,7 @@ export class PurchaseQueryDto {
     @IsOptional()
     bankType?: number;
 
-    cashbox?: number;
+    cashboxId?: number;
 
     @IsIn(getEnumIntValuesToString(PURCHASE_STATUSES))
     @IsOptional()

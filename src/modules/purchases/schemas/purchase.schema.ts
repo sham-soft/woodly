@@ -1,5 +1,6 @@
 import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Cashbox } from '../../cashboxes/schemas/cashbox.schema';
 
 export type PurchaseDocument = HydratedDocument<Purchase>;
 
@@ -7,9 +8,6 @@ export type PurchaseDocument = HydratedDocument<Purchase>;
 export class Purchase {
     @Prop()
     purchaseId: number;
-
-    @Prop()
-    cashbox: number;
 
     @Prop()
     paymentSystem: number;
@@ -43,6 +41,12 @@ export class Purchase {
 
     @Prop()
     receipt: string;
+
+    @Prop({ type: Cashbox })
+    cashbox: {
+        cashboxId: number,
+        creatorId: number,
+    };
 
     @Prop()
     creatorId: number;

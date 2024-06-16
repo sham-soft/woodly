@@ -4,7 +4,7 @@ import { PAYMENT_SYSTEMS, BANK_TYPES, CURRENCIES } from '../../../helpers/consta
 
 export class PurchaseCreateDto {
     @IsNumber()
-    cashbox: number;
+    cashboxId: number;
 
     @IsIn(getEnumIntValues(PAYMENT_SYSTEMS))
     paymentSystem: number;
