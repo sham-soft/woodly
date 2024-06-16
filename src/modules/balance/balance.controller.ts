@@ -4,12 +4,14 @@ import {
     Get,
     Header,
     Query,
+    Request,
     StreamableFile,
 } from '@nestjs/common';
 import { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
 import { BalanceExportQueryDto } from './dto/balance-export.dto';
 import { BalanceService } from './balance.service';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 import type { BalanceTransaction } from './types/balance-transaction.type';
 
 @ApiTags('Balance')
@@ -19,8 +21,8 @@ export class BalanceController {
 
     @ApiOperation({ summary: 'Получения баланса' })
     @Get()
-    getBalance(): Promise<PaginatedList<BalanceTransaction>> {
-        return this.balanceService.getBalance();
+    getBalance(@Request() req: CustomRequest): Promise<PaginatedList<BalanceTransaction>> {
+        return this.balanceService.getBalance(req.user.userId);
     }
 
     @ApiOperation({ summary: 'Получения списка операций для раздела баланса' })

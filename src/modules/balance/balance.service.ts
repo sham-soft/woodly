@@ -15,8 +15,8 @@ export class BalanceService {
         private readonly exportTransactionsService: ExportTransactionsService,
     ) {}
 
-    async getBalance(): Promise<PaginatedList<BalanceTransaction>> {
-        return this.getBalanceService.getBalance();
+    async getBalance(userId: number): Promise<PaginatedList<BalanceTransaction>> {
+        return this.getBalanceService.getBalance(userId);
     }
 
     async getTransactions(query: BalanceTransactionsQueryDto): Promise<any> {

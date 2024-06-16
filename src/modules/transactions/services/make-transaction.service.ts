@@ -8,6 +8,7 @@ import { Message } from '../../messages/schemas/message.schema';
 import { Card } from '../../cards/schemas/card.schema';
 import { Autopayment } from '../../autopayments/schemas/autopayment.schema';
 import { createId } from '../../../helpers/unique';
+import { getPercentOfValue } from '../../../helpers/numbers';
 import { getСurrentDateToString } from '../../../helpers/date';
 import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 
@@ -42,8 +43,7 @@ export class MakeTransactionService {
 
             await this.transactionModel.findOneAndUpdate({ transactionId: transaction.transactionId }, { $set: payloadTransaction });
             await this.updateCardTurnover(transaction);
-            // Обновление баланса трейдера. Списание
-            await this.usersService.updateBalance(transaction.card.creatorId, -params.amount);
+            await this.updateBalances(transaction, params.amount);
 
             return 'Операция успешно прошла!';
         }
@@ -104,5 +104,20 @@ export class MakeTransactionService {
         newMessage.save();
 
         throw new BadRequestException('Операция с такой суммой не найдена. Создано новое общее СМС.');
+    }
+
+    private async updateBalances(transaction: Transaction, amount: number): Promise<void> {
+        // Обновление баланса трейдера. Списание
+        await this.usersService.updateBalance(transaction.card.creatorId, -amount);
+
+        const ADMIN_ID = 1;
+        const ADMIN_PERCENT = 6;
+        const adminAmount = getPercentOfValue(ADMIN_PERCENT, amount);
+        // Обновление баланса админа. Пополнение
+        await this.usersService.updateBalance(ADMIN_ID, adminAmount);
+
+        const merchantAmount = amount - adminAmount;
+        // Обновление баланса мерчанта. Пополнение
+        await this.usersService.updateBalance(transaction.cashbox.creatorId, merchantAmount);
     }
 }

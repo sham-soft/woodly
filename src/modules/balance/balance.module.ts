@@ -6,6 +6,7 @@ import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
 import { BalanceService } from './balance.service';
 import { BalanceController } from './balance.controller';
+import { UsersModule } from '../users/users.module';
 import { TransactionSchema } from '../transactions/schemas/transaction.schema';
 import { ConfigsModule } from '../configs/configs.module';
 
@@ -13,6 +14,7 @@ import { ConfigsModule } from '../configs/configs.module';
     imports: [
         MongooseModule.forFeature([{ name: 'transactions', schema: TransactionSchema, collection: 'transactions' }]),
         HttpModule,
+        UsersModule,
         ConfigsModule,
     ],
     providers: [
