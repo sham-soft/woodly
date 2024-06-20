@@ -10,6 +10,8 @@ import {
 import { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
 import { BalanceExportQueryDto } from './dto/balance-export.dto';
 import { BalanceService } from './balance.service';
+import { ROLES } from '../../helpers/constants';
+import { RequireRoles } from '../../decorators/roles.decorator';
 import type { PaginatedList } from '../../types/paginated-list.type';
 import type { CustomRequest } from '../../types/custom-request.type';
 import type { BalanceTransaction } from './types/balance-transaction.type';
@@ -20,6 +22,7 @@ export class BalanceController {
     constructor(private readonly balanceService: BalanceService) {}
 
     @ApiOperation({ summary: 'Получения баланса' })
+    @RequireRoles(ROLES.Trader)
     @Get()
     getBalance(@Request() req: CustomRequest): Promise<PaginatedList<BalanceTransaction>> {
         return this.balanceService.getBalance(req.user.userId);

@@ -30,8 +30,8 @@ export class GetBalanceService {
         const rates = balanceData[2];
         const amountFreezeTransactions = balanceData[3];
 
-        const balanceWallet = getFixedFloat((wallet.quantity * rates.rateWithPercent), 2);
-        const balance = userBalance + balanceWallet;
+        const balanceWallet = wallet.quantity * rates.rateWithPercent;
+        const balance = getFixedFloat((userBalance + balanceWallet - amountFreezeTransactions), 2);
 
         return [
             {
