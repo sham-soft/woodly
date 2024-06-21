@@ -18,5 +18,6 @@ import { CashboxSchema } from '../cashboxes/schemas/cashbox.schema';
         ExportPurchasesService,
     ],
     controllers: [PurchasesController],
+    exports: [PurchasesService],
 })
 export class PurchasesModule {}

@@ -92,4 +92,12 @@ export class PurchasesService {
             throw new BadRequestException('Выплаты с таким id не существует');
         }
     }
+
+    async getPurchasesCount(filters: unknown): Promise<number> {
+        return this.purchaseModel.countDocuments(filters);
+    }
+
+    async getPurchasesCollection(filters: unknown, skip: number, limit: number): Promise<Purchase[]> {
+        return this.purchaseModel.find(filters).skip(skip).limit(limit);
+    }
 }

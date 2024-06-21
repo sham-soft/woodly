@@ -116,4 +116,12 @@ export class TransactionsService {
     async getTransactionsExport(query: TransactionExportQueryDto): Promise<StreamableFile> {
         return this.exportTransactionService.getTransactionsExport(query);
     }
+
+    async getTransactionsCount(filters: unknown): Promise<number> {
+        return this.transactionModel.countDocuments(filters);
+    }
+
+    async getTransactionsCollection(filters: unknown, skip: number, limit: number): Promise<Transaction[]> {
+        return this.transactionModel.find(filters).skip(skip).limit(limit);
+    }
 }

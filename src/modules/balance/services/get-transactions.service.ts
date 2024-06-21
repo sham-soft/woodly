@@ -1,12 +1,11 @@
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { Transaction } from '../../transactions/schemas/transaction.schema';
+import { TransactionsService } from '../../transactions/transactions.service';
+import { PurchasesService } from '../../purchases/purchases.service';
 import { ConfigsService } from '../../configs/configs.service';
 import { getPagination } from '../../../helpers/pagination';
 import { convertDateToString } from '../../../helpers/date';
-import { TRANSACTION_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
+import { TRANSACTION_STATUSES, PURCHASE_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
 import type { BalanceTransaction } from '../types/balance-transaction.type';
 import type { BalanceTransactionsQueryDto } from '../dto/balance-transactions.dto';
 import type { PaginatedList } from '../../../types/paginated-list.type';
@@ -14,9 +13,10 @@ import type { PaginatedList } from '../../../types/paginated-list.type';
 @Injectable()
 export class GetTransactionsService {
     constructor(
-        @InjectModel('transactions') private transactionModel: Model<Transaction>,
         private readonly httpService: HttpService,
         private readonly configsService: ConfigsService,
+        private readonly purchasesService: PurchasesService,
+        private readonly transactionsService: TransactionsService,
     ) {}
 
     async getTransactions(query: BalanceTransactionsQueryDto): Promise<PaginatedList<BalanceTransaction>> {
@@ -41,18 +41,73 @@ export class GetTransactionsService {
                     TRANSACTION_STATUSES.Successful : TRANSACTION_STATUSES.Active;
                 const filters = { status };
 
-                total = await this.transactionModel.countDocuments(filters);
+                total = await this.transactionsService.getTransactionsCount(filters);
                 transactions = await this.getWoodlyTransactions(filters, pagination.skip, pagination.limit);
                 break;
 
             default:
             {
-                const filters = {
-                    status: { $in: [TRANSACTION_STATUSES.Active, TRANSACTION_STATUSES.Successful] },
-                };
+                // Проверяем количество документов во всех источниках
+                const totalInternal = 0;
+                const totalTronscan = await this.getTronscanCount();
+                const totalSuccesPurchases = await this.purchasesService.getPurchasesCount({
+                    status: PURCHASE_STATUSES.Successful,
+                });
+                const totalSuccesTransactions = await this.transactionsService.getTransactionsCount({
+                    status: TRANSACTION_STATUSES.Successful,
+                });
+                const totalActiveTransactions = await this.transactionsService.getTransactionsCount({
+                    status: TRANSACTION_STATUSES.Active,
+                });
 
-                total = await this.transactionModel.countDocuments(filters);
-                transactions = await this.getWoodlyTransactions(filters, pagination.skip, pagination.limit);
+                // Вычисляем сколько всего источников, на данной странице есть документы
+                const totalsCount = [
+                    totalInternal,
+                    totalTronscan,
+                    totalSuccesPurchases,
+                    totalSuccesTransactions,
+                    totalActiveTransactions,
+                ].filter(item => (item - pagination.skip) !== 0).length;
+                // Вычисляем отдельный лимит для источников
+                const limit = pagination.limit / totalsCount;
+                // Вычисляем отдельный шаг для источников
+                const skip = getPagination(query.page, limit).skip;
+
+                let transactionsInternal = [];
+                let transactionsTronscan = [];
+                let transactionsSuccesPurchases = [];
+                let transactionsSuccesTransactions = [];
+                let transactionsActiveTransactions = [];
+
+                if (totalInternal) {
+                    transactionsInternal = [];
+                }
+
+                if (totalTronscan) {
+                    transactionsTronscan = await this.getTronscanTransactions(skip, limit);
+                }
+
+                if (totalSuccesPurchases) {
+                    transactionsSuccesPurchases = await this.getWoodlyPurchases(filters, skip, limit);
+                }
+
+                if (totalSuccesTransactions) {
+                    const filters = { status: TRANSACTION_STATUSES.Successful };
+                    transactionsSuccesTransactions = await this.getWoodlyTransactions(filters, skip, limit);
+                }
+
+                if (totalActiveTransactions) {
+                    const filters = { status: TRANSACTION_STATUSES.Active };
+                    transactionsActiveTransactions = await this.getWoodlyTransactions(filters, skip, limit);
+                }
+
+                transactions = [
+                    ...transactionsInternal,
+                    ...transactionsTronscan,
+                    ...transactionsSuccesPurchases,
+                    ...transactionsSuccesTransactions,
+                    ...transactionsActiveTransactions,
+                ];
                 break;
             }
         }
@@ -65,8 +120,19 @@ export class GetTransactionsService {
         };
     }
 
+    private async getWoodlyPurchases(filters: unknown, skip: number, limit: number): Promise<BalanceTransaction[]> {
+        const data = await this.purchasesService.getPurchasesCollection(filters, skip, limit);
+
+        return data.map(item => ({
+            transactionId: item.purchaseId,
+            status: BALANCE_STATUSES.Deposit,
+            amount: item.amount,
+            date: item.dateClose,
+        }));
+    }
+
     private async getWoodlyTransactions(filters: unknown, skip: number, limit: number): Promise<BalanceTransaction[]> {
-        const data = await this.transactionModel.find(filters).skip(skip).limit(limit);
+        const data = await this.transactionsService.getTransactionsCollection(filters, skip, limit);
 
         return data.map(item => ({
             transactionId: item.transactionId,

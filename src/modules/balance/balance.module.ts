@@ -7,7 +7,9 @@ import { ExportTransactionsService } from './services/export-transactions.servic
 import { BalanceService } from './balance.service';
 import { BalanceController } from './balance.controller';
 import { UsersModule } from '../users/users.module';
+import { TransactionsModule } from '../transactions/transactions.module';
 import { TransactionSchema } from '../transactions/schemas/transaction.schema';
+import { PurchasesModule } from '../purchases/purchases.module';
 import { ConfigsModule } from '../configs/configs.module';
 
 @Module({
@@ -16,6 +18,8 @@ import { ConfigsModule } from '../configs/configs.module';
         HttpModule,
         UsersModule,
         ConfigsModule,
+        PurchasesModule,
+        TransactionsModule,
     ],
     providers: [
         BalanceService,

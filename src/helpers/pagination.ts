@@ -4,8 +4,7 @@ interface IPagination {
     page: number,
 }
 
-export function getPagination(page: number): IPagination {
-    const limit = 50;
+export function getPagination(page: number, limit: number = 50): IPagination {
     let skip = 0;
     page = Number(page);
 

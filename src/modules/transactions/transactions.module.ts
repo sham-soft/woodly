@@ -32,5 +32,6 @@ import { AutopaymentSchema } from '../autopayments/schemas/autopayment.schema';
         ExportTransactionService,
     ],
     controllers: [TransactionsController],
+    exports: [TransactionsService],
 })
 export class TransactionsModule {}
