@@ -4,6 +4,7 @@ import { TransactionsService } from '../../transactions/transactions.service';
 import { PurchasesService } from '../../purchases/purchases.service';
 import { ConfigsService } from '../../configs/configs.service';
 import { getPagination } from '../../../helpers/pagination';
+import { getFilters, FilterRules } from '../../../helpers/filters';
 import { convertDateToString } from '../../../helpers/date';
 import { TRANSACTION_STATUSES, PURCHASE_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
 import type { BalanceTransaction } from '../types/balance-transaction.type';
@@ -32,12 +33,17 @@ export class GetTransactionsService {
 
             case BALANCE_STATUSES.Deposit:
             {
+                const filters = getFilters({
+                    purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+                    status: { rule: FilterRules.EQUAL, value: PURCHASE_STATUSES.Successful },
+                    buyerId: { rule: FilterRules.EQUAL, value: userId },
+                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
+                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                });
+
                 // Проверяем количество документов во двух источниках
                 const totalTronscan = await this.getTronscanCount();
-                const totalSuccesPurchases = await this.purchasesService.getPurchasesCount({
-                    status: PURCHASE_STATUSES.Successful,
-                    buyerId: userId,
-                });
+                const totalSuccesPurchases = await this.purchasesService.getPurchasesCount(filters);
                 
                 // Вычисляем сколько всего источников, у которых на данной странице есть документы
                 const totalsCount = [totalTronscan, totalSuccesPurchases].filter(item => (item - pagination.skip) !== 0).length;
@@ -55,7 +61,6 @@ export class GetTransactionsService {
                 }
 
                 if (totalSuccesPurchases) {
-                    const filters = { status: PURCHASE_STATUSES.Successful, buyerId: userId };
                     transactionsSuccesPurchases = await this.getWoodlyPurchases(filters, skip, limit);
                 }
 
@@ -71,7 +76,13 @@ export class GetTransactionsService {
             {
                 const status = Number(query.status) === BALANCE_STATUSES.Deduction ?
                     TRANSACTION_STATUSES.Successful : TRANSACTION_STATUSES.Active;
-                const filters = { status, 'card.creatorId': userId };
+                const filters = getFilters({
+                    transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+                    status: { rule: FilterRules.EQUAL, value: status },
+                    'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
+                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
+                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                });
 
                 total = await this.transactionsService.getTransactionsCount(filters);
                 transactions = await this.getWoodlyTransactions(filters, pagination.skip, pagination.limit);
@@ -79,21 +90,34 @@ export class GetTransactionsService {
             }
             default:
             {
+                const filtersSuccesPurchases = getFilters({
+                    purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+                    status: { rule: FilterRules.EQUAL, value: PURCHASE_STATUSES.Successful },
+                    buyerId: { rule: FilterRules.EQUAL, value: userId },
+                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
+                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                });
+                const filtersSuccesTransactions = getFilters({
+                    transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+                    status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Successful },
+                    'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
+                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
+                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                });
+                const filtersActiveTransactions = getFilters({
+                    transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+                    status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Active },
+                    'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
+                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
+                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                });
+
                 // Проверяем количество документов во всех источниках
                 const totalInternal = 0;
                 const totalTronscan = await this.getTronscanCount();
-                const totalSuccesPurchases = await this.purchasesService.getPurchasesCount({
-                    status: PURCHASE_STATUSES.Successful,
-                    buyerId: userId,
-                });
-                const totalSuccesTransactions = await this.transactionsService.getTransactionsCount({
-                    status: TRANSACTION_STATUSES.Successful,
-                    'card.creatorId': userId,
-                });
-                const totalActiveTransactions = await this.transactionsService.getTransactionsCount({
-                    status: TRANSACTION_STATUSES.Active,
-                    'card.creatorId': userId,
-                });
+                const totalSuccesPurchases = await this.purchasesService.getPurchasesCount(filtersSuccesPurchases);
+                const totalSuccesTransactions = await this.transactionsService.getTransactionsCount(filtersSuccesTransactions);
+                const totalActiveTransactions = await this.transactionsService.getTransactionsCount(filtersActiveTransactions);
 
                 // Вычисляем сколько всего источников, у которых на данной странице есть документы
                 const totalsCount = [
@@ -123,18 +147,15 @@ export class GetTransactionsService {
                 }
 
                 if (totalSuccesPurchases) {
-                    const filters = { status: PURCHASE_STATUSES.Successful, buyerId: userId };
-                    transactionsSuccesPurchases = await this.getWoodlyPurchases(filters, skip, limit);
+                    transactionsSuccesPurchases = await this.getWoodlyPurchases(filtersSuccesPurchases, skip, limit);
                 }
 
                 if (totalSuccesTransactions) {
-                    const filters = { status: TRANSACTION_STATUSES.Successful, 'card.creatorId': userId };
-                    transactionsSuccesTransactions = await this.getWoodlyTransactions(filters, skip, limit);
+                    transactionsSuccesTransactions = await this.getWoodlyTransactions(filtersSuccesTransactions, skip, limit);
                 }
 
                 if (totalActiveTransactions) {
-                    const filters = { status: TRANSACTION_STATUSES.Active, 'card.creatorId': userId };
-                    transactionsActiveTransactions = await this.getWoodlyTransactions(filters, skip, limit);
+                    transactionsActiveTransactions = await this.getWoodlyTransactions(filtersActiveTransactions, skip, limit);
                 }
 
                 transactions = [
