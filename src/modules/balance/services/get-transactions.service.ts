@@ -62,7 +62,8 @@ export class GetTransactionsService {
                 let transactionsTronscan = [];
                 let transactionsSuccesPurchases = [];
 
-                if (totalTronscan) {
+                // Если есть фильтрация, то из кошелька ничего не тянем
+                if (totalTronscan && !(query.transactionId || query.amountStart || query.dateStart)) {
                     transactionsTronscan = await this.getTronscanTransactions(skip, limit);
                 }
 
@@ -172,7 +173,8 @@ export class GetTransactionsService {
                     transactionsInternal = [];
                 }
 
-                if (totalTronscan) {
+                // Если есть фильтрация, то из кошелька ничего не тянем
+                if (totalTronscan && !(query.transactionId || query.amountStart || query.dateStart)) {
                     transactionsTronscan = await this.getTronscanTransactions(skip, limit);
                 }
 
