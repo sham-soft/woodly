@@ -37,7 +37,7 @@ export class BalanceController {
     @ApiOperation({ summary: 'Экспорт списка операций из раздела баланса' })
     @Get('export/')
     @Header('Content-Disposition', 'attachment; filename="BalanceTransactions.xlsx"')
-    getTransactionsExport(@Query() exportQuery: BalanceExportQueryDto): Promise<StreamableFile> {
-        return this.balanceService.getTransactionsExport(exportQuery);
+    getTransactionsExport(@Query() exportQuery: BalanceExportQueryDto, @Request() req: CustomRequest): Promise<StreamableFile> {
+        return this.balanceService.getTransactionsExport(exportQuery, req.user.userId);
     }
 }

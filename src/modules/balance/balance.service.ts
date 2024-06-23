@@ -23,7 +23,7 @@ export class BalanceService {
         return this.getTransactionsService.getTransactions(query, userId);
     }
 
-    async getTransactionsExport(query: BalanceExportQueryDto): Promise<StreamableFile> {
-        return this.exportTransactionsService.getTransactionsExport(query);
+    async getTransactionsExport(query: BalanceExportQueryDto, userId: number): Promise<StreamableFile> {
+        return this.exportTransactionsService.getTransactionsExport(query, userId);
     }
 }

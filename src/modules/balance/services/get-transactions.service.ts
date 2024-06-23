@@ -37,8 +37,14 @@ export class GetTransactionsService {
                     purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
                     status: { rule: FilterRules.EQUAL, value: PURCHASE_STATUSES.Successful },
                     buyerId: { rule: FilterRules.EQUAL, value: userId },
-                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
-                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                    amount: {
+                        rule: FilterRules.GT_LT,
+                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                    },
+                    dateCreate: {
+                        rule: FilterRules.GT_LT,
+                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                    },
                 });
 
                 // Проверяем количество документов во двух источниках
@@ -80,8 +86,14 @@ export class GetTransactionsService {
                     transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
                     status: { rule: FilterRules.EQUAL, value: status },
                     'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
-                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
-                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                    amount: {
+                        rule: FilterRules.GT_LT,
+                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                    },
+                    dateCreate: {
+                        rule: FilterRules.GT_LT,
+                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                    },
                 });
 
                 total = await this.transactionsService.getTransactionsCount(filters);
@@ -94,22 +106,40 @@ export class GetTransactionsService {
                     purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
                     status: { rule: FilterRules.EQUAL, value: PURCHASE_STATUSES.Successful },
                     buyerId: { rule: FilterRules.EQUAL, value: userId },
-                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
-                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                    amount: {
+                        rule: FilterRules.GT_LT,
+                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                    },
+                    dateCreate: {
+                        rule: FilterRules.GT_LT,
+                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                    },
                 });
                 const filtersSuccesTransactions = getFilters({
                     transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
                     status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Successful },
                     'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
-                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
-                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                    amount: {
+                        rule: FilterRules.GT_LT,
+                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                    },
+                    dateCreate: {
+                        rule: FilterRules.GT_LT,
+                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                    },
                 });
                 const filtersActiveTransactions = getFilters({
                     transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
                     status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Active },
                     'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
-                    amount: { rule: FilterRules.GT_LT, value: [query.amountStart, query.amountEnd] },
-                    dateCreate: { rule: FilterRules.GT_LT, value: [query.dateStart, query.dateEnd] },
+                    amount: {
+                        rule: FilterRules.GT_LT,
+                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                    },
+                    dateCreate: {
+                        rule: FilterRules.GT_LT,
+                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                    },
                 });
 
                 // Проверяем количество документов во всех источниках
