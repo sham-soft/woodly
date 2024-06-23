@@ -19,7 +19,7 @@ export class GetTransactionsService {
         private readonly transactionsService: TransactionsService,
     ) {}
 
-    async getTransactions(query: BalanceTransactionsQueryDto): Promise<PaginatedList<BalanceTransaction>> {
+    async getTransactions(query: BalanceTransactionsQueryDto, userId: number): Promise<PaginatedList<BalanceTransaction>> {
         const pagination = getPagination(query.page);
         let total = 0;
         let transactions = [];
@@ -31,20 +31,52 @@ export class GetTransactionsService {
                 break;
 
             case BALANCE_STATUSES.Deposit:
-                total = await this.getTronscanCount();
-                transactions = await this.getTronscanTransactions(pagination.skip, pagination.limit);
-                break;
+            {
+                // Проверяем количество документов во двух источниках
+                const totalTronscan = await this.getTronscanCount();
+                const totalSuccesPurchases = await this.purchasesService.getPurchasesCount({
+                    status: PURCHASE_STATUSES.Successful,
+                    buyerId: userId,
+                });
+                
+                // Вычисляем сколько всего источников, у которых на данной странице есть документы
+                const totalsCount = [totalTronscan, totalSuccesPurchases].filter(item => (item - pagination.skip) !== 0).length;
 
+                // Вычисляем отдельный лимит для двух источников
+                const limit = pagination.limit / totalsCount;
+                // Вычисляем отдельный шаг для двух источников
+                const skip = getPagination(query.page, limit).skip;
+
+                let transactionsTronscan = [];
+                let transactionsSuccesPurchases = [];
+
+                if (totalTronscan) {
+                    transactionsTronscan = await this.getTronscanTransactions(skip, limit);
+                }
+
+                if (totalSuccesPurchases) {
+                    const filters = { status: PURCHASE_STATUSES.Successful, buyerId: userId };
+                    transactionsSuccesPurchases = await this.getWoodlyPurchases(filters, skip, limit);
+                }
+
+                transactions = [
+                    ...transactionsTronscan,
+                    ...transactionsSuccesPurchases,
+                ];
+
+                break;
+            }
             case BALANCE_STATUSES.Deduction:
             case BALANCE_STATUSES.Freeze:
+            {
                 const status = Number(query.status) === BALANCE_STATUSES.Deduction ?
                     TRANSACTION_STATUSES.Successful : TRANSACTION_STATUSES.Active;
-                const filters = { status };
+                const filters = { status, 'card.creatorId': userId };
 
                 total = await this.transactionsService.getTransactionsCount(filters);
                 transactions = await this.getWoodlyTransactions(filters, pagination.skip, pagination.limit);
                 break;
-
+            }
             default:
             {
                 // Проверяем количество документов во всех источниках
@@ -52,15 +84,18 @@ export class GetTransactionsService {
                 const totalTronscan = await this.getTronscanCount();
                 const totalSuccesPurchases = await this.purchasesService.getPurchasesCount({
                     status: PURCHASE_STATUSES.Successful,
+                    buyerId: userId,
                 });
                 const totalSuccesTransactions = await this.transactionsService.getTransactionsCount({
                     status: TRANSACTION_STATUSES.Successful,
+                    'card.creatorId': userId,
                 });
                 const totalActiveTransactions = await this.transactionsService.getTransactionsCount({
                     status: TRANSACTION_STATUSES.Active,
+                    'card.creatorId': userId,
                 });
 
-                // Вычисляем сколько всего источников, на данной странице есть документы
+                // Вычисляем сколько всего источников, у которых на данной странице есть документы
                 const totalsCount = [
                     totalInternal,
                     totalTronscan,
@@ -88,16 +123,17 @@ export class GetTransactionsService {
                 }
 
                 if (totalSuccesPurchases) {
+                    const filters = { status: PURCHASE_STATUSES.Successful, buyerId: userId };
                     transactionsSuccesPurchases = await this.getWoodlyPurchases(filters, skip, limit);
                 }
 
                 if (totalSuccesTransactions) {
-                    const filters = { status: TRANSACTION_STATUSES.Successful };
+                    const filters = { status: TRANSACTION_STATUSES.Successful, 'card.creatorId': userId };
                     transactionsSuccesTransactions = await this.getWoodlyTransactions(filters, skip, limit);
                 }
 
                 if (totalActiveTransactions) {
-                    const filters = { status: TRANSACTION_STATUSES.Active };
+                    const filters = { status: TRANSACTION_STATUSES.Active, 'card.creatorId': userId };
                     transactionsActiveTransactions = await this.getWoodlyTransactions(filters, skip, limit);
                 }
 

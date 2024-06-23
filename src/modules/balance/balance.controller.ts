@@ -30,8 +30,8 @@ export class BalanceController {
 
     @ApiOperation({ summary: 'Получения списка операций для раздела баланса' })
     @Get('transactions')
-    getTransactions(@Query() transactionQuery: BalanceTransactionsQueryDto): Promise<any> {
-        return this.balanceService.getTransactions(transactionQuery);
+    getTransactions(@Query() transactionQuery: BalanceTransactionsQueryDto, @Request() req: CustomRequest): Promise<any> {
+        return this.balanceService.getTransactions(transactionQuery, req.user.userId);
     }
 
     @ApiOperation({ summary: 'Экспорт списка операций из раздела баланса' })

@@ -19,8 +19,8 @@ export class BalanceService {
         return this.getBalanceService.getBalance(userId);
     }
 
-    async getTransactions(query: BalanceTransactionsQueryDto): Promise<any> {
-        return this.getTransactionsService.getTransactions(query);
+    async getTransactions(query: BalanceTransactionsQueryDto, userId: number): Promise<any> {
+        return this.getTransactionsService.getTransactions(query, userId);
     }
 
     async getTransactionsExport(query: BalanceExportQueryDto): Promise<StreamableFile> {
