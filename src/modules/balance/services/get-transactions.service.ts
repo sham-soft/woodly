@@ -39,11 +39,11 @@ export class GetTransactionsService {
                     buyerId: { rule: FilterRules.EQUAL, value: userId },
                     amount: {
                         rule: FilterRules.GT_LT,
-                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                        value: { gt: query.amountStart, lt: query.amountEnd },
                     },
                     dateCreate: {
                         rule: FilterRules.GT_LT,
-                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                        value: { gt: query.dateStart, lt: query.dateEnd },
                     },
                 });
 
@@ -89,11 +89,11 @@ export class GetTransactionsService {
                     'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
                     amount: {
                         rule: FilterRules.GT_LT,
-                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                        value: { gt: query.amountStart, lt: query.amountEnd },
                     },
                     dateCreate: {
                         rule: FilterRules.GT_LT,
-                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                        value: { gt: query.dateStart, lt: query.dateEnd },
                     },
                 });
 
@@ -109,11 +109,11 @@ export class GetTransactionsService {
                     buyerId: { rule: FilterRules.EQUAL, value: userId },
                     amount: {
                         rule: FilterRules.GT_LT,
-                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                        value: { gt: query.amountStart, lt: query.amountEnd },
                     },
                     dateCreate: {
                         rule: FilterRules.GT_LT,
-                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                        value: { gt: query.dateStart, lt: query.dateEnd },
                     },
                 });
                 const filtersSuccesTransactions = getFilters({
@@ -122,11 +122,11 @@ export class GetTransactionsService {
                     'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
                     amount: {
                         rule: FilterRules.GT_LT,
-                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                        value: { gt: query.amountStart, lt: query.amountEnd },
                     },
                     dateCreate: {
                         rule: FilterRules.GT_LT,
-                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                        value: { gt: query.dateStart, lt: query.dateEnd },
                     },
                 });
                 const filtersActiveTransactions = getFilters({
@@ -135,11 +135,11 @@ export class GetTransactionsService {
                     'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
                     amount: {
                         rule: FilterRules.GT_LT,
-                        value: query.amountStart || query.amountEnd ? [query.amountStart, query.amountEnd] : undefined,
+                        value: { gt: query.amountStart, lt: query.amountEnd },
                     },
                     dateCreate: {
                         rule: FilterRules.GT_LT,
-                        value: query.dateStart || query.dateEnd ? [query.dateStart, query.dateEnd] : undefined,
+                        value: { gt: query.dateStart, lt: query.dateEnd },
                     },
                 });
 

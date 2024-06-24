@@ -81,10 +81,15 @@ export enum FilterRules {
     REGEX_INTEGER = 'regexInteger',
 }
 
+interface GtLt {
+    gt: string | number;
+    lt: string | number;
+}
+
 export interface FilterOption {
     [key: string]: {
         rule: FilterRules;
-        value: string | number | string[] | number[];
+        value: string | number | string[] | number[] | GtLt;
     }
 }
 
@@ -116,10 +121,17 @@ export function getFilters(options: FilterOption): object {
                 break;
 
             case FilterRules.GT_LT:
-                filters[key] = {
-                    $gt: value[0],
-                    $lt: value[1],
-                };
+                if ((value as GtLt).gt) {
+                    filters[key] = {
+                        $gt: (value as GtLt).gt,
+                    };
+                }
+                if ((value as GtLt).lt) {
+                    filters[key] = {
+                        $lt: (value as GtLt).lt,
+                        ...filters[key],
+                    };
+                }
                 break;
 
             case FilterRules.REGEX_STRING:
