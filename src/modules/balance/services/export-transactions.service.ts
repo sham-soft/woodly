@@ -11,7 +11,7 @@ export class ExportTransactionsService {
     ) {}
 
     async getTransactionsExport(query: BalanceExportQueryDto, userId: number): Promise<StreamableFile> {
-        const transactions = await this.getTransactionsService.getTransactions(query, userId);
+        const transactions = await this.getTransactionsService.getBalanceTransactions(query, userId);
 
         const headers = ['ID операции', 'Тип операции', 'Сумма', 'Дата и время'];
 

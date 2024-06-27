@@ -15,6 +15,9 @@ export class Transfer {
     rate: number;
 
     @Prop()
+    rateWithPercent: number;
+
+    @Prop()
     amount: number;
 
     @Prop()

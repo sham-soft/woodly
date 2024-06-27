@@ -8,6 +8,7 @@ import { UsersService } from '../users/users.service';
 import { ConfigsService } from '../configs/configs.service';
 import { createId } from '../../helpers/unique';
 import { getPagination } from '../../helpers/pagination';
+import { getSumWithPercent } from '../../helpers/numbers';
 import { convertDateToString } from '../../helpers/date';
 import { CONFIGS } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
@@ -35,6 +36,14 @@ export class TransfersService {
         };
     }
 
+    async getTransfersCount(filters: unknown): Promise<number> {
+        return this.transferModel.countDocuments(filters);
+    }
+
+    async getTransfersCollection(filters: unknown, skip: number, limit: number): Promise<Transfer[]> {
+        return this.transferModel.find(filters).skip(skip).limit(limit);
+    }
+
     async checkAndUpdateTransfers(userId: number): Promise<Transfer[]> {
         const totalTransfers = await this.transferModel.countDocuments();
         const totalTronscan = await this.getTronscanCount();
@@ -55,10 +64,12 @@ export class TransfersService {
     }
 
     private async getTronscanCount(): Promise<number> {
+        const ADDRESS = 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS';
+
         const params = {
             limit: 0,
-            relatedAddress: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
-            toAddress: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
+            relatedAddress: ADDRESS,
+            toAddress: ADDRESS,
         };
 
         const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
@@ -69,6 +80,8 @@ export class TransfersService {
         let newTransferId = await createId(this.transferModel, 'transferId');
 
         const rate = await this.configsService.getConfigs(CONFIGS.RubleRate);
+        const RATE_PERCENT = 2.5;
+        const rateWithPercent = getSumWithPercent(RATE_PERCENT, Number(rate));
         const DECIMALS = 1000000;
         const ADDRESS = 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS';
 
@@ -89,7 +102,8 @@ export class TransfersService {
         return trsnsfers.map((item: any) => ({
             transferId: newTransferId++,
             hashId: item.transaction_id,
-            rate: Number(rate),
+            rate: rate,
+            rateWithPercent: rateWithPercent,
             amount: (item.quant / DECIMALS) * Number(rate),
             dateCreate: convertDateToString(new Date(item.block_ts)),
             creatorId: userId,

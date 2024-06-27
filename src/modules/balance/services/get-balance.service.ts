@@ -1,7 +1,6 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
 import { UsersService } from '../../users/users.service';
 import { Transaction } from '../../transactions/schemas/transaction.schema';
 import { ConfigsService } from '../../configs/configs.service';
@@ -12,45 +11,33 @@ import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 export class GetBalanceService {
     constructor(
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
-        private readonly httpService: HttpService,
         private readonly configsService: ConfigsService,
         private readonly usersService: UsersService,
     ) {}
 
     async getBalance(userId: number): Promise<any> {
+        const ADDRESS = 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS';
+
         const balanceData = await Promise.all([
-            this.getWallet(),
             this.getUserBalance(userId),
             this.getRates(),
             this.getAmountFreezeTransactions(userId),
         ]);
 
-        const wallet = balanceData[0];
-        const userBalance = balanceData[1];
-        const rates = balanceData[2];
-        const amountFreezeTransactions = balanceData[3];
+        const userBalance = balanceData[0];
+        const rates = balanceData[1];
+        const amountFreezeTransactions = balanceData[2];
 
-        const balanceWallet = wallet.quantity * rates.rateWithPercent;
-        const balance = getFixedFloat((userBalance + balanceWallet - amountFreezeTransactions), 2);
+        const balance = getFixedFloat((userBalance - amountFreezeTransactions), 2);
 
         return [
             {
-                address: wallet.tokenId,
+                address: ADDRESS,
                 balance,
                 freeze: amountFreezeTransactions,
                 ...rates,
             },
         ];
-    }
-
-    private async getWallet(): Promise<any> {
-        const params = {
-            address: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
-            token: 'Tether USD',
-        };
-
-        const wallet = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/account/tokens', { params });
-        return wallet.data.data[0];
     }
 
     private async getUserBalance(userId: number): Promise<number> {
