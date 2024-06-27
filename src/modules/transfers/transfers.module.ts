@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { TransfersService } from './transfers.service';
 import { TransfersController } from './transfers.controller';
+import { UpdateTransfersService } from './services/update-transfers.service';
 import { TransferSchema } from './schemas/transfer.schema';
 import { UsersModule } from '../users/users.module';
 import { ConfigsModule } from '../configs/configs.module';
@@ -14,7 +15,10 @@ import { ConfigsModule } from '../configs/configs.module';
         ConfigsModule,
         UsersModule,
     ],
-    providers: [TransfersService],
+    providers: [
+        TransfersService,
+        UpdateTransfersService,
+    ],
     controllers: [TransfersController],
     exports: [TransfersService],
 })
