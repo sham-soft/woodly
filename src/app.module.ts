@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { UsersModule } from './modules/users/users.module';
+import { TransfersModule } from './modules/transfers/transfers.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ReferencesModule } from './modules/references/references.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
@@ -33,6 +34,7 @@ import { AppController } from './app.controller';
         ReferencesModule,
         TransactionsModule,
         UsersModule,
+        TransfersModule,
         ScheduleModule.forRoot(),
         // MongooseModule.forRoot('mongodb://localhost:27017/woodly'),
         MongooseModule.forRoot('mongodb+srv://code-build:code-build@cluster0.3bdan.mongodb.net/woodly'),

@@ -82,6 +82,10 @@ export enum PERMISSIONS {
     Settings = 'settings',
 }
 
+export enum CONFIGS {
+    RubleRate = 'RUBLE_RATE',
+}
+
 export const jwtConstants = {
     secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };

@@ -242,6 +242,7 @@ export class GetTransactionsService {
             sort: '-timestamp',
             count: 'true',
             filterTokenValue: 0,
+            toAddress: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
         };
 
         const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
@@ -258,6 +259,7 @@ export class GetTransactionsService {
         const params = {
             limit: 0,
             relatedAddress: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
+            toAddress: 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS',
         };
 
         const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
