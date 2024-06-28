@@ -2,6 +2,7 @@ import { Injectable, StreamableFile } from '@nestjs/common';
 import { GetTransactionsService } from './services/get-transactions.service';
 import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
+import { TransfersService } from '../transfers/transfers.service';
 import type { PaginatedList } from '../../types/paginated-list.type';
 import type { BalanceTransaction } from './types/balance-transaction.type';
 import type { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
@@ -13,17 +14,21 @@ export class BalanceService {
         private readonly getBalanceService: GetBalanceService,
         private readonly getTransactionsService: GetTransactionsService,
         private readonly exportTransactionsService: ExportTransactionsService,
+        private readonly transfersService: TransfersService,
     ) {}
 
     async getBalance(userId: number): Promise<PaginatedList<BalanceTransaction>> {
+        await this.transfersService.checkAndUpdateTransfers(userId);
         return this.getBalanceService.getBalance(userId);
     }
 
     async getTransactions(query: BalanceTransactionsQueryDto, userId: number): Promise<any> {
+        await this.transfersService.checkAndUpdateTransfers(userId);
         return this.getTransactionsService.getBalanceTransactions(query, userId);
     }
 
     async getTransactionsExport(query: BalanceExportQueryDto, userId: number): Promise<StreamableFile> {
+        await this.transfersService.checkAndUpdateTransfers(userId);
         return this.exportTransactionsService.getTransactionsExport(query, userId);
     }
 }

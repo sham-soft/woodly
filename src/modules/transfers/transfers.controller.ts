@@ -3,7 +3,6 @@ import {
     Controller,
     Get,
     Query,
-    Request,
 } from '@nestjs/common';
 import { TransfersService } from './transfers.service';
 import { Transfer } from './schemas/transfer.schema';
@@ -11,7 +10,6 @@ import { TransferQueryDto } from './dto/transfer.dto';
 import { ROLES } from '../../helpers/constants';
 import { RequireRoles } from '../../decorators/roles.decorator';
 import type { PaginatedList } from '../../types/paginated-list.type';
-import type { CustomRequest } from '../../types/custom-request.type';
 
 @ApiTags('Transfers')
 @RequireRoles(ROLES.Trader)
@@ -23,11 +21,5 @@ export class TransfersController {
     @Get()
     getAllTransfers(@Query() query: TransferQueryDto): Promise<PaginatedList<Transfer>> {
         return this.transfersService.getAllTransfers(query);
-    }
-
-    @ApiOperation({ summary: 'Сравнение БД с кошельком. Обновлние БД' })
-    @Get('check/')
-    checkAndUpdateTransfers(@Request() req: CustomRequest): Promise<Transfer[]> {
-        return this.transfersService.checkAndUpdateTransfers(req.user.userId);
     }
 }
