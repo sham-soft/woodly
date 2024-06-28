@@ -7,6 +7,7 @@ import { Purchase } from './schemas/purchase.schema';
 import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
+import { UsersService } from '../users/users.service';
 import { getPagination } from '../../helpers/pagination';
 import { getFilters, FilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
@@ -19,6 +20,7 @@ export class PurchasesService {
         @InjectModel('purchases') private purchaseModel: Model<Purchase>,
         private readonly createPurchaseService: CreatePurchaseService,
         private readonly exportPurchasesService: ExportPurchasesService,
+        private readonly usersService: UsersService,
     ) {}
 
     async getPurchases(query: PurchaseQueryDto): Promise<PaginatedList<Purchase>> {
@@ -57,11 +59,19 @@ export class PurchasesService {
         );
     }
 
-    async confirmPurchase(id: number): Promise<void> {
-        await this.purchaseModel.findOneAndUpdate(
+    async confirmPurchase(id: number, userId: number): Promise<void> {
+        const purchase = await this.purchaseModel.findOneAndUpdate(
             { purchaseId: id },
             { $set: { status: PURCHASE_STATUSES.Successful, dateClose: getСurrentDateToString() } }, 
+            { new: true }
         );
+
+        if (!purchase) {
+            throw new BadRequestException('Выплаты с таким id не существует');
+        }
+
+        // Обновление баланса трейдера. Пополнение
+        await this.usersService.updateBalance(userId, purchase.amount);
     }
 
     async cancelPurchase(id: number): Promise<void> {
