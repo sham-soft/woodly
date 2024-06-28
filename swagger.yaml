@@ -253,11 +253,52 @@
       "summary": "Получения списка операций для раздела баланса"
       "parameters":
         -
-          "name": "status"
+          "name": "transactionId"
           "required": false
           "in": "query"
           "schema":
             "type": "number"
+        -
+          "name": "paymentId"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "string"
+        -
+          "name": "amountStart"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+        -
+          "name": "amountEnd"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+        -
+          "name": "dateStart"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "string"
+        -
+          "name": "dateEnd"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "string"
+        -
+          "name": "status"
+          "required": false
+          "in": "query"
+          "schema":
+            "enum":
+              - "1"
+              - "2"
+              - "3"
+              - "4"
+            "type": "string"
         -
           "name": "page"
           "required": false
@@ -343,382 +384,6 @@
                 "properties": {}
       "tags":
         - "Configs"
-  "/cards":
-    "get":
-      "operationId": "CardsController_getCards"
-      "summary": "Получение списка карт"
-      "parameters":
-        -
-          "name": "status"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "number"
-        -
-          "name": "cardNumber"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "string"
-        -
-          "name": "page"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cards"
-  "/cards/create":
-    "post":
-      "operationId": "CardsController_createCard"
-      "summary": "Создание карты"
-      "parameters": []
-      "requestBody":
-        "required": true
-        "content":
-          "application/json":
-            "schema":
-              "type": "object"
-              "properties":
-                "title":
-                  "type": "string"
-                "cardNumber":
-                  "type": "string"
-                  "minLength": 16
-                  "maxLength": 16
-                "fio":
-                  "type": "string"
-                "bankType":
-                  "type": "number"
-                  "enum":
-                    - 1
-                    - 2
-                    - 3
-                "processMethod":
-                  "type": "number"
-                  "enum":
-                    - 1
-                    - 2
-                    - 3
-                    - 4
-                "currency":
-                  "type": "string"
-                  "enum":
-                    - "rub"
-                    - "kzt"
-                "deviceId":
-                  "type": "string"
-                "apiKey":
-                  "type": "string"
-                "slotSim":
-                  "type": "number"
-                  "enum":
-                    - 1
-                    - 2
-                "isSbp":
-                  "type": "boolean"
-                "phone":
-                  "type": "string"
-                "recipient":
-                  "type": "string"
-              "required":
-                - "title"
-                - "cardNumber"
-                - "fio"
-                - "bankType"
-                - "processMethod"
-                - "currency"
-                - "deviceId"
-                - "apiKey"
-                - "slotSim"
-                - "isSbp"
-      "responses":
-        "201":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "Cards"
-  "/cards/edit":
-    "patch":
-      "operationId": "CardsController_editCard"
-      "summary": "Редактирование карты"
-      "parameters": []
-      "requestBody":
-        "required": true
-        "content":
-          "application/json":
-            "schema":
-              "type": "object"
-              "properties":
-                "cardId":
-                  "type": "number"
-                "title":
-                  "type": "string"
-                "cardNumber":
-                  "type": "string"
-                  "minLength": 16
-                  "maxLength": 16
-                "fio":
-                  "type": "string"
-                "bankType":
-                  "type": "number"
-                "processMethod":
-                  "type": "number"
-                "currency":
-                  "type": "number"
-                "deviceId":
-                  "type": "string"
-                "apiKey":
-                  "type": "string"
-                "slotSim":
-                  "type": "number"
-                "isQiwi":
-                  "type": "boolean"
-                "isSbp":
-                  "type": "boolean"
-                "phone":
-                  "type": "string"
-                "recipient":
-                  "type": "string"
-              "required":
-                - "cardId"
-                - "title"
-                - "cardNumber"
-                - "fio"
-                - "bankType"
-                - "processMethod"
-                - "currency"
-                - "deviceId"
-                - "apiKey"
-                - "slotSim"
-                - "isQiwi"
-                - "isSbp"
-      "responses":
-        "200":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "Cards"
-  "/cards/set-limit":
-    "patch":
-      "operationId": "CardsController_setLimitCard"
-      "summary": "Установка лимитов"
-      "parameters": []
-      "requestBody":
-        "required": true
-        "content":
-          "application/json":
-            "schema":
-              "type": "object"
-              "properties":
-                "cardId":
-                  "type": "number"
-                "paymentsLimitPerDay":
-                  "type": "number"
-                "transactionsLimitPerDay":
-                  "type": "number"
-                "paymentMin":
-                  "type": "number"
-                "paymentMax":
-                  "type": "number"
-              "required":
-                - "cardId"
-                - "paymentsLimitPerDay"
-                - "transactionsLimitPerDay"
-                - "paymentMin"
-                - "paymentMax"
-      "responses":
-        "200":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "Cards"
-  "/cards/change-status":
-    "patch":
-      "operationId": "CardsController_changeStatusCard"
-      "summary": "Активация карты. Отключение карты. Удаление карты. Восстановление карты"
-      "description": "\n                    - Чтобы активировать карту, нужно передать status = 1.\n                    - Чтобы отключить карту, нужно передать status = 2.\n                    - Чтобы удалить карту, нужно передать status = 3.\n                    - Чтобы восстановить карту, нужно передать status = 1.\n"
-      "parameters": []
-      "requestBody":
-        "required": true
-        "content":
-          "application/json":
-            "schema":
-              "type": "object"
-              "properties":
-                "cardId":
-                  "type": "number"
-                "status":
-                  "type": "number"
-              "required":
-                - "cardId"
-                - "status"
-      "responses":
-        "200":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "Cards"
-  "/cards/{id}/transactions":
-    "get":
-      "operationId": "CardsController_getCardTransactions"
-      "summary": "Получение сделок по определенной карте"
-      "parameters":
-        -
-          "name": "id"
-          "required": true
-          "in": "path"
-          "schema":
-            "type": "number"
-        -
-          "name": "page"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cards"
-  "/cashboxes":
-    "get":
-      "operationId": "CashboxesController_getCashboxes"
-      "summary": "Получение списка касс"
-      "parameters":
-        -
-          "name": "page"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cashboxes"
-  "/cashboxes/create":
-    "post":
-      "operationId": "CashboxesController_createCard"
-      "summary": "Создание кассы"
-      "parameters": []
-      "requestBody":
-        "required": true
-        "content":
-          "application/json":
-            "schema":
-              "type": "object"
-              "properties":
-                "title":
-                  "type": "string"
-                "url":
-                  "type": "string"
-                "successUrl":
-                  "type": "string"
-                "errorUrl":
-                  "type": "string"
-                "notificationUrlPayments":
-                  "type": "string"
-                "notificationUrlPayOff":
-                  "type": "string"
-                "commissionPayer":
-                  "type": "number"
-                  "enum":
-                    - 1
-                    - 2
-                "apiKey":
-                  "type": "string"
-              "required":
-                - "title"
-                - "url"
-                - "successUrl"
-                - "errorUrl"
-                - "notificationUrlPayments"
-                - "notificationUrlPayOff"
-                - "commissionPayer"
-      "responses":
-        "201":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "Cashboxes"
-  "/cashboxes/activate/{id}":
-    "patch":
-      "operationId": "CashboxesController_activateCashbox"
-      "summary": "Активация кассы"
-      "parameters":
-        -
-          "name": "id"
-          "required": true
-          "in": "path"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cashboxes"
-  "/cashboxes/deactivate/{id}":
-    "patch":
-      "operationId": "CashboxesController_deactivateCashbox"
-      "summary": "Деактивация кассы"
-      "parameters":
-        -
-          "name": "id"
-          "required": true
-          "in": "path"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cashboxes"
-  "/messages":
-    "get":
-      "operationId": "MessagesController_getMessages"
-      "summary": "Получение списка общих смс по карте"
-      "parameters":
-        -
-          "name": "cardLastNumber"
-          "required": true
-          "in": "query"
-          "schema":
-            "type": "string"
-        -
-          "name": "page"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Messages"
   "/purchases":
     "get":
       "operationId": "PurchasesController_getPurchases"
@@ -761,9 +426,13 @@
           "required": false
           "in": "query"
           "schema":
-            "type": "number"
+            "enum":
+              - "1"
+              - "2"
+              - "3"
+            "type": "string"
         -
-          "name": "cashbox"
+          "name": "cashboxId"
           "required": false
           "in": "query"
           "schema":
@@ -773,7 +442,12 @@
           "required": false
           "in": "query"
           "schema":
-            "type": "number"
+            "enum":
+              - "1"
+              - "2"
+              - "3"
+              - "4"
+            "type": "string"
         -
           "name": "page"
           "required": false
@@ -797,7 +471,7 @@
             "schema":
               "type": "object"
               "properties":
-                "cashbox":
+                "cashboxId":
                   "type": "number"
                 "paymentSystem":
                   "type": "number"
@@ -824,7 +498,7 @@
                   "minLength": 11
                   "maxLength": 16
               "required":
-                - "cashbox"
+                - "cashboxId"
                 - "paymentSystem"
                 - "bankType"
                 - "amount"
@@ -895,7 +569,7 @@
       "summary": "Получение списка выплат в формате Excel"
       "parameters":
         -
-          "name": "cashboxes"
+          "name": "cashboxIds"
           "required": false
           "in": "query"
           "schema":
@@ -946,45 +620,6 @@
           "description": ""
       "tags":
         - "Purchases"
-  "/references":
-    "get":
-      "operationId": "ReferencesController_getAllReference"
-      "summary": "Получение всех справочников"
-      "parameters": []
-      "responses":
-        "200":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "array"
-                "items":
-                  "type": "object"
-                  "properties": {}
-      "tags":
-        - "References"
-  "/references/{name}":
-    "get":
-      "operationId": "ReferencesController_getReference"
-      "summary": "Получение справочника"
-      "description": "\n                    - Список статусов карт - card-statuses.\n                    - Список статусов продаж - transaction-statuses.\n                    - Список статусов для баланса - balance-statuses.\n                    - Список статусов покупок - purchase-statuses.\n                    - Список типов банков - bank-types.\n                    - Список способов оплаты - payment-systems.\n"
-      "parameters":
-        -
-          "name": "name"
-          "required": true
-          "in": "path"
-          "schema":
-            "type": "string"
-      "responses":
-        "200":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "References"
   "/transactions":
     "get":
       "operationId": "TransactionsController_getTransactions"
@@ -1001,7 +636,13 @@
           "required": false
           "in": "query"
           "schema":
-            "type": "number"
+            "enum":
+              - "1"
+              - "2"
+              - "3"
+              - "4"
+              - "5"
+            "type": "string"
         -
           "name": "title"
           "required": false
@@ -1033,7 +674,7 @@
           "schema":
             "type": "string"
         -
-          "name": "cashbox"
+          "name": "cashboxId"
           "required": false
           "in": "query"
           "schema":
@@ -1069,7 +710,7 @@
               "properties":
                 "orderNumber":
                   "type": "number"
-                "cashbox":
+                "cashboxId":
                   "type": "number"
                 "paymentSystem":
                   "type": "number"
@@ -1087,7 +728,7 @@
                   "type": "string"
               "required":
                 - "orderNumber"
-                - "cashbox"
+                - "cashboxId"
                 - "paymentSystem"
                 - "currency"
                 - "amount"
@@ -1267,12 +908,6 @@
       "summary": "Получение списка платежей в формате Excel"
       "parameters":
         -
-          "name": "cashbox"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "number"
-        -
           "name": "dateStart"
           "required": true
           "in": "query"
@@ -1295,6 +930,471 @@
           "description": ""
       "tags":
         - "Transactions"
+  "/transfers":
+    "get":
+      "operationId": "TransfersController_getAllTransfers"
+      "summary": "Получение списка всех операций кошелька"
+      "parameters":
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Transfers"
+  "/cards":
+    "get":
+      "operationId": "CardsController_getCards"
+      "summary": "Получение списка карт"
+      "parameters":
+        -
+          "name": "status"
+          "required": false
+          "in": "query"
+          "schema":
+            "enum":
+              - "1"
+              - "2"
+              - "3"
+            "type": "string"
+        -
+          "name": "cardNumber"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "string"
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cards"
+  "/cards/create":
+    "post":
+      "operationId": "CardsController_createCard"
+      "summary": "Создание карты"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "title":
+                  "type": "string"
+                "cardNumber":
+                  "type": "string"
+                  "minLength": 16
+                  "maxLength": 16
+                "fio":
+                  "type": "string"
+                "bankType":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                    - 3
+                "processMethod":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                "currency":
+                  "type": "string"
+                  "enum":
+                    - "rub"
+                    - "kzt"
+                "deviceId":
+                  "type": "string"
+                "apiKey":
+                  "type": "string"
+                "slotSim":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                "isSbp":
+                  "type": "boolean"
+                "phone":
+                  "type": "string"
+                "recipient":
+                  "type": "string"
+              "required":
+                - "title"
+                - "cardNumber"
+                - "fio"
+                - "bankType"
+                - "processMethod"
+                - "currency"
+                - "deviceId"
+                - "apiKey"
+                - "slotSim"
+                - "isSbp"
+      "responses":
+        "201":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Cards"
+  "/cards/edit":
+    "patch":
+      "operationId": "CardsController_editCard"
+      "summary": "Редактирование карты"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "cardId":
+                  "type": "number"
+                "title":
+                  "type": "string"
+                "cardNumber":
+                  "type": "string"
+                  "minLength": 16
+                  "maxLength": 16
+                "fio":
+                  "type": "string"
+                "bankType":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                    - 3
+                "processMethod":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                "currency":
+                  "type": "string"
+                  "enum":
+                    - "rub"
+                    - "kzt"
+                "deviceId":
+                  "type": "string"
+                "apiKey":
+                  "type": "string"
+                "slotSim":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                "isSbp":
+                  "type": "boolean"
+                "phone":
+                  "type": "string"
+                "recipient":
+                  "type": "string"
+              "required":
+                - "cardId"
+                - "title"
+                - "cardNumber"
+                - "fio"
+                - "bankType"
+                - "processMethod"
+                - "currency"
+                - "deviceId"
+                - "apiKey"
+                - "slotSim"
+                - "isSbp"
+      "responses":
+        "200":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Cards"
+  "/cards/set-limit":
+    "patch":
+      "operationId": "CardsController_setLimitCard"
+      "summary": "Установка лимитов"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "cardId":
+                  "type": "number"
+                "paymentsLimitPerDay":
+                  "type": "number"
+                "transactionsLimitPerDay":
+                  "type": "number"
+                "paymentMin":
+                  "type": "number"
+                "paymentMax":
+                  "type": "number"
+              "required":
+                - "cardId"
+                - "paymentsLimitPerDay"
+                - "transactionsLimitPerDay"
+                - "paymentMin"
+                - "paymentMax"
+      "responses":
+        "200":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Cards"
+  "/cards/activate/{id}":
+    "patch":
+      "operationId": "CardsController_activateCard"
+      "summary": "Активация карты"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cards"
+  "/cards/disable/{id}":
+    "patch":
+      "operationId": "CardsController_disableCard"
+      "summary": "Отключение карты"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cards"
+  "/cards/delete/{id}":
+    "patch":
+      "operationId": "CardsController_deleteCard"
+      "summary": "Удаление карты"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cards"
+  "/cards/{id}/transactions":
+    "get":
+      "operationId": "CardsController_getCardTransactions"
+      "summary": "Получение сделок по определенной карте"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cards"
+  "/cashboxes":
+    "get":
+      "operationId": "CashboxesController_getCashboxes"
+      "summary": "Получение списка касс"
+      "parameters":
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cashboxes"
+  "/cashboxes/create":
+    "post":
+      "operationId": "CashboxesController_createCard"
+      "summary": "Создание кассы"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "title":
+                  "type": "string"
+                "url":
+                  "type": "string"
+                "successUrl":
+                  "type": "string"
+                "errorUrl":
+                  "type": "string"
+                "notificationUrlPayments":
+                  "type": "string"
+                "notificationUrlPayOff":
+                  "type": "string"
+                "commissionPayer":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                "apiKey":
+                  "type": "string"
+              "required":
+                - "title"
+                - "url"
+                - "successUrl"
+                - "errorUrl"
+                - "notificationUrlPayments"
+                - "notificationUrlPayOff"
+                - "commissionPayer"
+      "responses":
+        "201":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Cashboxes"
+  "/cashboxes/activate/{id}":
+    "patch":
+      "operationId": "CashboxesController_activateCashbox"
+      "summary": "Активация кассы"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cashboxes"
+  "/cashboxes/deactivate/{id}":
+    "patch":
+      "operationId": "CashboxesController_deactivateCashbox"
+      "summary": "Деактивация кассы"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cashboxes"
+  "/messages":
+    "get":
+      "operationId": "MessagesController_getMessages"
+      "summary": "Получение списка общих смс по карте"
+      "parameters":
+        -
+          "name": "cardLastNumber"
+          "required": true
+          "in": "query"
+          "schema":
+            "type": "string"
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Messages"
+  "/references":
+    "get":
+      "operationId": "ReferencesController_getAllReference"
+      "summary": "Получение всех справочников"
+      "parameters": []
+      "responses":
+        "200":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "type": "object"
+                  "properties": {}
+      "tags":
+        - "References"
+  "/references/{name}":
+    "get":
+      "operationId": "ReferencesController_getReference"
+      "summary": "Получение справочника"
+      "description": "\n                    - Список статусов карт - card-statuses.\n                    - Список статусов продаж - transaction-statuses.\n                    - Список статусов для баланса - balance-statuses.\n                    - Список статусов покупок - purchase-statuses.\n                    - Список типов банков - bank-types.\n                    - Список способов оплаты - payment-systems.\n"
+      "parameters":
+        -
+          "name": "name"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "string"
+      "responses":
+        "200":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "References"
 "info":
   "title": "Woodly"
   "description": "The woodly API description"
@@ -1396,6 +1496,130 @@
     "Config":
       "type": "object"
       "properties": {}
+    "PurchaseCreateDto":
+      "type": "object"
+      "properties":
+        "cashboxId":
+          "type": "number"
+        "paymentSystem":
+          "type": "number"
+          "enum":
+            - 1
+            - 2
+        "bankType":
+          "type": "number"
+          "enum":
+            - 1
+            - 2
+            - 3
+        "amount":
+          "type": "number"
+        "orderNumber":
+          "type": "number"
+        "currency":
+          "type": "string"
+          "enum":
+            - "rub"
+            - "kzt"
+        "requisites":
+          "type": "string"
+          "minLength": 11
+          "maxLength": 16
+      "required":
+        - "cashboxId"
+        - "paymentSystem"
+        - "bankType"
+        - "amount"
+        - "orderNumber"
+        - "currency"
+        - "requisites"
+    "Purchase":
+      "type": "object"
+      "properties": {}
+    "PurchaseUploadDto":
+      "type": "object"
+      "properties":
+        "comment":
+          "type": "string"
+        "purchaseId":
+          "type": "number"
+        "file":
+          "type": "string"
+          "format": "binary"
+      "required":
+        - "purchaseId"
+        - "file"
+    "TransactionCreateDto":
+      "type": "object"
+      "properties":
+        "orderNumber":
+          "type": "number"
+        "cashboxId":
+          "type": "number"
+        "paymentSystem":
+          "type": "number"
+          "enum":
+            - 1
+            - 2
+        "currency":
+          "type": "string"
+          "enum":
+            - "rub"
+            - "kzt"
+        "amount":
+          "type": "number"
+        "clientNumber":
+          "type": "string"
+      "required":
+        - "orderNumber"
+        - "cashboxId"
+        - "paymentSystem"
+        - "currency"
+        - "amount"
+        - "clientNumber"
+    "Transaction":
+      "type": "object"
+      "properties": {}
+    "TransactionActivateDto":
+      "type": "object"
+      "properties":
+        "transactionId":
+          "type": "number"
+        "isSbp":
+          "type": "boolean"
+        "bankType":
+          "type": "number"
+          "enum":
+            - 1
+            - 2
+      "required":
+        - "transactionId"
+        - "bankType"
+    "TransactionMakeDto":
+      "type": "object"
+      "properties":
+        "cardLastNumber":
+          "type": "string"
+        "amount":
+          "type": "number"
+        "message":
+          "type": "string"
+      "required":
+        - "cardLastNumber"
+        - "message"
+    "TransactionEditDto":
+      "type": "object"
+      "properties":
+        "transactionId":
+          "type": "number"
+        "cardId":
+          "type": "number"
+        "amount":
+          "type": "number"
+      "required":
+        - "transactionId"
+        - "cardId"
+        - "amount"
     "CardCreateDto":
       "type": "object"
       "properties":
@@ -1469,18 +1693,31 @@
           "type": "string"
         "bankType":
           "type": "number"
+          "enum":
+            - 1
+            - 2
+            - 3
         "processMethod":
           "type": "number"
+          "enum":
+            - 1
+            - 2
+            - 3
+            - 4
         "currency":
-          "type": "number"
+          "type": "string"
+          "enum":
+            - "rub"
+            - "kzt"
         "deviceId":
           "type": "string"
         "apiKey":
           "type": "string"
         "slotSim":
           "type": "number"
-        "isQiwi":
-          "type": "boolean"
+          "enum":
+            - 1
+            - 2
         "isSbp":
           "type": "boolean"
         "phone":
@@ -1498,7 +1735,6 @@
         - "deviceId"
         - "apiKey"
         - "slotSim"
-        - "isQiwi"
         - "isSbp"
     "CardSetLimitDto":
       "type": "object"
@@ -1519,16 +1755,6 @@
         - "transactionsLimitPerDay"
         - "paymentMin"
         - "paymentMax"
-    "CardChangeStatusDto":
-      "type": "object"
-      "properties":
-        "cardId":
-          "type": "number"
-        "status":
-          "type": "number"
-      "required":
-        - "cardId"
-        - "status"
     "CashboxCreateDto":
       "type": "object"
       "properties":
@@ -1562,133 +1788,9 @@
     "Cashbox":
       "type": "object"
       "properties": {}
-    "PurchaseCreateDto":
-      "type": "object"
-      "properties":
-        "cashbox":
-          "type": "number"
-        "paymentSystem":
-          "type": "number"
-          "enum":
-            - 1
-            - 2
-        "bankType":
-          "type": "number"
-          "enum":
-            - 1
-            - 2
-            - 3
-        "amount":
-          "type": "number"
-        "orderNumber":
-          "type": "number"
-        "currency":
-          "type": "string"
-          "enum":
-            - "rub"
-            - "kzt"
-        "requisites":
-          "type": "string"
-          "minLength": 11
-          "maxLength": 16
-      "required":
-        - "cashbox"
-        - "paymentSystem"
-        - "bankType"
-        - "amount"
-        - "orderNumber"
-        - "currency"
-        - "requisites"
-    "Purchase":
-      "type": "object"
-      "properties": {}
-    "PurchaseUploadDto":
-      "type": "object"
-      "properties":
-        "comment":
-          "type": "string"
-        "purchaseId":
-          "type": "number"
-        "file":
-          "type": "string"
-          "format": "binary"
-      "required":
-        - "purchaseId"
-        - "file"
     "Reference":
       "type": "object"
       "properties": {}
-    "TransactionCreateDto":
-      "type": "object"
-      "properties":
-        "orderNumber":
-          "type": "number"
-        "cashbox":
-          "type": "number"
-        "paymentSystem":
-          "type": "number"
-          "enum":
-            - 1
-            - 2
-        "currency":
-          "type": "string"
-          "enum":
-            - "rub"
-            - "kzt"
-        "amount":
-          "type": "number"
-        "clientNumber":
-          "type": "string"
-      "required":
-        - "orderNumber"
-        - "cashbox"
-        - "paymentSystem"
-        - "currency"
-        - "amount"
-        - "clientNumber"
-    "Transaction":
-      "type": "object"
-      "properties": {}
-    "TransactionActivateDto":
-      "type": "object"
-      "properties":
-        "transactionId":
-          "type": "number"
-        "isSbp":
-          "type": "boolean"
-        "bankType":
-          "type": "number"
-          "enum":
-            - 1
-            - 2
-      "required":
-        - "transactionId"
-        - "bankType"
-    "TransactionMakeDto":
-      "type": "object"
-      "properties":
-        "cardLastNumber":
-          "type": "string"
-        "amount":
-          "type": "number"
-        "message":
-          "type": "string"
-      "required":
-        - "cardLastNumber"
-        - "message"
-    "TransactionEditDto":
-      "type": "object"
-      "properties":
-        "transactionId":
-          "type": "number"
-        "cardId":
-          "type": "number"
-        "amount":
-          "type": "number"
-      "required":
-        - "transactionId"
-        - "cardId"
-        - "amount"
 "security":
   -
     "bearer": []
