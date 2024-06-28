@@ -5,6 +5,8 @@ import { BALANCE_STATUSES } from '../../../helpers/constants';
 export class BalanceTransactionsQueryDto {
     transactionId?: number;
 
+    paymentId?: string;
+
     amountStart?: number;
 
     amountEnd?: number;

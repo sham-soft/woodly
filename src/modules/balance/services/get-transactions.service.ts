@@ -24,6 +24,7 @@ export class GetTransactionsService {
 
         const filtersSuccesPurchases = getFilters({
             purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             status: { rule: FilterRules.EQUAL, value: PURCHASE_STATUSES.Successful },
             buyerId: { rule: FilterRules.EQUAL, value: userId },
             amount: {
@@ -38,6 +39,7 @@ export class GetTransactionsService {
 
         const filtersSuccesTransactions = getFilters({
             transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Successful },
             'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
             amount: {
@@ -52,6 +54,7 @@ export class GetTransactionsService {
 
         const filtersActiveTransactions = getFilters({
             transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Active },
             'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
             amount: {
@@ -66,6 +69,7 @@ export class GetTransactionsService {
 
         const filtersTransfers = getFilters({
             transferId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             creatorId: { rule: FilterRules.EQUAL, value: userId },
             amount: {
                 rule: FilterRules.GT_LT,
