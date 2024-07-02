@@ -27,7 +27,7 @@ export class Cashbox {
     notificationUrlPayOff: string;
 
     @Prop()
-    commissionPayer: string;
+    commissionPayer: number;
 
     @Prop()
     apiKey: string;
