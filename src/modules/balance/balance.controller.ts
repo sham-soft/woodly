@@ -17,7 +17,7 @@ import type { CustomRequest } from '../../types/custom-request.type';
 import type { BalanceTransaction } from './types/balance-transaction.type';
 
 @ApiTags('Balance')
-@RequireRoles(ROLES.Trader)
+@RequireRoles(ROLES.Trader, ROLES.Merchant)
 @Controller('balance')
 export class BalanceController {
     constructor(private readonly balanceService: BalanceService) {}
@@ -25,7 +25,7 @@ export class BalanceController {
     @ApiOperation({ summary: 'Получения баланса' })
     @Get()
     getBalance(@Request() req: CustomRequest): Promise<PaginatedList<BalanceTransaction>> {
-        return this.balanceService.getBalance(req.user.userId);
+        return this.balanceService.getBalance(req.user);
     }
 
     @ApiOperation({ summary: 'Получения списка операций для раздела баланса' })

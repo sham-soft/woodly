@@ -4,6 +4,7 @@ import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
 import { TransfersService } from '../transfers/transfers.service';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 import type { BalanceTransaction } from './types/balance-transaction.type';
 import type { BalanceTransactionsQueryDto } from './dto/balance-transactions.dto';
 import type { BalanceExportQueryDto } from './dto/balance-export.dto';
@@ -17,9 +18,9 @@ export class BalanceService {
         private readonly transfersService: TransfersService,
     ) {}
 
-    async getBalance(userId: number): Promise<PaginatedList<BalanceTransaction>> {
-        await this.transfersService.checkAndUpdateTransfers(userId);
-        return this.getBalanceService.getBalance(userId);
+    async getBalance(user: CustomRequest['user']): Promise<PaginatedList<BalanceTransaction>> {
+        await this.transfersService.checkAndUpdateTransfers(user.userId);
+        return this.getBalanceService.getBalance(user);
     }
 
     async getTransactions(query: BalanceTransactionsQueryDto, userId: number): Promise<any> {

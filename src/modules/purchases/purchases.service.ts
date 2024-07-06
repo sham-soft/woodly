@@ -70,6 +70,9 @@ export class PurchasesService {
             throw new BadRequestException('Выплаты с таким id не существует');
         }
 
+        // Обновление баланса мерчанта. Списание
+        await this.usersService.updateBalance(purchase.cashbox.creatorId, -purchase.amount);
+
         // Обновление баланса трейдера. Пополнение
         await this.usersService.updateBalance(userId, purchase.amount);
     }
@@ -107,7 +110,7 @@ export class PurchasesService {
         return this.purchaseModel.countDocuments(filters);
     }
 
-    async getPurchasesCollection(filters: unknown, skip: number, limit: number): Promise<Purchase[]> {
+    async getPurchasesCollection(filters: unknown, skip?: number, limit?: number): Promise<Purchase[]> {
         return this.purchaseModel.find(filters).skip(skip).limit(limit);
     }
 }
