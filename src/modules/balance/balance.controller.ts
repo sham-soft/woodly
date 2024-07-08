@@ -31,13 +31,13 @@ export class BalanceController {
     @ApiOperation({ summary: 'Получения списка операций для раздела баланса' })
     @Get('transactions')
     getTransactions(@Query() transactionQuery: BalanceTransactionsQueryDto, @Request() req: CustomRequest): Promise<any> {
-        return this.balanceService.getTransactions(transactionQuery, req.user.userId);
+        return this.balanceService.getTransactions(transactionQuery, req.user);
     }
 
     @ApiOperation({ summary: 'Экспорт списка операций из раздела баланса' })
     @Get('export/')
     @Header('Content-Disposition', 'attachment; filename="BalanceTransactions.xlsx"')
     getTransactionsExport(@Query() exportQuery: BalanceExportQueryDto, @Request() req: CustomRequest): Promise<StreamableFile> {
-        return this.balanceService.getTransactionsExport(exportQuery, req.user.userId);
+        return this.balanceService.getTransactionsExport(exportQuery, req.user);
     }
 }

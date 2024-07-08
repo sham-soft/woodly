@@ -10,7 +10,7 @@ import type { BalanceTransactionsQueryDto } from '../dto/balance-transactions.dt
 import type { PaginatedList } from '../../../types/paginated-list.type';
 
 @Injectable()
-export class GetTransactionsService {
+export class GetTransactionsMerchantService {
     constructor(
         private readonly purchasesService: PurchasesService,
         private readonly transfersService: TransfersService,
@@ -26,7 +26,7 @@ export class GetTransactionsService {
             purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
             hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             status: { rule: FilterRules.EQUAL, value: PURCHASE_STATUSES.Successful },
-            buyerId: { rule: FilterRules.EQUAL, value: userId },
+            creatorId: { rule: FilterRules.EQUAL, value: userId },
             amount: {
                 rule: FilterRules.GT_LT,
                 value: { gt: query.amountStart, lt: query.amountEnd },
@@ -41,22 +41,7 @@ export class GetTransactionsService {
             transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
             hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Successful },
-            'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
-            amount: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.amountStart, lt: query.amountEnd },
-            },
-            dateClose: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.dateStart, lt: query.dateEnd },
-            },
-        });
-
-        const filtersActiveTransactions = getFilters({
-            transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
-            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
-            status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Active },
-            'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
+            'cashbox.creatorId': { rule: FilterRules.EQUAL, value: userId },
             amount: {
                 rule: FilterRules.GT_LT,
                 value: { gt: query.amountStart, lt: query.amountEnd },
@@ -87,14 +72,19 @@ export class GetTransactionsService {
                 transactions = [];
                 break;
 
-            case BALANCE_STATUSES.Deposit:
+            case BALANCE_STATUSES.Withdrawal:
+                total = 0;
+                transactions = [];
+                break;
+
+            case BALANCE_STATUSES.Transaction:
             {
                 // Проверяем количество документов во двух источниках
                 const totalTransfers = await this.transfersService.getTransfersCount(filtersTransfers);
-                const totalSuccesPurchases = await this.purchasesService.getPurchasesCount(filtersSuccesPurchases);
+                const totalSuccesTransactions = await this.transactionsService.getTransactionsCount(filtersSuccesTransactions);
                 
                 // Вычисляем сколько всего источников, у которых на данной странице есть документы
-                const totalsCount = [totalTransfers, totalSuccesPurchases].filter(item => (item - pagination.skip) !== 0).length;
+                const totalsCount = [totalTransfers, totalSuccesTransactions].filter(item => (item - pagination.skip) !== 0).length;
 
                 // Вычисляем отдельный лимит для двух источников
                 const limit = pagination.limit / totalsCount;
@@ -102,44 +92,27 @@ export class GetTransactionsService {
                 const skip = getPagination(query.page, limit).skip;
 
                 let transactionsTransfers = [];
-                let transactionsSuccesPurchases = [];
+                let transactionsSuccesTransactions = [];
 
                 if (totalTransfers) {
                     transactionsTransfers = await this.getTransfers(filtersTransfers, skip, limit);
                 }
 
-                if (totalSuccesPurchases) {
-                    transactionsSuccesPurchases = await this.getPurchases(filtersSuccesPurchases, skip, limit);
+                if (totalSuccesTransactions) {
+                    transactionsSuccesTransactions = await this.getTransactions(filtersSuccesTransactions, skip, limit);
                 }
 
                 transactions = [
                     ...transactionsTransfers,
-                    ...transactionsSuccesPurchases,
+                    ...transactionsSuccesTransactions,
                 ];
 
                 break;
             }
-            case BALANCE_STATUSES.Deduction:
-            case BALANCE_STATUSES.Freeze:
+            case BALANCE_STATUSES.Purchase:
             {
-                const status = Number(query.status) === BALANCE_STATUSES.Deduction ?
-                    TRANSACTION_STATUSES.Successful : TRANSACTION_STATUSES.Active;
-                const filters = getFilters({
-                    transactionId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
-                    status: { rule: FilterRules.EQUAL, value: status },
-                    'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
-                    amount: {
-                        rule: FilterRules.GT_LT,
-                        value: { gt: query.amountStart, lt: query.amountEnd },
-                    },
-                    dateClose: {
-                        rule: FilterRules.GT_LT,
-                        value: { gt: query.dateStart, lt: query.dateEnd },
-                    },
-                });
-
-                total = await this.transactionsService.getTransactionsCount(filters);
-                transactions = await this.getTransactions(filters, pagination.skip, pagination.limit);
+                total = await this.purchasesService.getPurchasesCount(filtersSuccesPurchases);
+                transactions = await this.getPurchases(filtersSuccesPurchases, pagination.skip, pagination.limit);
                 break;
             }
             default:
@@ -149,7 +122,7 @@ export class GetTransactionsService {
                 const totalTransfers = await this.transfersService.getTransfersCount(filtersTransfers);
                 const totalSuccesPurchases = await this.purchasesService.getPurchasesCount(filtersSuccesPurchases);
                 const totalSuccesTransactions = await this.transactionsService.getTransactionsCount(filtersSuccesTransactions);
-                const totalActiveTransactions = await this.transactionsService.getTransactionsCount(filtersActiveTransactions);
+                const totalWithdrawals = 0;
 
                 // Вычисляем сколько всего источников, у которых на данной странице есть документы
                 const totalsCount = [
@@ -157,7 +130,7 @@ export class GetTransactionsService {
                     totalTransfers,
                     totalSuccesPurchases,
                     totalSuccesTransactions,
-                    totalActiveTransactions,
+                    totalWithdrawals,
                 ].filter(item => (item - pagination.skip) !== 0).length;
                 // Вычисляем отдельный лимит для источников
                 const limit = pagination.limit / totalsCount;
@@ -168,7 +141,7 @@ export class GetTransactionsService {
                 let transactionsTransfers = [];
                 let transactionsSuccesPurchases = [];
                 let transactionsSuccesTransactions = [];
-                let transactionsActiveTransactions = [];
+                let transactionsWithdrawals = [];
 
                 if (totalInternal) {
                     transactionsInternal = [];
@@ -186,8 +159,8 @@ export class GetTransactionsService {
                     transactionsSuccesTransactions = await this.getTransactions(filtersSuccesTransactions, skip, limit);
                 }
 
-                if (totalActiveTransactions) {
-                    transactionsActiveTransactions = await this.getTransactions(filtersActiveTransactions, skip, limit);
+                if (totalWithdrawals) {
+                    transactionsWithdrawals = [];
                 }
 
                 transactions = [
@@ -195,7 +168,7 @@ export class GetTransactionsService {
                     ...transactionsTransfers,
                     ...transactionsSuccesPurchases,
                     ...transactionsSuccesTransactions,
-                    ...transactionsActiveTransactions,
+                    ...transactionsWithdrawals,
                 ];
                 break;
             }
@@ -215,7 +188,7 @@ export class GetTransactionsService {
         return data.map(item => ({
             transactionId: item.purchaseId,
             paymentId: '',
-            status: BALANCE_STATUSES.Deposit,
+            status: BALANCE_STATUSES.Purchase,
             amount: item.amount,
             date: item.dateClose,
         }));
@@ -227,7 +200,7 @@ export class GetTransactionsService {
         return data.map(item => ({
             transactionId: item.transactionId,
             paymentId: '',
-            status: item.status === TRANSACTION_STATUSES.Active ? BALANCE_STATUSES.Freeze : BALANCE_STATUSES.Deduction,
+            status: BALANCE_STATUSES.Transaction,
             amount: item.amount,
             date: item.dateClose,
         }));
@@ -239,7 +212,7 @@ export class GetTransactionsService {
         return data.map(item => ({
             transactionId: item.transferId,
             paymentId: item.hashId,
-            status: BALANCE_STATUSES.Deposit,
+            status: BALANCE_STATUSES.Transaction,
             amount: item.amount,
             date: item.dateCreate,
         }));

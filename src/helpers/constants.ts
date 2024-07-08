@@ -17,6 +17,9 @@ export enum BALANCE_STATUSES {
     Deposit,
     Deduction,
     Freeze,
+    Transaction,
+    Purchase,
+    Withdrawal,
 }
 
 export enum PURCHASE_STATUSES {

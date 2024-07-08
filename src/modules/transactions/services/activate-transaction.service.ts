@@ -18,10 +18,10 @@ export class ActivateTransactionService {
 
     async activateTransaction(params: TransactionActivateDto): Promise<Transaction | string> {
         const card = await this.getCard(params);
-
-        await this.checkWorkTransactions(card);
-
+        
         if (card) {
+            await this.checkWorkTransactions(card);
+
             const payload = {
                 status: TRANSACTION_STATUSES.Active,
                 dateActivate: getСurrentDateToString(),
