@@ -5,7 +5,7 @@ import { Purchase } from '../schemas/purchase.schema';
 import { PurchaseCreateDto } from '../dto/purchase-create.dto';
 import { Cashbox } from '../../cashboxes/schemas/cashbox.schema';
 import { createId } from '../../../helpers/unique';
-import { getSumWithPercent } from '../../../helpers/numbers';
+import { getPercentOfValue, getSumWithPercent } from '../../../helpers/numbers';
 import { getСurrentDateToString } from '../../../helpers/date';
 import { PURCHASE_STATUSES } from '../../../helpers/constants';
 
@@ -20,18 +20,20 @@ export class CreatePurchaseService {
         const cashbox = await this.getCashbox(params.cashboxId);
 
         const newPurchaseId = await createId(this.purchaseModel, 'purchaseId');
-        const debit = getSumWithPercent(4, params.amount);
+
+        const BONUS_PERCENT = 6;
 
         const payload = {
             purchaseId: newPurchaseId,
             status: PURCHASE_STATUSES.Available,
             dateCreate: getСurrentDateToString(),
-            debit,
             creatorId: userId,
             cashbox: {
                 cashboxId: cashbox.cashboxId,
                 creatorId: cashbox.creatorId,
             },
+            traderBonus: getPercentOfValue(BONUS_PERCENT, params.amount),
+            amountWithTraderBonus: getSumWithPercent(BONUS_PERCENT, params.amount),
             ...params,
         };
 

@@ -75,6 +75,6 @@ export class GetBalanceService {
             creatorId: userId,
         };
         const data = await this.purchasesService.getPurchasesCollection(filters);
-        return data.reduce((prev, item) => prev + item.amount, 0);
+        return data.reduce((prev, item) => prev + item.amountWithTraderBonus, 0);
     }
 }

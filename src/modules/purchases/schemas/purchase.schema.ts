@@ -19,6 +19,18 @@ export class Purchase {
     amount: number;
 
     @Prop()
+    traderBonus: number;
+
+    @Prop()
+    amountWithTraderBonus: number;
+
+    @Prop()
+    adminBonus: number;
+
+    @Prop()
+    amountWithBonuses: number;
+
+    @Prop()
     orderNumber: number;
 
     @Prop()
@@ -35,9 +47,6 @@ export class Purchase {
 
     @Prop()
     dateClose: string;
-
-    @Prop()
-    debit: number;
 
     @Prop()
     receipt: string;

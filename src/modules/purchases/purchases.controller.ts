@@ -56,8 +56,8 @@ export class PurchasesController {
     @ApiOperation({ summary: 'Подтвердить сделку' })
     @RequireRoles(ROLES.Admin, ROLES.Trader)
     @Patch('confirm/:id')
-    confirmPurchase(@Param('id') id: number, @Request() req: CustomRequest): Promise<void> {
-        return this.purchasesService.confirmPurchase(id, req.user.userId);
+    confirmPurchase(@Param('id') id: number): Promise<void> {
+        return this.purchasesService.confirmPurchase(id);
     }
 
     @ApiOperation({ summary: 'Отменить сделку' })

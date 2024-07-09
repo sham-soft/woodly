@@ -21,10 +21,12 @@ export class CreateTransactionService {
 
         const newTransactionId = await createId(this.transactionModel, 'transactionId');
 
+        const ADMIN_PERCENT = 6;
+
         const payload = {
             transactionId: newTransactionId,
-            commission: getPercentOfValue(2.5, params.amount),
-            amountMinusCommission: getSumWithoutPercent(2.5, params.amount),
+            commission: getPercentOfValue(ADMIN_PERCENT, params.amount),
+            amountMinusCommission: getSumWithoutPercent(ADMIN_PERCENT, params.amount),
             status: TRANSACTION_STATUSES.Created,
             dateCreate: getСurrentDateToString(),
             cashbox: {

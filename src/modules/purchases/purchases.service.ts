@@ -9,6 +9,7 @@ import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { UsersService } from '../users/users.service';
 import { getPagination } from '../../helpers/pagination';
+import { getPercentOfValue } from '../../helpers/numbers';
 import { getFilters, FilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
 import { PURCHASE_STATUSES } from '../../helpers/constants';
@@ -59,22 +60,42 @@ export class PurchasesService {
         );
     }
 
-    async confirmPurchase(id: number, userId: number): Promise<void> {
-        const purchase = await this.purchaseModel.findOneAndUpdate(
-            { purchaseId: id },
-            { $set: { status: PURCHASE_STATUSES.Successful, dateClose: getСurrentDateToString() } }, 
-            { new: true }
-        );
+    async confirmPurchase(id: number): Promise<void> {
+        const purchase = await this.purchaseModel.findOne({ purchaseId: id });
 
         if (!purchase) {
             throw new BadRequestException('Выплаты с таким id не существует');
         }
+    
+        if (!purchase.buyerId) {
+            throw new BadRequestException('Выплата не может быть завершена, так как она еще не была активирована');
+        }
+
+        const ADMIN_BONUS_PERCENT = 4;
+        const adminBonus = getPercentOfValue(ADMIN_BONUS_PERCENT, purchase.amount);
+        const amountWithBonuses = purchase.amountWithTraderBonus + adminBonus;
+
+        const payload = {
+            status: PURCHASE_STATUSES.Successful,
+            dateClose: getСurrentDateToString(),
+            adminBonus,
+            amountWithBonuses,
+        };
+
+        await this.purchaseModel.findOneAndUpdate(
+            { purchaseId: id },
+            { $set: payload },
+        );
 
         // Обновление баланса мерчанта. Списание
-        await this.usersService.updateBalance(purchase.cashbox.creatorId, -purchase.amount);
+        await this.usersService.updateBalance(purchase.cashbox.creatorId, -purchase.amountWithTraderBonus);
+
+        const ADMIN_ID = 1;
+        // Обновление баланса админа. Списание
+        await this.usersService.updateBalance(ADMIN_ID, -adminBonus);
 
         // Обновление баланса трейдера. Пополнение
-        await this.usersService.updateBalance(userId, purchase.amount);
+        await this.usersService.updateBalance(purchase.buyerId, amountWithBonuses);
     }
 
     async cancelPurchase(id: number): Promise<void> {

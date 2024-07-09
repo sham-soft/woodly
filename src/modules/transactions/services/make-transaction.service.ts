@@ -8,7 +8,6 @@ import { Message } from '../../messages/schemas/message.schema';
 import { Card } from '../../cards/schemas/card.schema';
 import { Autopayment } from '../../autopayments/schemas/autopayment.schema';
 import { createId } from '../../../helpers/unique';
-import { getPercentOfValue } from '../../../helpers/numbers';
 import { getСurrentDateToString } from '../../../helpers/date';
 import { TRANSACTION_STATUSES } from '../../../helpers/constants';
 
@@ -111,13 +110,10 @@ export class MakeTransactionService {
         await this.usersService.updateBalance(transaction.card.creatorId, -amount);
 
         const ADMIN_ID = 1;
-        const ADMIN_PERCENT = 6;
-        const adminAmount = getPercentOfValue(ADMIN_PERCENT, amount);
         // Обновление баланса админа. Пополнение
-        await this.usersService.updateBalance(ADMIN_ID, adminAmount);
+        await this.usersService.updateBalance(ADMIN_ID, transaction.commission);
 
-        const merchantAmount = amount - adminAmount;
         // Обновление баланса мерчанта. Пополнение
-        await this.usersService.updateBalance(transaction.cashbox.creatorId, merchantAmount);
+        await this.usersService.updateBalance(transaction.cashbox.creatorId, transaction.amountMinusCommission);
     }
 }
