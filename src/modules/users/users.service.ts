@@ -97,4 +97,8 @@ export class UsersService {
             { $inc: { balance: value } }, 
         );
     }
+
+    async getUsersCollection(filters: unknown, skip?: number, limit?: number): Promise<User[]> {
+        return this.userModel.find(filters).skip(skip).limit(limit);
+    }
 }

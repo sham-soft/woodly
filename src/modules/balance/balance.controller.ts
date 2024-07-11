@@ -14,23 +14,26 @@ import { ROLES } from '../../helpers/constants';
 import { RequireRoles } from '../../decorators/roles.decorator';
 import type { PaginatedList } from '../../types/paginated-list.type';
 import type { CustomRequest } from '../../types/custom-request.type';
-import type { BalanceTransaction } from './types/balance-transaction.type';
+import type { Balance, BalanceTransaction } from './types/balance.type';
 
 @ApiTags('Balance')
-@RequireRoles(ROLES.Trader, ROLES.Merchant)
+@RequireRoles(ROLES.Admin, ROLES.Trader, ROLES.Merchant)
 @Controller('balance')
 export class BalanceController {
     constructor(private readonly balanceService: BalanceService) {}
 
     @ApiOperation({ summary: 'Получения баланса' })
     @Get()
-    getBalance(@Request() req: CustomRequest): Promise<PaginatedList<BalanceTransaction>> {
+    getBalance(@Request() req: CustomRequest): Promise<Balance[]> {
         return this.balanceService.getBalance(req.user);
     }
 
     @ApiOperation({ summary: 'Получения списка операций для раздела баланса' })
     @Get('transactions')
-    getTransactions(@Query() transactionQuery: BalanceTransactionsQueryDto, @Request() req: CustomRequest): Promise<any> {
+    getTransactions(
+        @Query() transactionQuery: BalanceTransactionsQueryDto,
+        @Request() req: CustomRequest,
+    ): Promise<PaginatedList<BalanceTransaction>> {
         return this.balanceService.getTransactions(transactionQuery, req.user);
     }
 

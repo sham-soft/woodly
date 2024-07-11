@@ -121,7 +121,7 @@ export class TransactionsService {
         return this.transactionModel.countDocuments(filters);
     }
 
-    async getTransactionsCollection(filters: unknown, skip: number, limit: number): Promise<Transaction[]> {
+    async getTransactionsCollection(filters: unknown, skip?: number, limit?: number): Promise<Transaction[]> {
         return this.transactionModel.find(filters).skip(skip).limit(limit);
     }
 }

@@ -5,7 +5,7 @@ import { PurchasesService } from '../../purchases/purchases.service';
 import { getPagination } from '../../../helpers/pagination';
 import { getFilters, FilterRules } from '../../../helpers/filters';
 import { TRANSACTION_STATUSES, PURCHASE_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
-import type { BalanceTransaction } from '../types/balance-transaction.type';
+import type { BalanceTransaction } from '../types/balance.type';
 import type { BalanceTransactionsQueryDto } from '../dto/balance-transactions.dto';
 import type { PaginatedList } from '../../../types/paginated-list.type';
 

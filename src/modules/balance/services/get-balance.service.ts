@@ -1,45 +1,48 @@
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../../users/users.service';
-import { Transaction } from '../../transactions/schemas/transaction.schema';
+import { TransactionsService } from '../../transactions/transactions.service';
 import { PurchasesService } from '../../purchases/purchases.service';
 import { ConfigsService } from '../../configs/configs.service';
 import { getFixedFloat, getSumWithPercent } from '../../../helpers/numbers';
 import { TRANSACTION_STATUSES, PURCHASE_STATUSES, ROLES } from '../../../helpers/constants';
+import type { Balance } from '../types/balance.type';
 import type { CustomRequest } from '../../../types/custom-request.type';
 
 @Injectable()
 export class GetBalanceService {
     constructor(
-        @InjectModel('transactions') private transactionModel: Model<Transaction>,
         private readonly configsService: ConfigsService,
         private readonly usersService: UsersService,
         private readonly purchasesService: PurchasesService,
+        private readonly transactionsService: TransactionsService,
     ) {}
 
-    async getBalance(user: CustomRequest['user']): Promise<any> {
+    async getBalance(user: CustomRequest['user']): Promise<Balance[]> {
         const userId = user.userId;
         const ADDRESS = 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS';
         const requests = [
             this.getUserBalance(userId),
             this.getRates(),
-            user.role === ROLES.Trader ? this.getAmountFreezeTransactions(userId) : this.getAmountFreezePurchases(userId),
+            this.getAmountFreeze(user),
+            user.role === ROLES.Admin ? this.getBalanceAllUsers(ROLES.Trader) : 0,
+            user.role === ROLES.Admin ? this.getBalanceAllUsers(ROLES.Merchant) : 0,
         ];
 
         const balanceData = await Promise.all(requests);
 
-        const userBalance = balanceData[0];
+        const userBalance = user.role === ROLES.Admin ? balanceData[0] : balanceData[0] - balanceData[2];
         const rates = balanceData[1];
         const amountFreezeTransactions = balanceData[2];
-
-        const balance = getFixedFloat((userBalance - amountFreezeTransactions), 2);
+        const balanceTraders = balanceData[3];
+        const balanceMerchants = balanceData[4];
 
         return [
             {
                 address: ADDRESS,
-                balance,
-                freeze: amountFreezeTransactions,
+                balance: userBalance,
+                freeze: getFixedFloat((amountFreezeTransactions), 2),
+                balanceTraders,
+                balanceMerchants,
                 ...rates,
             },
         ];
@@ -64,17 +67,45 @@ export class GetBalanceService {
         };
     }
 
-    private async getAmountFreezeTransactions(userId: number): Promise<number> {
-        const data = await this.transactionModel.find({ status: TRANSACTION_STATUSES.Active, 'card.creatorId': userId });
-        return data.reduce((prev, item) => prev + item.amount, 0);
+    private async getAmountFreeze(user: CustomRequest['user']): Promise<number> {
+        switch (user.role) {
+            case ROLES.Merchant:
+            {
+                const filters = {
+                    status: { $in: [PURCHASE_STATUSES.Available, PURCHASE_STATUSES.Active] },
+                    creatorId: user.userId,
+                };
+                const data = await this.purchasesService.getPurchasesCollection(filters);
+                return data.reduce((prev, item) => prev + item.amountWithTraderBonus, 0);
+            }
+            case ROLES.Trader:
+            {
+                const filters = {
+                    status: TRANSACTION_STATUSES.Active,
+                    'card.creatorId': user.userId,
+                };
+                const data = await this.transactionsService.getTransactionsCollection(filters);
+                return data.reduce((prev, item) => prev + item.amount, 0);
+            }
+            case ROLES.Admin:
+            {
+                const transactions = await this.transactionsService.getTransactionsCollection({ status: TRANSACTION_STATUSES.Active });
+                const purchases = await this.purchasesService.getPurchasesCollection({
+                    status: { $in: [PURCHASE_STATUSES.Available, PURCHASE_STATUSES.Active] },
+                });
+        
+                const amountTransactions = transactions.reduce((prev, item) => prev + item.amount, 0);
+                const amountPurchases = purchases.reduce((prev, item) => prev + item.amountWithTraderBonus, 0);
+        
+                return amountTransactions + amountPurchases;
+            }
+        }
     }
 
-    private async getAmountFreezePurchases(userId: number): Promise<number> {
-        const filters = {
-            status: { $in: [PURCHASE_STATUSES.Available, PURCHASE_STATUSES.Active] },
-            creatorId: userId,
-        };
-        const data = await this.purchasesService.getPurchasesCollection(filters);
-        return data.reduce((prev, item) => prev + item.amountWithTraderBonus, 0);
+    private async getBalanceAllUsers(role: ROLES): Promise<number> {
+        const data = await this.usersService.getUsersCollection({ role });
+        const balance = data.reduce((prev, item) => prev + item.balance, 0);
+
+        return getFixedFloat((balance), 2);
     }
 }
