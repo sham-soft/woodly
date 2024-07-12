@@ -2,6 +2,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 import { GetTransactionsService } from './services/get-transactions.service';
 import { GetTransactionsMerchantService } from './services/get-transactions-merchant.service';
+import { GetTransactionsAdminService } from './services/get-transactions-admin.service';
 import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
 import { BalanceService } from './balance.service';
@@ -26,6 +27,7 @@ import { ConfigsModule } from '../configs/configs.module';
         BalanceService,
         GetBalanceService,
         GetTransactionsService,
+        GetTransactionsAdminService,
         GetTransactionsMerchantService,
         ExportTransactionsService,
     ],

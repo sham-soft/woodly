@@ -39,7 +39,7 @@ export class GetBalanceService {
         return [
             {
                 address: ADDRESS,
-                balance: userBalance,
+                balance: getFixedFloat((userBalance), 2),
                 freeze: getFixedFloat((amountFreezeTransactions), 2),
                 balanceTraders,
                 balanceMerchants,

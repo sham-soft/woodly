@@ -20,6 +20,10 @@ export enum BALANCE_STATUSES {
     Transaction,
     Purchase,
     Withdrawal,
+    Ordered,
+    Sent,
+    DepositTraders,
+
 }
 
 export enum PURCHASE_STATUSES {

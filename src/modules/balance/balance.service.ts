@@ -1,6 +1,7 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { GetTransactionsService } from './services/get-transactions.service';
 import { GetTransactionsMerchantService } from './services/get-transactions-merchant.service';
+import { GetTransactionsAdminService } from './services/get-transactions-admin.service';
 import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
 import { TransfersService } from '../transfers/transfers.service';
@@ -16,6 +17,7 @@ export class BalanceService {
     constructor(
         private readonly getBalanceService: GetBalanceService,
         private readonly getTransactionsService: GetTransactionsService,
+        private readonly getTransactionsAdminService: GetTransactionsAdminService,
         private readonly getTransactionsMerchantService: GetTransactionsMerchantService,
         private readonly exportTransactionsService: ExportTransactionsService,
         private readonly transfersService: TransfersService,
@@ -35,18 +37,14 @@ export class BalanceService {
 
             case ROLES.Trader:
                 return this.getTransactionsService.getBalanceTransactions(query, user.userId);
+
+            case ROLES.Admin:
+                return this.getTransactionsAdminService.getBalanceTransactions(query);
         }
     }
 
     async getTransactionsExport(query: BalanceExportQueryDto, user: CustomRequest['user']): Promise<StreamableFile> {
         await this.transfersService.checkAndUpdateTransfers(user.userId);
-
-        switch (user.role) {
-            case ROLES.Merchant:
-                return this.exportTransactionsService.getTransactionsMerchantExport(query, user.userId);
-
-            case ROLES.Trader:
-                return this.exportTransactionsService.getTransactionsTraderExport(query, user.userId);
-        }
+        return this.exportTransactionsService.getTransactionsExport(query, user);
     }
 }

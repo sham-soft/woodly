@@ -93,7 +93,7 @@ export interface FilterOption {
     }
 }
 
-export function getFilters(options: FilterOption): object {
+export function getFilters(options: FilterOption): any {
     const filters: any = {};
 
     for (const key in options) {
