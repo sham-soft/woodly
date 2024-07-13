@@ -46,7 +46,13 @@ export class Purchase {
     dateCreate: string;
 
     @Prop()
+    dateActivate: string;
+
+    @Prop()
     dateClose: string;
+
+    @Prop()
+    dateCancel: string;
 
     @Prop()
     receipt: string;

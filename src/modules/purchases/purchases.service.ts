@@ -54,9 +54,15 @@ export class PurchasesService {
     }
 
     async activatePurchase(id: number, userId: number): Promise<void> {
+        const payload = {
+            status: PURCHASE_STATUSES.Active,
+            buyerId: userId,
+            dateActivate: getСurrentDateToString(),
+        };
+
         await this.purchaseModel.findOneAndUpdate(
             { purchaseId: id },
-            { $set: { status: PURCHASE_STATUSES.Active, buyerId: userId } }, 
+            { $set: payload }, 
         );
     }
 
@@ -99,9 +105,14 @@ export class PurchasesService {
     }
 
     async cancelPurchase(id: number): Promise<void> {
+        const payload = {
+            status: PURCHASE_STATUSES.Cancelled,
+            dateCancel: getСurrentDateToString(),
+        };
+
         await this.purchaseModel.findOneAndUpdate(
             { purchaseId: id },
-            { $set: { status: PURCHASE_STATUSES.Cancelled, dateClose: getСurrentDateToString() } }, 
+            { $set: payload }, 
         );
     }
 
