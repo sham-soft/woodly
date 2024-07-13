@@ -124,4 +124,8 @@ export class TransactionsService {
     async getTransactionsCollection(filters: unknown, skip?: number, limit?: number): Promise<Transaction[]> {
         return this.transactionModel.find(filters).skip(skip).limit(limit);
     }
+
+    async updateTransactionsCollection(filters: unknown, values: unknown): Promise<void> {
+        this.transactionModel.updateMany(filters, { $set: values });
+    }
 }

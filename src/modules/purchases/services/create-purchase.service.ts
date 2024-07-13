@@ -4,6 +4,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Purchase } from '../schemas/purchase.schema';
 import { PurchaseCreateDto } from '../dto/purchase-create.dto';
 import { Cashbox } from '../../cashboxes/schemas/cashbox.schema';
+import { CashboxesService } from '../../cashboxes/cashboxes.service';
 import { createId } from '../../../helpers/unique';
 import { getPercentOfValue, getSumWithPercent } from '../../../helpers/numbers';
 import { getСurrentDateToString } from '../../../helpers/date';
@@ -13,7 +14,7 @@ import { PURCHASE_STATUSES } from '../../../helpers/constants';
 export class CreatePurchaseService {
     constructor(
         @InjectModel('purchases') private purchaseModel: Model<Purchase>,
-        @InjectModel('cashboxes') private cashboxModel: Model<Cashbox>,
+        private readonly cashboxesService: CashboxesService,
     ) {}
 
     async createPurchase(params: PurchaseCreateDto, userId: number): Promise<Purchase> {
@@ -44,7 +45,7 @@ export class CreatePurchaseService {
     }
 
     private async getCashbox(cashboxId: number): Promise<Cashbox> {
-        const cashbox = await this.cashboxModel.findOne({ cashboxId });
+        const cashbox = await this.cashboxesService.getCashboxesDocument({ cashboxId });
 
         if (!cashbox) {
             throw new BadRequestException('Нет кассы с id: ' + cashboxId);

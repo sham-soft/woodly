@@ -10,5 +10,6 @@ import { CashboxesController } from './cashboxes.controller';
     ])],
     providers: [CashboxesService],
     controllers: [CashboxesController],
+    exports: [CashboxesService],
 })
 export class CashboxesModule {}

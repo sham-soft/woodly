@@ -7,6 +7,7 @@ import { CardTransactionsQueryDto } from './dto/card-transactions.dto';
 import { CardSetLimitDto } from './dto/card-set-limit.dto';
 import { CardEditDto } from './dto/card-edit.dto';
 import { CardCreateDto } from './dto/card-create.dto';
+import { TransactionsService } from '../transactions/transactions.service';
 import { Transaction } from '../transactions/schemas/transaction.schema';
 import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
@@ -18,7 +19,7 @@ import type { PaginatedList } from '../../types/paginated-list.type';
 export class CardsService {
     constructor(
         @InjectModel('cards') private cardModel: Model<Card>,
-        @InjectModel('transactions') private transactionModel: Model<Transaction>,
+        private readonly transactionsService: TransactionsService,
     ) {}
 
     async getCards(query: CardQueryDto): Promise<PaginatedList<Card>> {
@@ -158,8 +159,8 @@ export class CardsService {
             status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Successful },
         });
 
-        const total = await this.transactionModel.countDocuments(filters);
-        const data = await this.transactionModel.find(filters).skip(pagination.skip).limit(pagination.limit);
+        const total = await this.transactionsService.getTransactionsCount(filters);
+        const data = await this.transactionsService.getTransactionsCollection(filters, pagination.skip, pagination.limit);;
 
         return {
             page: pagination.page,

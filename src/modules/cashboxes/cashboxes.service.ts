@@ -62,4 +62,8 @@ export class CashboxesService {
             { $set: { status: CASHBOX_STATUSES.Inactive } },
         );
     }
+
+    async getCashboxesDocument(filters: unknown): Promise<Cashbox> {
+        return this.cashboxModel.findOne(filters);
+    }
 }

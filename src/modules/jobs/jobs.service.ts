@@ -3,7 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { Transaction } from '../transactions/schemas/transaction.schema';
+import { TransactionsService } from '../transactions/transactions.service';
 import { ConfigDto } from '../configs/dto/config.dto';
 import { ConfigsService } from '../configs/configs.service';
 import { Card } from '../cards/schemas/card.schema';
@@ -14,9 +14,9 @@ import { TRANSACTION_STATUSES } from '../../helpers/constants';
 export class JobsService {
     constructor(
         @InjectModel('cards') private cardModel: Model<Card>,
-        @InjectModel('transactions') private transactionModel: Model<Transaction>,
         private readonly httpService: HttpService,
         private readonly configsService: ConfigsService,
+        private readonly transactionsService: TransactionsService,
     ) {}
 
     @Cron('0 */4 * * * *')
@@ -26,7 +26,7 @@ export class JobsService {
             dateClose: { $lt: getСurrentDateToString() },
         };
         
-        await this.transactionModel.updateMany(filters, { $set: { status: TRANSACTION_STATUSES.Cancelled } });
+        await this.transactionsService.updateTransactionsCollection(filters, { status: TRANSACTION_STATUSES.Cancelled });
         console.log('Called updateActiveTransactions every 4 minutes');
     }
 

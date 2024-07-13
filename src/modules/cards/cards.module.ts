@@ -3,13 +3,13 @@ import { Module } from '@nestjs/common';
 import { CardSchema } from './schemas/card.schema';
 import { CardsService } from './cards.service';
 import { CardsController } from './cards.controller';
-import { TransactionSchema } from '../transactions/schemas/transaction.schema';
+import { TransactionsModule } from '../transactions/transactions.module';
 
 @Module({
-    imports: [MongooseModule.forFeature([
-        { name: 'cards', schema: CardSchema, collection: 'cards' },
-        { name: 'transactions', schema: TransactionSchema, collection: 'transactions' },
-    ])],
+    imports: [
+        MongooseModule.forFeature([{ name: 'cards', schema: CardSchema, collection: 'cards' }]),
+        TransactionsModule,
+    ],
     providers: [CardsService],
     controllers: [CardsController],
 })

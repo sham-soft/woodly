@@ -6,15 +6,13 @@ import { PurchaseSchema } from './schemas/purchase.schema';
 import { PurchasesService } from './purchases.service';
 import { PurchasesController } from './purchases.controller';
 import { UsersModule } from '../users/users.module';
-import { CashboxSchema } from '../cashboxes/schemas/cashbox.schema';
+import { CashboxesModule } from '../cashboxes/cashboxes.module';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([
-            { name: 'purchases', schema: PurchaseSchema, collection: 'purchases' },
-            { name: 'cashboxes', schema: CashboxSchema, collection: 'cashboxes' },
-        ]),
+        MongooseModule.forFeature([{ name: 'purchases', schema: PurchaseSchema, collection: 'purchases' }]),
         UsersModule,
+        CashboxesModule,
     ],
     providers: [
         PurchasesService,
