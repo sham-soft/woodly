@@ -21,4 +21,7 @@ export class UserCreateDto {
 
     @IsInArray(Object.values(PERMISSIONS))
     permissions: string[];
+
+    @IsString()
+    address: string;
 }

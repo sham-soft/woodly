@@ -98,6 +98,10 @@ export class UsersService {
         );
     }
 
+    async getUsersDocument(filters: unknown): Promise<User> {
+        return this.userModel.findOne(filters);
+    }
+
     async getUsersCollection(filters: unknown, skip?: number, limit?: number): Promise<User[]> {
         return this.userModel.find(filters).skip(skip).limit(limit);
     }

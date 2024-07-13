@@ -18,14 +18,13 @@ export class GetBalanceService {
     ) {}
 
     async getBalance(user: CustomRequest['user']): Promise<Balance[]> {
-        const userId = user.userId;
-        const ADDRESS = 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS';
         const requests = [
-            this.getUserBalance(userId),
+            this.getUserBalance(user.userId),
             this.getRates(),
             this.getAmountFreeze(user),
             user.role === ROLES.Admin ? this.getBalanceAllUsers(ROLES.Trader) : 0,
             user.role === ROLES.Admin ? this.getBalanceAllUsers(ROLES.Merchant) : 0,
+            this.usersService.getUsersDocument({ userId: user.userId }),
         ];
 
         const balanceData = await Promise.all(requests);
@@ -35,10 +34,11 @@ export class GetBalanceService {
         const amountFreezeTransactions = balanceData[2];
         const balanceTraders = balanceData[3];
         const balanceMerchants = balanceData[4];
+        const address = balanceData[5].address;
 
         return [
             {
-                address: ADDRESS,
+                address,
                 balance: getFixedFloat((userBalance), 2),
                 freeze: getFixedFloat((amountFreezeTransactions), 2),
                 balanceTraders,

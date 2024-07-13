@@ -19,12 +19,14 @@ export class UpdateTransfersService {
         private readonly usersService: UsersService,
     ) {}
     async checkAndUpdateTransfers(userId: number): Promise<Transfer[]> {
-        const totalTransfers = await this.transferModel.countDocuments();
-        const totalTronscan = await this.getTronscanCount();
+        const user = await this.usersService.getUsersDocument({ userId });
+
+        const totalTransfers = await this.transferModel.countDocuments({ creatorId: userId });
+        const totalTronscan = await this.getTronscanCount(user.address);
         const difference = totalTronscan - totalTransfers;
 
         if (difference) {
-            const transactions = await this.getTronscanTransfers(difference, userId);
+            const transactions = await this.getTronscanTransfers(difference, userId, user.address);
 
             const amount = transactions.reduce((prev, item) => prev + item.amount, 0);
 
@@ -37,36 +39,33 @@ export class UpdateTransfersService {
         return [];
     }
 
-    private async getTronscanCount(): Promise<number> {
-        const ADDRESS = 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS';
-
+    private async getTronscanCount(address: string): Promise<number> {
         const params = {
             limit: 0,
-            relatedAddress: ADDRESS,
-            toAddress: ADDRESS,
+            relatedAddress: address,
+            toAddress: address,
         };
 
         const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
         return tronscan.data.total;
     }
 
-    private async getTronscanTransfers(limit: number, userId: number): Promise<Transfer[]> {
+    private async getTronscanTransfers(limit: number, userId: number, address: string): Promise<Transfer[]> {
         let newTransferId = await createId(this.transferModel, 'transferId');
 
         const rate = await this.configsService.getConfigs(CONFIGS.RubleRate);
         const RATE_PERCENT = 2.5;
         const rateWithPercent = getSumWithPercent(RATE_PERCENT, Number(rate));
         const DECIMALS = 1000000;
-        const ADDRESS = 'TW8RAkPRpxct7NyXU1DZoF8ZHHx6nzzktS';
 
         const params = {
-            relatedAddress: ADDRESS,
+            relatedAddress: address,
             limit,
             start: 0,
             sort: '-timestamp',
             count: 'true',
             filterTokenValue: 0,
-            toAddress: ADDRESS,
+            toAddress: address,
         };
 
         const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
@@ -81,7 +80,7 @@ export class UpdateTransfersService {
             amount: (item.quant / DECIMALS) * Number(rate),
             dateCreate: convertDateToString(new Date(item.block_ts)),
             creatorId: userId,
-            address: ADDRESS,
+            address: address,
         }));
     }
 }

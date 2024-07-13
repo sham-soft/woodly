@@ -23,7 +23,6 @@ export enum BALANCE_STATUSES {
     Ordered,
     Sent,
     DepositTraders,
-
 }
 
 export enum PURCHASE_STATUSES {

@@ -31,6 +31,9 @@ export class User {
 
     @Prop()
     balance: number;
+
+    @Prop()
+    address: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
