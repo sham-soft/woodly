@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Message } from './schemas/message.schema';
 import { MessageQueryDto } from './dto/message.dto';
 import { getPagination } from '../../helpers/pagination';
-import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
+import { getFilters, FilterRules } from '../../helpers/filters';
 import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
@@ -16,8 +16,8 @@ export class MessagesService {
     async getMessages(query: MessageQueryDto): Promise<PaginatedList<Message>> {
         const pagination = getPagination(query.page);
 
-        const filters = getQueryFilters(query, {
-            cardLastNumber: QueryFilterRules.EQUAL,
+        const filters = getFilters({
+            cardLastNumber: { rule: FilterRules.EQUAL, value: query.cardLastNumber },
         });
 
         const total = await this.messageModel.countDocuments(filters);

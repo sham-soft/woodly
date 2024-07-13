@@ -10,7 +10,7 @@ import { CardCreateDto } from './dto/card-create.dto';
 import { Transaction } from '../transactions/schemas/transaction.schema';
 import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
-import { getQueryFilters, QueryFilterRules } from '../../helpers/filters';
+import { getFilters, FilterRules } from '../../helpers/filters';
 import { CARD_STATUSES, TRANSACTION_STATUSES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
 
@@ -24,9 +24,9 @@ export class CardsService {
     async getCards(query: CardQueryDto): Promise<PaginatedList<Card>> {
         const pagination = getPagination(query.page);
 
-        const extraFilters = getQueryFilters(query, {
-            status: QueryFilterRules.EQUAL,
-            cardNumber: QueryFilterRules.REGEX_STRING,
+        const extraFilters = getFilters({
+            status: { rule: FilterRules.EQUAL, value: query.status },
+            cardNumber: { rule: FilterRules.REGEX_STRING, value: query.cardNumber },
         });
         const filters = {
             status: { $nin: [CARD_STATUSES.Deleted] },
@@ -153,10 +153,10 @@ export class CardsService {
     async getCardTransactions(cardId: number, query: CardTransactionsQueryDto): Promise<PaginatedList<Transaction>> {
         const pagination = getPagination(query.page);
 
-        const filters = {
-            cardId: cardId,
-            status: TRANSACTION_STATUSES.Successful,
-        };
+        const filters = getFilters({
+            cardId: { rule: FilterRules.EQUAL, value: cardId },
+            status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Successful },
+        });
 
         const total = await this.transactionModel.countDocuments(filters);
         const data = await this.transactionModel.find(filters).skip(pagination.skip).limit(pagination.limit);

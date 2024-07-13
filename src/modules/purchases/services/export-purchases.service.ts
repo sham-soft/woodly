@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { StreamableFile } from '@nestjs/common';
 import { Purchase } from '../schemas/purchase.schema';
 import { PurchaseExportQueryDto } from '../dto/purchase-export.dto';
+import { getFilters, FilterRules } from '../../../helpers/filters';
 
 @Injectable()
 export class ExportPurchasesService {
@@ -13,12 +14,12 @@ export class ExportPurchasesService {
     ) {}
 
     async getPurchasesExport(query: PurchaseExportQueryDto): Promise<StreamableFile> {
-        const filters: any = {
+        const filters = getFilters({
             dateCreate: {
-                $gt : query.dateStart,
-                $lt : query.dateEnd,
+                rule: FilterRules.GT_LT,
+                value: { gt: query.dateStart, lt: query.dateEnd },
             },
-        };
+        });
 
         if (query.cashboxIds) {
             filters['cashbox.cashboxId'] = { $in: [...query.cashboxIds] };
