@@ -6,7 +6,7 @@ type ColumnType = {
 
 interface IXlsx {
     headers: string[];
-    values: string[][];
+    values: (string | number)[][];
     cols: ColumnType[];
 }
 

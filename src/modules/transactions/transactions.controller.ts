@@ -89,7 +89,7 @@ export class TransactionsController {
     @ApiOperation({ summary: 'Получение списка платежей в формате Excel' })
     @Get('export/')
     @Header('Content-Disposition', 'attachment; filename="Transactions.xlsx"')
-    getTransactionsExport(@Query() transactionQuery: TransactionExportQueryDto): Promise<StreamableFile> {
-        return this.transactionsService.getTransactionsExport(transactionQuery);
+    getTransactionsExport(@Query() transactionQuery: TransactionExportQueryDto, @Request() req: CustomRequest): Promise<StreamableFile> {
+        return this.transactionsService.getTransactionsExport(transactionQuery, req.user);
     }
 }

@@ -113,8 +113,8 @@ export class TransactionsService {
         );
     }
 
-    async getTransactionsExport(query: TransactionExportQueryDto): Promise<StreamableFile> {
-        return this.exportTransactionService.getTransactionsExport(query);
+    async getTransactionsExport(query: TransactionExportQueryDto, user: CustomRequest['user']): Promise<StreamableFile> {
+        return this.exportTransactionService.getTransactionsExport(query, user);
     }
 
     async getTransactionsCount(filters: unknown): Promise<number> {
