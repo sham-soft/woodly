@@ -5,6 +5,7 @@ import { Transaction } from '../schemas/transaction.schema';
 import { TransactionMakeDto } from '../dto/transaction-make.dto';
 import { UsersService } from '../../users/users.service';
 import { Message } from '../../messages/schemas/message.schema';
+import { CashboxesService } from '../../cashboxes/cashboxes.service';
 import { Card } from '../../cards/schemas/card.schema';
 import { Autopayment } from '../../autopayments/schemas/autopayment.schema';
 import { createId } from '../../../helpers/unique';
@@ -19,6 +20,7 @@ export class MakeTransactionService {
         @InjectModel('messages') private messageModel: Model<Message>,
         @InjectModel('transactions') private transactionModel: Model<Transaction>,
         private readonly usersService: UsersService,
+        private readonly cashboxesService: CashboxesService,
     ) {}
 
     async makeTransaction(params: TransactionMakeDto): Promise<string> {
@@ -115,5 +117,8 @@ export class MakeTransactionService {
 
         // Обновление баланса мерчанта. Пополнение
         await this.usersService.updateBalance(transaction.cashbox.creatorId, transaction.amountMinusCommission);
+
+        // Обновление баланса кассы. Пополнение
+        await this.cashboxesService.updateBalance(transaction.cashbox.cashboxId, transaction.amountMinusCommission);
     }
 }

@@ -40,6 +40,7 @@ export class CashboxesService {
             cashboxId: newCashboxId,
             creatorId: userId,
             status: CASHBOX_STATUSES.Active,
+            balance: { rub: 0 },
             ...params,
         };
 
@@ -60,6 +61,13 @@ export class CashboxesService {
         await this.cashboxModel.findOneAndUpdate(
             { cashboxId: id },
             { $set: { status: CASHBOX_STATUSES.Inactive } },
+        );
+    }
+
+    async updateBalance(cashboxId: number, value: number): Promise<void> {
+        await this.cashboxModel.findOneAndUpdate(
+            { cashboxId: cashboxId },
+            { $inc: { 'balance.rub': value } }, 
         );
     }
 

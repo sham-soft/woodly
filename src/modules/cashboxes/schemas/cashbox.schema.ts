@@ -37,6 +37,11 @@ export class Cashbox {
 
     @Prop()
     status: number;
+
+    @Prop({ type: Object })
+    balance: {
+        rub: number;
+    };
 }
 
 export const CashboxSchema = SchemaFactory.createForClass(Cashbox);

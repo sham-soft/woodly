@@ -8,6 +8,7 @@ import { PurchaseQueryDto } from './dto/purchase.dto';
 import { PurchaseExportQueryDto } from './dto/purchase-export.dto';
 import { PurchaseCreateDto } from './dto/purchase-create.dto';
 import { UsersService } from '../users/users.service';
+import { CashboxesService } from '../cashboxes/cashboxes.service';
 import { getPagination } from '../../helpers/pagination';
 import { getPercentOfValue } from '../../helpers/numbers';
 import { getFilters, FilterRules } from '../../helpers/filters';
@@ -22,6 +23,7 @@ export class PurchasesService {
         private readonly createPurchaseService: CreatePurchaseService,
         private readonly exportPurchasesService: ExportPurchasesService,
         private readonly usersService: UsersService,
+        private readonly cashboxesService: CashboxesService,
     ) {}
 
     async getPurchases(query: PurchaseQueryDto): Promise<PaginatedList<Purchase>> {
@@ -95,6 +97,9 @@ export class PurchasesService {
 
         // Обновление баланса мерчанта. Списание
         await this.usersService.updateBalance(purchase.cashbox.creatorId, -purchase.amountWithTraderBonus);
+
+        // Обновление баланса Кассы. Списание
+        await this.cashboxesService.updateBalance(purchase.cashbox.cashboxId, -purchase.amountWithTraderBonus);
 
         const ADMIN_ID = 1;
         // Обновление баланса админа. Списание
