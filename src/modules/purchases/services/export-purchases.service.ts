@@ -16,8 +16,8 @@ export class ExportPurchasesService {
     async getPurchasesExport(query: PurchaseExportQueryDto): Promise<StreamableFile> {
         const filters = getFilters({
             dateCreate: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.dateStart, lt: query.dateEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
             },
         });
 

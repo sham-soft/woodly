@@ -3,8 +3,11 @@ export enum FilterRules {
     EQUAL_LIST = 'equalList',
     NOT_EQUAL_LIST = 'notEqualList',
     GT = 'gt',
+    GTE = 'gte',
     LT = 'lt',
+    LTE = 'lte',
     GT_LT = 'gtLt',
+    GTE_LTE = 'gteLte',
     REGEX_STRING = 'regexString',
     REGEX_STRING_OR = 'regexStringOr',
     REGEX_INTEGER = 'regexInteger',
@@ -15,10 +18,15 @@ interface GtLt {
     lt: string | number;
 }
 
+interface GteLte {
+    gte: string | number;
+    lte: string | number;
+}
+
 export interface FilterOption {
     [key: string]: {
         rule: FilterRules;
-        value: string | number | string[] | number[] | GtLt;
+        value: string | number | string[] | number[] | GtLt | GteLte;
     }
 }
 
@@ -49,8 +57,16 @@ export function getFilters(options: FilterOption): any {
                 filters[key] = { $gt: value };
                 break;
 
+            case FilterRules.GTE:
+                filters[key] = { $gte: value };
+                break;
+
             case FilterRules.LT:
                 filters[key] = { $lt: value };
+                break;
+
+            case FilterRules.LTE:
+                filters[key] = { $lte: value };
                 break;
 
             case FilterRules.GT_LT:
@@ -62,6 +78,20 @@ export function getFilters(options: FilterOption): any {
                 if ((value as GtLt).lt) {
                     filters[key] = {
                         $lt: (value as GtLt).lt,
+                        ...filters[key],
+                    };
+                }
+                break;
+
+            case FilterRules.GTE_LTE:
+                if ((value as GteLte).gte) {
+                    filters[key] = {
+                        $gte: (value as GteLte).gte,
+                    };
+                }
+                if ((value as GteLte).lte) {
+                    filters[key] = {
+                        $lte: (value as GteLte).lte,
                         ...filters[key],
                     };
                 }

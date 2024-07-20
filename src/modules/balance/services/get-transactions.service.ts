@@ -28,12 +28,12 @@ export class GetTransactionsService {
             status: { rule: FilterRules.EQUAL, value: PURCHASE_STATUSES.Successful },
             buyerId: { rule: FilterRules.EQUAL, value: userId },
             amount: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.amountStart, lt: query.amountEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
             },
             dateClose: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.dateStart, lt: query.dateEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
             },
         });
 
@@ -43,12 +43,12 @@ export class GetTransactionsService {
             status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Successful },
             'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
             amount: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.amountStart, lt: query.amountEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
             },
             dateClose: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.dateStart, lt: query.dateEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
             },
         });
 
@@ -58,12 +58,12 @@ export class GetTransactionsService {
             status: { rule: FilterRules.EQUAL, value: TRANSACTION_STATUSES.Active },
             'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
             amount: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.amountStart, lt: query.amountEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
             },
             dateClose: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.dateStart, lt: query.dateEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
             },
         });
 
@@ -72,12 +72,12 @@ export class GetTransactionsService {
             hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             creatorId: { rule: FilterRules.EQUAL, value: userId },
             amount: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.amountStart, lt: query.amountEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
             },
             dateCreate: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.dateStart, lt: query.dateEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
             },
         });
 
@@ -129,12 +129,12 @@ export class GetTransactionsService {
                     status: { rule: FilterRules.EQUAL, value: status },
                     'card.creatorId': { rule: FilterRules.EQUAL, value: userId },
                     amount: {
-                        rule: FilterRules.GT_LT,
-                        value: { gt: query.amountStart, lt: query.amountEnd },
+                        rule: FilterRules.GTE_LTE,
+                        value: { gte: query.amountStart, lte: query.amountEnd },
                     },
                     dateClose: {
-                        rule: FilterRules.GT_LT,
-                        value: { gt: query.dateStart, lt: query.dateEnd },
+                        rule: FilterRules.GTE_LTE,
+                        value: { gte: query.dateStart, lte: query.dateEnd },
                     },
                 });
 

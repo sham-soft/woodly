@@ -40,8 +40,8 @@ export class ExportTransactionService {
         const filters = getFilters({
             'cashbox.cashboxId': { rule: FilterRules.EQUAL, value: query.cashboxId },
             dateCreate: {
-                rule: FilterRules.GT_LT,
-                value: { gt: query.dateStart, lt: query.dateEnd },
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
             },
             status: { rule: FilterRules.EQUAL, value: query.status },
         });
