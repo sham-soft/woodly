@@ -1,10 +1,11 @@
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsIn, IsOptional } from 'class-validator';
+import { TRADER_TARIFFS } from '../../../helpers/constants';
 
 export class UserEditTariffDto {
     @IsNumber()
     userId: number;
 
-    @IsString()
+    @IsIn(Object.values(TRADER_TARIFFS))
     tariffId: string;
 
     @IsNumber()
@@ -17,9 +18,9 @@ export class UserEditTariffDto {
 
     @IsNumber()
     @IsOptional()
-    commissionPercent?: number;
+    addPercent?: number;
 
     @IsNumber()
     @IsOptional()
-    commissionAmount?: number;
+    addAmount?: number;
 }

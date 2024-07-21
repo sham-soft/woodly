@@ -41,8 +41,8 @@ export class User {
         title: string;
         limitMin: number;
         limitMax: number;
-        commissionPercent: number;
-        commissionAmount: number;
+        addPercent: number;
+        addAmount: number;
     }[];
 }
 

@@ -4,11 +4,12 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Transfer } from '../schemas/transfer.schema';
 import { UsersService } from '../../users/users.service';
+import { User } from '../../users/schemas/user.schema';
 import { ConfigsService } from '../../configs/configs.service';
 import { createId } from '../../../helpers/unique';
 import { getSumWithPercent } from '../../../helpers/numbers';
 import { convertDateToString } from '../../../helpers/date';
-import { CONFIGS } from '../../../helpers/constants';
+import { CONFIGS, ROLES, TRADER_TARIFFS } from '../../../helpers/constants';
 
 @Injectable()
 export class UpdateTransfersService {
@@ -26,7 +27,7 @@ export class UpdateTransfersService {
         const difference = totalTronscan - totalTransfers;
 
         if (difference) {
-            const transactions = await this.getTronscanTransfers(difference, userId, user.address);
+            const transactions = await this.getTronscanTransfers(difference, user);
 
             const amount = transactions.reduce((prev, item) => prev + item.amount, 0);
 
@@ -50,22 +51,29 @@ export class UpdateTransfersService {
         return tronscan.data.total;
     }
 
-    private async getTronscanTransfers(limit: number, userId: number, address: string): Promise<Transfer[]> {
+    private async getTronscanTransfers(limit: number, user: User): Promise<Transfer[]> {
         let newTransferId = await createId(this.transferModel, 'transferId');
 
         const rate = await this.configsService.getConfigs(CONFIGS.RubleRate);
-        const RATE_PERCENT = 2.5;
-        const rateWithPercent = getSumWithPercent(RATE_PERCENT, Number(rate));
         const DECIMALS = 1000000;
 
+        let tariffPercent = 0;
+
+        if (user.role === ROLES.Trader) {
+            const tariff = user.tariffs.find(item => item.tariffId === TRADER_TARIFFS.Transfer);
+            tariffPercent = tariff?.addPercent || 0;
+        }
+
+        const rateWithPercent = getSumWithPercent(tariffPercent, Number(rate));
+
         const params = {
-            relatedAddress: address,
+            relatedAddress: user.address,
             limit,
             start: 0,
             sort: '-timestamp',
             count: 'true',
             filterTokenValue: 0,
-            toAddress: address,
+            toAddress: user.address,
         };
 
         const tronscan = await this.httpService.axiosRef.get('https://apilist.tronscanapi.com/api/filter/trc20/transfers', { params });
@@ -77,10 +85,10 @@ export class UpdateTransfersService {
             hashId: item.transaction_id,
             rate: rate,
             rateWithPercent: rateWithPercent,
-            amount: (item.quant / DECIMALS) * Number(rate),
+            amount: (item.quant / DECIMALS) * rateWithPercent,
             dateCreate: convertDateToString(new Date(item.block_ts)),
-            creatorId: userId,
-            address: address,
+            creatorId: user.userId,
+            address: user.address,
         }));
     }
 }

@@ -4,7 +4,7 @@ import { TransactionsService } from '../../transactions/transactions.service';
 import { PurchasesService } from '../../purchases/purchases.service';
 import { ConfigsService } from '../../configs/configs.service';
 import { getFixedFloat, getSumWithPercent } from '../../../helpers/numbers';
-import { TRANSACTION_STATUSES, PURCHASE_STATUSES, ROLES } from '../../../helpers/constants';
+import { TRANSACTION_STATUSES, PURCHASE_STATUSES, ROLES, TRADER_TARIFFS } from '../../../helpers/constants';
 import type { Balance } from '../types/balance.type';
 import type { CustomRequest } from '../../../types/custom-request.type';
 
@@ -20,7 +20,7 @@ export class GetBalanceService {
     async getBalance(user: CustomRequest['user']): Promise<Balance[]> {
         const requests = [
             this.getUserBalance(user.userId),
-            this.getRates(),
+            this.getRates(user.userId),
             this.getAmountFreeze(user),
             user.role === ROLES.Admin ? this.getBalanceAllUsers(ROLES.Trader) : 0,
             user.role === ROLES.Admin ? this.getBalanceAllUsers(ROLES.Merchant) : 0,
@@ -53,16 +53,24 @@ export class GetBalanceService {
         return user.balance;
     }
 
-    private async getRates(): Promise<any> {
-        const RATE_PERCENT = 2.5;
-
+    private async getRates(userId: number): Promise<any> {
         const config = await this.configsService.getConfigs('RUBLE_RATE');
         const rate = Number(config);
-        const rateWithPercent = getSumWithPercent(RATE_PERCENT, rate);
+
+        const user = await this.usersService.getUser(userId);
+
+        let ratePercent = 0;
+
+        if (user.role === ROLES.Trader) {
+            const tariff = user.tariffs.find(item => item.tariffId === TRADER_TARIFFS.Transfer);
+            ratePercent = tariff?.addPercent || 0;
+        }
+
+        const rateWithPercent = getSumWithPercent(ratePercent, rate);
 
         return {
             rate,
-            ratePercent: RATE_PERCENT,
+            ratePercent,
             rateWithPercent,
         };
     }

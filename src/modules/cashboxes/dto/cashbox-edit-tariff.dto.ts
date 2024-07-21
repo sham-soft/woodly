@@ -1,10 +1,11 @@
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsIn, IsOptional } from 'class-validator';
+import { CASHBOX_TARIFFS } from '../../../helpers/constants';
 
 export class CashboxEditTariffDto {
     @IsNumber()
     cashboxId: number;
 
-    @IsString()
+    @IsIn(Object.values(CASHBOX_TARIFFS))
     tariffId: string;
 
     @IsNumber()

@@ -92,27 +92,45 @@ export enum CONFIGS {
     RubleRate = 'RUBLE_RATE',
 }
 
+export enum TRADER_TARIFFS {
+    Sbp = 'sbp',
+    Sber = 'sber',
+    Other = 'other',
+    Transfer = 'transfer',
+}
+
+export enum CASHBOX_TARIFFS {
+    P2p = 'p2p',
+    SbpTransaction = 'sbp_transaction',
+    Trc20 = 'trc20',
+    UsdtTrc20 = 'usdt_trc20',
+    Bank = 'bank',
+    SbpPurchase = 'sbp_purchase',
+    Trx = 'trx',
+    Piastrix = 'piastrix',
+}
+
 export const jwtConstants = {
     secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
 
 export const DEFAULT_TRADER_TARIFFS = [
-    { tariffId: 'sbp', title: 'СБП', limitMin: 0, limitMax: 300000, commissionPercent: 1, commissionAmount: 0 },
-    { tariffId: 'sber', title: 'Сбербанк', limitMin: 0, limitMax: 300000, commissionPercent: 1, commissionAmount: 0 },
-    { tariffId: 'other', title: 'Другие банки', limitMin: 0, limitMax: 300000, commissionPercent: 2.5, commissionAmount: 0 },
+    { tariffId: TRADER_TARIFFS.Sbp, title: 'СБП', limitMin: 0, limitMax: 300000, addPercent: 1, addAmount: 0 },
+    { tariffId: TRADER_TARIFFS.Sber, title: 'Сбербанк', limitMin: 0, limitMax: 300000, addPercent: 1, addAmount: 0 },
+    { tariffId: TRADER_TARIFFS.Other, title: 'Другие банки', limitMin: 0, limitMax: 300000, addPercent: 2.5, addAmount: 0 },
     {
-        tariffId: 'transfer',
+        tariffId: TRADER_TARIFFS.Transfer,
         title: 'Пополнение криптовалютой и оплата откупа',
         limitMin: 0,
         limitMax: 300000,
-        commissionPercent: 2.5,
-        commissionAmount: 0,
+        addPercent: 2.5,
+        addAmount: 0,
     },
 ];
 
 export const DEFAULT_CASHBOX_TARIFFS = [
     {
-        tariffId: 'p2p',
+        tariffId: CASHBOX_TARIFFS.P2p,
         title: 'CARD P2P (PAYMENT_METHOD: 1, CURRENCY: 1)',
         type: 'transaction',
         limitMin: 100,
@@ -121,7 +139,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 0,
     },
     {
-        tariffId: 'sbp_transaction',
+        tariffId: CASHBOX_TARIFFS.SbpTransaction,
         title: 'СБП (PAYMENT_METHOD: 2, CURRENCY: 1)',
         type: 'transaction',
         limitMin: 100,
@@ -130,7 +148,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 0,
     },
     {
-        tariffId: 'trc20',
+        tariffId: CASHBOX_TARIFFS.Trc20,
         title: 'TRC-20 (PAYMENT_METHOD: 3, CURRENCY: 1)',
         type: 'transaction',
         limitMin: 100,
@@ -139,7 +157,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 0,
     },
     {
-        tariffId: 'usdt_trc20',
+        tariffId: CASHBOX_TARIFFS.UsdtTrc20,
         title: 'USDT TRC-20 (PAYMENT_METHOD: 2, CURRENCY: 1)',
         type: 'purchase',
         limitMin: 5000,
@@ -148,7 +166,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 250,
     },
     {
-        id: 'bank',
+        id: CASHBOX_TARIFFS.Bank,
         title: 'Банковская карта (PAYMENT_METHOD: 1, CURRENCY: 1)',
         type: 'purchase',
         limitMin: 500,
@@ -157,7 +175,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 0,
     },
     {
-        tariffId: 'sbp_purchase',
+        tariffId: CASHBOX_TARIFFS.SbpPurchase,
         title: 'СБП (PAYMENT_METHOD: 3, CURRENCY: 1)',
         type: 'purchase',
         limitMin: 1000,
@@ -166,7 +184,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 0,
     },
     {
-        tariffId: 'trx',
+        tariffId: CASHBOX_TARIFFS.Trx,
         title: 'TRX (PAYMENT_METHOD: 4, CURRENCY: 1)',
         type: 'purchase',
         limitMin: 100,
@@ -175,7 +193,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 20,
     },
     {
-        tariffId: 'piastrix',
+        tariffId: CASHBOX_TARIFFS.Piastrix,
         title: 'PIASTRIX (PAYMENT_METHOD: 5, CURRENCY: 1)',
         type: 'purchase',
         limitMin: 500,

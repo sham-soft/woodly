@@ -100,8 +100,8 @@ export class UsersService {
             { $set: {
                 'tariffs.$.limitMin': params.limitMin,
                 'tariffs.$.limitMax': params.limitMax,
-                'tariffs.$.commissionPercent': params.commissionPercent,
-                'tariffs.$.commissionAmount': params.commissionAmount,
+                'tariffs.$.addPercent': params.addPercent,
+                'tariffs.$.addAmount': params.addAmount,
             }}, 
             { new: true }
         );
