@@ -10,7 +10,7 @@ import { Card } from '../../cards/schemas/card.schema';
 import { Autopayment } from '../../autopayments/schemas/autopayment.schema';
 import { createId } from '../../../helpers/unique';
 import { getСurrentDateToString } from '../../../helpers/date';
-import { TRANSACTION_STATUSES } from '../../../helpers/constants';
+import { ADMIN_ID, TRANSACTION_STATUSES } from '../../../helpers/constants';
 
 @Injectable()
 export class MakeTransactionService {
@@ -111,7 +111,6 @@ export class MakeTransactionService {
         // Обновление баланса трейдера. Списание
         await this.usersService.updateBalance(transaction.card.creatorId, -amount);
 
-        const ADMIN_ID = 1;
         // Обновление баланса админа. Пополнение
         await this.usersService.updateBalance(ADMIN_ID, transaction.commission);
 

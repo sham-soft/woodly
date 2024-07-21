@@ -13,7 +13,7 @@ import { getPagination } from '../../helpers/pagination';
 import { getPercentOfValue } from '../../helpers/numbers';
 import { getFilters, FilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
-import { PURCHASE_STATUSES } from '../../helpers/constants';
+import { ADMIN_ID, PURCHASE_STATUSES, TRADER_TARIFFS } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
@@ -79,8 +79,10 @@ export class PurchasesService {
             throw new BadRequestException('Выплата не может быть завершена, так как она еще не была активирована');
         }
 
-        const ADMIN_BONUS_PERCENT = 4;
-        const adminBonus = getPercentOfValue(ADMIN_BONUS_PERCENT, purchase.amount);
+        const user = await this.usersService.getUsersDocument({ userId: purchase.buyerId });
+        const tariff = user.tariffs.find(item => item.tariffId === TRADER_TARIFFS.Transfer);
+
+        const adminBonus = getPercentOfValue(tariff.addPercent, purchase.amount);
         const amountWithBonuses = purchase.amountWithTraderBonus + adminBonus;
 
         const payload = {
@@ -101,7 +103,6 @@ export class PurchasesService {
         // Обновление баланса Кассы. Списание
         await this.cashboxesService.updateBalance(purchase.cashbox.cashboxId, -purchase.amountWithTraderBonus);
 
-        const ADMIN_ID = 1;
         // Обновление баланса админа. Списание
         await this.usersService.updateBalance(ADMIN_ID, -adminBonus);
 

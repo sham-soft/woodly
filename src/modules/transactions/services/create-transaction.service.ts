@@ -8,7 +8,7 @@ import { CashboxesService } from '../../cashboxes/cashboxes.service';
 import { createId } from '../../../helpers/unique';
 import { getPercentOfValue, getSumWithoutPercent } from '../../../helpers/numbers';
 import { getСurrentDateToString } from '../../../helpers/date';
-import { TRANSACTION_STATUSES } from '../../../helpers/constants';
+import { TRANSACTION_STATUSES, CASHBOX_TARIFFS, PAYMENT_SYSTEMS } from '../../../helpers/constants';
 
 @Injectable()
 export class CreateTransactionService {
@@ -22,12 +22,13 @@ export class CreateTransactionService {
 
         const newTransactionId = await createId(this.transactionModel, 'transactionId');
 
-        const ADMIN_PERCENT = 6;
+        const cashboxTariffId = params.paymentSystem === PAYMENT_SYSTEMS.Card ? CASHBOX_TARIFFS.P2p : CASHBOX_TARIFFS.SbpTransaction;
+        const tariff = cashbox.tariffs.find(item => item.tariffId === cashboxTariffId);
 
         const payload = {
             transactionId: newTransactionId,
-            commission: getPercentOfValue(ADMIN_PERCENT, params.amount),
-            amountMinusCommission: getSumWithoutPercent(ADMIN_PERCENT, params.amount),
+            commission: getPercentOfValue(tariff.commissionPercent, params.amount),
+            amountMinusCommission: getSumWithoutPercent(tariff.commissionPercent, params.amount),
             status: TRANSACTION_STATUSES.Created,
             dateCreate: getСurrentDateToString(),
             cashbox: {

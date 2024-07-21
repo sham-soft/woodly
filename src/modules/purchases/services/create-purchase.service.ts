@@ -8,7 +8,7 @@ import { CashboxesService } from '../../cashboxes/cashboxes.service';
 import { createId } from '../../../helpers/unique';
 import { getPercentOfValue, getSumWithPercent } from '../../../helpers/numbers';
 import { getСurrentDateToString } from '../../../helpers/date';
-import { PURCHASE_STATUSES } from '../../../helpers/constants';
+import { PURCHASE_STATUSES, PAYMENT_SYSTEMS, CASHBOX_TARIFFS } from '../../../helpers/constants';
 
 @Injectable()
 export class CreatePurchaseService {
@@ -22,7 +22,8 @@ export class CreatePurchaseService {
 
         const newPurchaseId = await createId(this.purchaseModel, 'purchaseId');
 
-        const BONUS_PERCENT = 6;
+        const cashboxTariffId = params.paymentSystem === PAYMENT_SYSTEMS.Card ? CASHBOX_TARIFFS.Bank : CASHBOX_TARIFFS.SbpPurchase;
+        const tariff = cashbox.tariffs.find(item => item.tariffId === cashboxTariffId);
 
         const payload = {
             purchaseId: newPurchaseId,
@@ -33,8 +34,8 @@ export class CreatePurchaseService {
                 cashboxId: cashbox.cashboxId,
                 creatorId: cashbox.creatorId,
             },
-            traderBonus: getPercentOfValue(BONUS_PERCENT, params.amount),
-            amountWithTraderBonus: getSumWithPercent(BONUS_PERCENT, params.amount),
+            traderBonus: getPercentOfValue(tariff.commissionPercent, params.amount),
+            amountWithTraderBonus: getSumWithPercent(tariff.commissionPercent, params.amount),
             ...params,
         };
 

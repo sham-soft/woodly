@@ -1,3 +1,5 @@
+export const ADMIN_ID = 1;
+
 export enum CARD_STATUSES {
     Active = 1,
     Inactive,
