@@ -137,6 +137,8 @@
                   "type": "array"
                   "items":
                     "type": "string"
+                "address":
+                  "type": "string"
               "required":
                 - "name"
                 - "email"
@@ -144,6 +146,7 @@
                 - "password"
                 - "role"
                 - "permissions"
+                - "address"
       "responses":
         "201":
           "description": ""
@@ -213,6 +216,48 @@
       "responses":
         "200":
           "description": ""
+      "tags":
+        - "Users"
+  "/users/edit-tariff":
+    "patch":
+      "operationId": "UsersController_editTariff"
+      "summary": "Редактирование тарифа пользователя"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "userId":
+                  "type": "number"
+                "tariffId":
+                  "type": "string"
+                  "enum":
+                    - "sbp"
+                    - "sber"
+                    - "other"
+                    - "transfer"
+                "limitMin":
+                  "type": "number"
+                "limitMax":
+                  "type": "number"
+                "addPercent":
+                  "type": "number"
+                "addAmount":
+                  "type": "number"
+              "required":
+                - "userId"
+                - "tariffId"
+      "responses":
+        "200":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
       "tags":
         - "Users"
   "/autopayments":
@@ -628,6 +673,149 @@
           "description": ""
       "tags":
         - "Purchases"
+  "/cashboxes":
+    "get":
+      "operationId": "CashboxesController_getCashboxes"
+      "summary": "Получение списка касс"
+      "parameters":
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cashboxes"
+  "/cashboxes/create":
+    "post":
+      "operationId": "CashboxesController_createCard"
+      "summary": "Создание кассы"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "title":
+                  "type": "string"
+                "url":
+                  "type": "string"
+                "successUrl":
+                  "type": "string"
+                "errorUrl":
+                  "type": "string"
+                "notificationUrlPayments":
+                  "type": "string"
+                "notificationUrlPayOff":
+                  "type": "string"
+                "commissionPayer":
+                  "type": "number"
+                  "enum":
+                    - 1
+                    - 2
+                "apiKey":
+                  "type": "string"
+              "required":
+                - "title"
+                - "url"
+                - "successUrl"
+                - "errorUrl"
+                - "notificationUrlPayments"
+                - "notificationUrlPayOff"
+                - "commissionPayer"
+      "responses":
+        "201":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Cashboxes"
+  "/cashboxes/activate/{id}":
+    "patch":
+      "operationId": "CashboxesController_activateCashbox"
+      "summary": "Активация кассы"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cashboxes"
+  "/cashboxes/deactivate/{id}":
+    "patch":
+      "operationId": "CashboxesController_deactivateCashbox"
+      "summary": "Деактивация кассы"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Cashboxes"
+  "/cashboxes/edit-tariff":
+    "patch":
+      "operationId": "CashboxesController_editTariff"
+      "summary": "Редактирование тарифа кассы"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "cashboxId":
+                  "type": "number"
+                "tariffId":
+                  "type": "string"
+                  "enum":
+                    - "p2p"
+                    - "sbp_transaction"
+                    - "trc20"
+                    - "usdt_trc20"
+                    - "bank"
+                    - "sbp_purchase"
+                    - "trx"
+                    - "piastrix"
+                "limitMin":
+                  "type": "number"
+                "limitMax":
+                  "type": "number"
+                "commissionPercent":
+                  "type": "number"
+                "commissionAmount":
+                  "type": "number"
+              "required":
+                - "cashboxId"
+                - "tariffId"
+      "responses":
+        "200":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Cashboxes"
   "/transactions":
     "get":
       "operationId": "TransactionsController_getTransactions"
@@ -915,6 +1103,12 @@
       "operationId": "TransactionsController_getTransactionsExport"
       "summary": "Получение списка платежей в формате Excel"
       "parameters":
+        -
+          "name": "cashboxId"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
         -
           "name": "dateStart"
           "required": true
@@ -1245,103 +1439,6 @@
           "description": ""
       "tags":
         - "Cards"
-  "/cashboxes":
-    "get":
-      "operationId": "CashboxesController_getCashboxes"
-      "summary": "Получение списка касс"
-      "parameters":
-        -
-          "name": "page"
-          "required": false
-          "in": "query"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cashboxes"
-  "/cashboxes/create":
-    "post":
-      "operationId": "CashboxesController_createCard"
-      "summary": "Создание кассы"
-      "parameters": []
-      "requestBody":
-        "required": true
-        "content":
-          "application/json":
-            "schema":
-              "type": "object"
-              "properties":
-                "title":
-                  "type": "string"
-                "url":
-                  "type": "string"
-                "successUrl":
-                  "type": "string"
-                "errorUrl":
-                  "type": "string"
-                "notificationUrlPayments":
-                  "type": "string"
-                "notificationUrlPayOff":
-                  "type": "string"
-                "commissionPayer":
-                  "type": "number"
-                  "enum":
-                    - 1
-                    - 2
-                "apiKey":
-                  "type": "string"
-              "required":
-                - "title"
-                - "url"
-                - "successUrl"
-                - "errorUrl"
-                - "notificationUrlPayments"
-                - "notificationUrlPayOff"
-                - "commissionPayer"
-      "responses":
-        "201":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "Cashboxes"
-  "/cashboxes/activate/{id}":
-    "patch":
-      "operationId": "CashboxesController_activateCashbox"
-      "summary": "Активация кассы"
-      "parameters":
-        -
-          "name": "id"
-          "required": true
-          "in": "path"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cashboxes"
-  "/cashboxes/deactivate/{id}":
-    "patch":
-      "operationId": "CashboxesController_deactivateCashbox"
-      "summary": "Деактивация кассы"
-      "parameters":
-        -
-          "name": "id"
-          "required": true
-          "in": "path"
-          "schema":
-            "type": "number"
-      "responses":
-        "200":
-          "description": ""
-      "tags":
-        - "Cashboxes"
   "/messages":
     "get":
       "operationId": "MessagesController_getMessages"
@@ -1458,6 +1555,8 @@
           "type": "array"
           "items":
             "type": "string"
+        "address":
+          "type": "string"
       "required":
         - "name"
         - "email"
@@ -1465,6 +1564,7 @@
         - "password"
         - "role"
         - "permissions"
+        - "address"
     "UserEditDto":
       "type": "object"
       "properties":
@@ -1491,6 +1591,29 @@
         - "email"
         - "password"
         - "role"
+    "UserEditTariffDto":
+      "type": "object"
+      "properties":
+        "userId":
+          "type": "number"
+        "tariffId":
+          "type": "string"
+          "enum":
+            - "sbp"
+            - "sber"
+            - "other"
+            - "transfer"
+        "limitMin":
+          "type": "number"
+        "limitMax":
+          "type": "number"
+        "addPercent":
+          "type": "number"
+        "addAmount":
+          "type": "number"
+      "required":
+        - "userId"
+        - "tariffId"
     "ConfigDto":
       "type": "object"
       "properties":
@@ -1557,6 +1680,66 @@
       "required":
         - "purchaseId"
         - "file"
+    "CashboxCreateDto":
+      "type": "object"
+      "properties":
+        "title":
+          "type": "string"
+        "url":
+          "type": "string"
+        "successUrl":
+          "type": "string"
+        "errorUrl":
+          "type": "string"
+        "notificationUrlPayments":
+          "type": "string"
+        "notificationUrlPayOff":
+          "type": "string"
+        "commissionPayer":
+          "type": "number"
+          "enum":
+            - 1
+            - 2
+        "apiKey":
+          "type": "string"
+      "required":
+        - "title"
+        - "url"
+        - "successUrl"
+        - "errorUrl"
+        - "notificationUrlPayments"
+        - "notificationUrlPayOff"
+        - "commissionPayer"
+    "Cashbox":
+      "type": "object"
+      "properties": {}
+    "CashboxEditTariffDto":
+      "type": "object"
+      "properties":
+        "cashboxId":
+          "type": "number"
+        "tariffId":
+          "type": "string"
+          "enum":
+            - "p2p"
+            - "sbp_transaction"
+            - "trc20"
+            - "usdt_trc20"
+            - "bank"
+            - "sbp_purchase"
+            - "trx"
+            - "piastrix"
+        "limitMin":
+          "type": "number"
+        "limitMax":
+          "type": "number"
+        "commissionPercent":
+          "type": "number"
+        "commissionAmount":
+          "type": "number"
+      "required":
+        - "cashboxId"
+        - "tariffId"
     "TransactionCreateDto":
       "type": "object"
       "properties":
@@ -1763,39 +1946,6 @@
         - "transactionsLimitPerDay"
         - "paymentMin"
         - "paymentMax"
-    "CashboxCreateDto":
-      "type": "object"
-      "properties":
-        "title":
-          "type": "string"
-        "url":
-          "type": "string"
-        "successUrl":
-          "type": "string"
-        "errorUrl":
-          "type": "string"
-        "notificationUrlPayments":
-          "type": "string"
-        "notificationUrlPayOff":
-          "type": "string"
-        "commissionPayer":
-          "type": "number"
-          "enum":
-            - 1
-            - 2
-        "apiKey":
-          "type": "string"
-      "required":
-        - "title"
-        - "url"
-        - "successUrl"
-        - "errorUrl"
-        - "notificationUrlPayments"
-        - "notificationUrlPayOff"
-        - "commissionPayer"
-    "Cashbox":
-      "type": "object"
-      "properties": {}
     "Reference":
       "type": "object"
       "properties": {}
