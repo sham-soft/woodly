@@ -13,6 +13,7 @@ import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
 import { UserQueryDto } from './dto/user.dto';
 import { UserEditDto } from './dto/user-edit.dto';
+import { UserEditTariffDto } from './dto/user-edit-tariff.dto';
 import { UserCreateDto } from './dto/user-create.dto';
 import { ROLES } from '../../helpers/constants';
 import { RequireRoles } from '../../decorators/roles.decorator';
@@ -65,5 +66,11 @@ export class UsersController {
     @Delete('delete/:id')
     deleteUser(@Param('id') id: number): Promise<void> {
         return this.usersService.deleteUser(id);
+    }
+
+    @ApiOperation({ summary: 'Редактирование тарифа пользователя' })
+    @Patch('edit-tariff/')
+    editTariff(@Body() tariffDto: UserEditTariffDto): Promise<User> {
+        return this.usersService.editTariff(tariffDto);
     }
 }

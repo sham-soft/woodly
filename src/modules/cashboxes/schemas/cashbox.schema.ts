@@ -42,6 +42,17 @@ export class Cashbox {
     balance: {
         rub: number;
     };
+
+    @Prop({ type: Array })
+    tariffs: {
+        tariffId: string;
+        title: string;
+        type: string;
+        limitMin: number;
+        limitMax: number;
+        commissionPercent: number;
+        commissionAmount: number;
+    }[];
 }
 
 export const CashboxSchema = SchemaFactory.createForClass(Cashbox);

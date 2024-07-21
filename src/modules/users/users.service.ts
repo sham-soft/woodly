@@ -4,9 +4,11 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { User } from './schemas/user.schema';
 import { UserQueryDto } from './dto/user.dto';
 import { UserEditDto } from './dto/user-edit.dto';
+import { UserEditTariffDto } from './dto/user-edit-tariff.dto';
 import { UserCreateDto } from './dto/user-create.dto';
 import { createId } from '../../helpers/unique';
 import { getPagination } from '../../helpers/pagination';
+import { ROLES, DEFAULT_TRADER_TARIFFS } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
 
 @Injectable()
@@ -51,6 +53,7 @@ export class UsersService {
             userId: newUserId,
             isWorkTransactions: true,
             balance: 0,
+            tariffs: params.role === ROLES.Trader ? DEFAULT_TRADER_TARIFFS : [],
             ...params,
         };
 
@@ -89,6 +92,25 @@ export class UsersService {
             { userId: userId },
             { $set: { isWorkTransactions: value } }, 
         );
+    }
+
+    async editTariff(params: UserEditTariffDto): Promise<User> {
+        const user = await this.userModel.findOneAndUpdate(
+            { userId: params.userId, 'tariffs.tariffId': params.tariffId },
+            { $set: {
+                'tariffs.$.limitMin': params.limitMin,
+                'tariffs.$.limitMax': params.limitMax,
+                'tariffs.$.commissionPercent': params.commissionPercent,
+                'tariffs.$.commissionAmount': params.commissionAmount,
+            }}, 
+            { new: true }
+        );
+
+        if (!user) {
+            throw new BadRequestException('Пользователя с таким id не существует');
+        }
+
+        return user;
     }
 
     async updateBalance(userId: number, value: number): Promise<void> {

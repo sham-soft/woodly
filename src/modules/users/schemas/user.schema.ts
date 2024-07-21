@@ -34,6 +34,16 @@ export class User {
 
     @Prop()
     address: string;
+
+    @Prop({ type: Array })
+    tariffs: {
+        tariffId: string;
+        title: string;
+        limitMin: number;
+        limitMax: number;
+        commissionPercent: number;
+        commissionAmount: number;
+    }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

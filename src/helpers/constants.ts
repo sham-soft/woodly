@@ -95,3 +95,92 @@ export enum CONFIGS {
 export const jwtConstants = {
     secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
+
+export const DEFAULT_TRADER_TARIFFS = [
+    { tariffId: 'sbp', title: 'СБП', limitMin: 0, limitMax: 300000, commissionPercent: 1, commissionAmount: 0 },
+    { tariffId: 'sber', title: 'Сбербанк', limitMin: 0, limitMax: 300000, commissionPercent: 1, commissionAmount: 0 },
+    { tariffId: 'other', title: 'Другие банки', limitMin: 0, limitMax: 300000, commissionPercent: 2.5, commissionAmount: 0 },
+    {
+        tariffId: 'transfer',
+        title: 'Пополнение криптовалютой и оплата откупа',
+        limitMin: 0,
+        limitMax: 300000,
+        commissionPercent: 2.5,
+        commissionAmount: 0,
+    },
+];
+
+export const DEFAULT_CASHBOX_TARIFFS = [
+    {
+        tariffId: 'p2p',
+        title: 'CARD P2P (PAYMENT_METHOD: 1, CURRENCY: 1)',
+        type: 'transaction',
+        limitMin: 100,
+        limitMax: 300000,
+        commissionPercent: 9,
+        commissionAmount: 0,
+    },
+    {
+        tariffId: 'sbp_transaction',
+        title: 'СБП (PAYMENT_METHOD: 2, CURRENCY: 1)',
+        type: 'transaction',
+        limitMin: 100,
+        limitMax: 300000,
+        commissionPercent: 9,
+        commissionAmount: 0,
+    },
+    {
+        tariffId: 'trc20',
+        title: 'TRC-20 (PAYMENT_METHOD: 3, CURRENCY: 1)',
+        type: 'transaction',
+        limitMin: 100,
+        limitMax: 300000,
+        commissionPercent: 1.5,
+        commissionAmount: 0,
+    },
+    {
+        tariffId: 'usdt_trc20',
+        title: 'USDT TRC-20 (PAYMENT_METHOD: 2, CURRENCY: 1)',
+        type: 'purchase',
+        limitMin: 5000,
+        limitMax: 500000,
+        commissionPercent: 4,
+        commissionAmount: 250,
+    },
+    {
+        id: 'bank',
+        title: 'Банковская карта (PAYMENT_METHOD: 1, CURRENCY: 1)',
+        type: 'purchase',
+        limitMin: 500,
+        limitMax: 300000,
+        commissionPercent: 4,
+        commissionAmount: 0,
+    },
+    {
+        tariffId: 'sbp_purchase',
+        title: 'СБП (PAYMENT_METHOD: 3, CURRENCY: 1)',
+        type: 'purchase',
+        limitMin: 1000,
+        limitMax: 500000,
+        commissionPercent: 4,
+        commissionAmount: 0,
+    },
+    {
+        tariffId: 'trx',
+        title: 'TRX (PAYMENT_METHOD: 4, CURRENCY: 1)',
+        type: 'purchase',
+        limitMin: 100,
+        limitMax: 1000000000,
+        commissionPercent: 0,
+        commissionAmount: 20,
+    },
+    {
+        tariffId: 'piastrix',
+        title: 'PIASTRIX (PAYMENT_METHOD: 5, CURRENCY: 1)',
+        type: 'purchase',
+        limitMin: 500,
+        limitMax: 2000000,
+        commissionPercent: 1,
+        commissionAmount: 0,
+    },
+];

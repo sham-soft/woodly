@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
+import { CashboxEditTariffDto } from './dto/cashbox-edit-tariff.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
 import { CashboxesService } from './cashboxes.service';
 import { ROLES } from '../../helpers/constants';
@@ -49,5 +50,12 @@ export class CashboxesController {
     @Patch('deactivate/:id')
     deactivateCashbox(@Param('id') id: number): Promise<void> {
         return this.cashboxesService.deactivateCashbox(id);
+    }
+
+    @ApiOperation({ summary: 'Редактирование тарифа кассы' })
+    @RequireRoles(ROLES.Admin)
+    @Patch('edit-tariff/')
+    editTariff(@Body() tariffDto: CashboxEditTariffDto): Promise<Cashbox> {
+        return this.cashboxesService.editTariff(tariffDto);
     }
 }

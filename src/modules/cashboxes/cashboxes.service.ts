@@ -1,13 +1,14 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Cashbox } from './schemas/cashbox.schema';
 import { CashboxQueryDto } from './dto/cashbox.dto';
+import { CashboxEditTariffDto } from './dto/cashbox-edit-tariff.dto';
 import { CashboxCreateDto } from './dto/cashbox-create.dto';
 import { createId } from '../../helpers/unique'; 
 import { getPagination } from '../../helpers/pagination';
 import { CASHBOX_STATUSES } from '../../helpers/constants';
-import { ROLES } from '../../helpers/constants';
+import { ROLES, DEFAULT_CASHBOX_TARIFFS } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
 import type { CustomRequest } from '../../types/custom-request.type';
 
@@ -41,6 +42,7 @@ export class CashboxesService {
             creatorId: userId,
             status: CASHBOX_STATUSES.Active,
             balance: { rub: 0 },
+            tariffs: DEFAULT_CASHBOX_TARIFFS,
             ...params,
         };
 
@@ -62,6 +64,25 @@ export class CashboxesService {
             { cashboxId: id },
             { $set: { status: CASHBOX_STATUSES.Inactive } },
         );
+    }
+
+    async editTariff(params: CashboxEditTariffDto): Promise<Cashbox> {
+        const cashbox = await this.cashboxModel.findOneAndUpdate(
+            { cashboxId: params.cashboxId, 'tariffs.tariffId': params.tariffId },
+            { $set: {
+                'tariffs.$.limitMin': params.limitMin,
+                'tariffs.$.limitMax': params.limitMax,
+                'tariffs.$.commissionPercent': params.commissionPercent,
+                'tariffs.$.commissionAmount': params.commissionAmount,
+            }}, 
+            { new: true }
+        );
+
+        if (!cashbox) {
+            throw new BadRequestException('Кассы с таким id не существует');
+        }
+
+        return cashbox;
     }
 
     async updateBalance(cashboxId: number, value: number): Promise<void> {
