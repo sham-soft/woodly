@@ -168,7 +168,7 @@ export const DEFAULT_CASHBOX_TARIFFS = [
         commissionAmount: 250,
     },
     {
-        id: CASHBOX_TARIFFS.Bank,
+        tariffId: CASHBOX_TARIFFS.Bank,
         title: 'Банковская карта (PAYMENT_METHOD: 1, CURRENCY: 1)',
         type: 'purchase',
         limitMin: 500,
