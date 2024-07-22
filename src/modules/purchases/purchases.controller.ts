@@ -70,8 +70,8 @@ export class PurchasesController {
     @ApiOperation({ summary: 'Получение списка выплат в формате Excel' })
     @Get('export/')
     @Header('Content-Disposition', 'attachment; filename="Purchases.xlsx"')
-    getPurchasesExport(@Query() purchaseQuery: PurchaseExportQueryDto): Promise<StreamableFile> {
-        return this.purchasesService.getPurchasesExport(purchaseQuery);
+    getPurchasesExport(@Query() purchaseQuery: PurchaseExportQueryDto, @Request() req: CustomRequest): Promise<StreamableFile> {
+        return this.purchasesService.getPurchasesExport(purchaseQuery, req.user);
     }
 
     @ApiOperation({ summary: 'Прикрепление чека' })

@@ -15,6 +15,7 @@ import { getFilters, FilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
 import { ADMIN_ID, PURCHASE_STATUSES, TRADER_TARIFFS } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @Injectable()
 export class PurchasesService {
@@ -122,8 +123,8 @@ export class PurchasesService {
         );
     }
 
-    async getPurchasesExport(query: PurchaseExportQueryDto): Promise<StreamableFile> {
-        return this.exportPurchasesService.getPurchasesExport(query);
+    async getPurchasesExport(query: PurchaseExportQueryDto, user: CustomRequest['user']): Promise<StreamableFile> {
+        return this.exportPurchasesService.getPurchasesExport(query, user);
     }
 
     async uploadFile(purchaseId: number, file: Express.Multer.File): Promise<void> {
