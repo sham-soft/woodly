@@ -4,13 +4,13 @@ import { InternalTransferSchema } from './schemas/internal-transfer.schema';
 import { InternalTransfersService } from './internal-transfers.service';
 import { InternalTransfersController } from './internal-transfers.controller';
 import { UsersModule } from '../users/users.module';
-import { BalanceModule } from '../balance/balance.module';
+import { TransfersModule } from '../transfers/transfers.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: 'internal-transfers', schema: InternalTransferSchema, collection: 'internal-transfers' }]),
         UsersModule,
-        BalanceModule,
+        TransfersModule,
     ],
     providers: [InternalTransfersService],
     controllers: [InternalTransfersController],

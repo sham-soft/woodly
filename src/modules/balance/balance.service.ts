@@ -4,7 +4,6 @@ import { GetTransactionsMerchantService } from './services/get-transactions-merc
 import { GetTransactionsAdminService } from './services/get-transactions-admin.service';
 import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
-import { UsersService } from '../users/users.service';
 import { TransfersService } from '../transfers/transfers.service';
 import { ROLES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
@@ -22,7 +21,6 @@ export class BalanceService {
         private readonly getTransactionsMerchantService: GetTransactionsMerchantService,
         private readonly exportTransactionsService: ExportTransactionsService,
         private readonly transfersService: TransfersService,
-        private readonly usersService: UsersService,
     ) {}
 
     async getBalance(user: CustomRequest['user']): Promise<Balance[]> {
@@ -48,12 +46,5 @@ export class BalanceService {
     async getTransactionsExport(query: BalanceExportQueryDto, user: CustomRequest['user']): Promise<StreamableFile> {
         await this.transfersService.checkAndUpdateTransfers(user.userId);
         return this.exportTransactionsService.getTransactionsExport(query, user);
-    }
-
-    async checkAmountOnBalance(userId: number, amount: number): Promise<boolean> {
-        await this.transfersService.checkAndUpdateTransfers(userId);
-
-        const user = await this.usersService.getUser(userId);
-        return (user.balance - amount) > 0;
     }
 }

@@ -3,6 +3,7 @@ import { UsersService } from '../../users/users.service';
 import { TransfersService } from '../../transfers/transfers.service';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { PurchasesService } from '../../purchases/purchases.service';
+import { InternalTransfersService } from '../../internal-transfers/internal-transfers.service';
 import { getPagination } from '../../../helpers/pagination';
 import { getFilters, FilterRules } from '../../../helpers/filters';
 import { TRANSACTION_STATUSES, PURCHASE_STATUSES, BALANCE_STATUSES, ROLES } from '../../../helpers/constants';
@@ -17,12 +18,26 @@ export class GetTransactionsAdminService {
         private readonly purchasesService: PurchasesService,
         private readonly transfersService: TransfersService,
         private readonly transactionsService: TransactionsService,
+        private readonly internalTransfersService: InternalTransfersService,
     ) {}
 
     async getBalanceTransactions(query: BalanceTransactionsQueryDto): Promise<PaginatedList<BalanceTransaction>> {
         const pagination = getPagination(query.page);
         let total = 0;
         let transactions = [];
+
+        const filtersInternalTransfers = getFilters({
+            internalTransferId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
+            amount: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
+            },
+            dateCreate: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
+            },
+        });
 
         const filtersSuccesPurchases = getFilters({
             purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
@@ -73,10 +88,11 @@ export class GetTransactionsAdminService {
 
         switch (Number(query.status)) {
             case BALANCE_STATUSES.Internal:
-                total = 0;
-                transactions = [];
+            {
+                total = await this.internalTransfersService.getInternalTransfersCount(filtersInternalTransfers);
+                transactions = await this.getInternalTransfers(filtersInternalTransfers, pagination.skip, pagination.limit);
                 break;
-
+            }
             case BALANCE_STATUSES.Ordered:
                 total = 0;
                 transactions = [];
@@ -108,7 +124,7 @@ export class GetTransactionsAdminService {
             default:
             {
                 // Проверяем количество документов во всех источниках
-                const totalInternal = 0;
+                const totalInternal = await this.internalTransfersService.getInternalTransfersCount(filtersInternalTransfers);
                 const totalOrdered = 0;
                 const totalTransfers = await this.transfersService.getTransfersCount(filtersTransfers);
                 const totalSuccesPurchases = await this.purchasesService.getPurchasesCount(filtersSuccesPurchases);
@@ -140,7 +156,7 @@ export class GetTransactionsAdminService {
                 let transactionsDepositTraders = [];
 
                 if (totalInternal) {
-                    transactionsInternal = [];
+                    transactionsInternal = await this.getInternalTransfers(filtersInternalTransfers, skip, limit);
                 }
 
                 if (totalOrdered) {
@@ -219,6 +235,18 @@ export class GetTransactionsAdminService {
             transactionId: item.transferId,
             paymentId: item.hashId,
             status: BALANCE_STATUSES.DepositTraders,
+            amount: item.amount,
+            date: item.dateCreate,
+        }));
+    }
+
+    private async getInternalTransfers(filters: unknown, skip: number, limit: number): Promise<BalanceTransaction[]> {
+        const data = await this.internalTransfersService.getInternalTransfersCollection(filters, skip, limit);
+
+        return data.map(item => ({
+            transactionId: item.internalTransferId,
+            paymentId: '',
+            status: BALANCE_STATUSES.Internal,
             amount: item.amount,
             date: item.dateCreate,
         }));

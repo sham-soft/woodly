@@ -12,6 +12,7 @@ import { TransfersModule } from '../transfers/transfers.module';
 import { TransactionsModule } from '../transactions/transactions.module';
 import { TransactionSchema } from '../transactions/schemas/transaction.schema';
 import { PurchasesModule } from '../purchases/purchases.module';
+import { InternalTransfersModule } from '../internal-transfers/internal-transfers.module';
 import { ConfigsModule } from '../configs/configs.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { ConfigsModule } from '../configs/configs.module';
         PurchasesModule,
         TransactionsModule,
         TransfersModule,
+        InternalTransfersModule,
     ],
     providers: [
         BalanceService,
@@ -32,6 +34,5 @@ import { ConfigsModule } from '../configs/configs.module';
         ExportTransactionsService,
     ],
     controllers: [BalanceController],
-    exports: [BalanceService],
 })
 export class BalanceModule {}

@@ -5,7 +5,7 @@ import { InternalTransfer } from './schemas/internal-transfer.schema';
 import { InternalTransferQueryDto } from './dto/internal-transfer.dto';
 import { InternalTransferSendDto } from './dto/internal-transfer-send.dto';
 import { UsersService } from '../users/users.service';
-import { BalanceService } from '../balance/balance.service';
+import { TransfersService } from '../transfers/transfers.service';
 import { createId } from '../../helpers/unique';
 import { getPagination } from '../../helpers/pagination';
 import { getСurrentDateToString } from '../../helpers/date';
@@ -16,7 +16,7 @@ export class InternalTransfersService {
     constructor(
         @InjectModel('internal-transfers') private internalTransferModel: Model<InternalTransfer>,
         private readonly usersService: UsersService,
-        private readonly balanceService: BalanceService,
+        private readonly transfersService: TransfersService,
     ) {}
 
     async getAllInternalTransfers(query: InternalTransferQueryDto): Promise<PaginatedList<InternalTransfer>> {
@@ -34,7 +34,7 @@ export class InternalTransfersService {
     }
 
     async sendMoney(params: InternalTransferSendDto, userId: number): Promise<InternalTransfer> {
-        const isAmountOnBalance = await this.balanceService.checkAmountOnBalance(userId, params.amount);
+        const isAmountOnBalance = await this.checkAmountOnBalance(userId, params.amount);
 
         if (!isAmountOnBalance) {
             throw new BadRequestException('На балансе нет запрашиваемой суммы');
@@ -61,5 +61,20 @@ export class InternalTransfersService {
         await Promise.all(requests);
 
         return newInternalTransfer;
+    }
+
+    async getInternalTransfersCount(filters: unknown): Promise<number> {
+        return this.internalTransferModel.countDocuments(filters);
+    }
+
+    async getInternalTransfersCollection(filters: unknown, skip: number, limit: number): Promise<InternalTransfer[]> {
+        return this.internalTransferModel.find(filters).skip(skip).limit(limit);
+    }
+
+    private async checkAmountOnBalance(userId: number, amount: number): Promise<boolean> {
+        await this.transfersService.checkAndUpdateTransfers(userId);
+
+        const user = await this.usersService.getUser(userId);
+        return (user.balance - amount) > 0;
     }
 }
