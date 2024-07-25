@@ -32,5 +32,6 @@ import { ConfigsModule } from '../configs/configs.module';
         ExportTransactionsService,
     ],
     controllers: [BalanceController],
+    exports: [BalanceService],
 })
 export class BalanceModule {}
