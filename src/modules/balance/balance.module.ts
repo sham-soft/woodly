@@ -7,6 +7,7 @@ import { GetBalanceService } from './services/get-balance.service';
 import { ExportTransactionsService } from './services/export-transactions.service';
 import { BalanceService } from './balance.service';
 import { BalanceController } from './balance.controller';
+import { WithdrawalsModule } from '../withdrawals/withdrawals.module';
 import { UsersModule } from '../users/users.module';
 import { TransfersModule } from '../transfers/transfers.module';
 import { TransactionsModule } from '../transactions/transactions.module';
@@ -24,6 +25,7 @@ import { ConfigsModule } from '../configs/configs.module';
         TransactionsModule,
         TransfersModule,
         InternalTransfersModule,
+        WithdrawalsModule,
     ],
     providers: [
         BalanceService,

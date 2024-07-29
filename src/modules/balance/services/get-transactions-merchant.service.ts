@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { WithdrawalsService } from '../../withdrawals/withdrawals.service';
 import { TransfersService } from '../../transfers/transfers.service';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { PurchasesService } from '../../purchases/purchases.service';
+import { InternalTransfersService } from '../../internal-transfers/internal-transfers.service';
 import { getPagination } from '../../../helpers/pagination';
 import { getFilters, FilterRules } from '../../../helpers/filters';
 import { TRANSACTION_STATUSES, PURCHASE_STATUSES, BALANCE_STATUSES } from '../../../helpers/constants';
@@ -14,13 +16,43 @@ export class GetTransactionsMerchantService {
     constructor(
         private readonly purchasesService: PurchasesService,
         private readonly transfersService: TransfersService,
+        private readonly withdrawalsService: WithdrawalsService,
         private readonly transactionsService: TransactionsService,
+        private readonly internalTransfersService: InternalTransfersService,
     ) {}
 
     async getBalanceTransactions(query: BalanceTransactionsQueryDto, userId: number): Promise<PaginatedList<BalanceTransaction>> {
         const pagination = getPagination(query.page);
         let total = 0;
         let transactions = [];
+
+        const filtersInternalTransfers = getFilters({
+            internalTransferId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
+            recipientId: { rule: FilterRules.EQUAL, value: userId },
+            amount: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
+            },
+            dateCreate: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
+            },
+        });
+
+        const filtersWithdrawals = getFilters({
+            withdrawalId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
+            creatorId: { rule: FilterRules.EQUAL, value: userId },
+            amount: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
+            },
+            dateCreate: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
+            },
+        });
 
         const filtersSuccesPurchases = getFilters({
             purchaseId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
@@ -68,15 +100,17 @@ export class GetTransactionsMerchantService {
 
         switch (Number(query.status)) {
             case BALANCE_STATUSES.Internal:
-                total = 0;
-                transactions = [];
+            {
+                total = await this.internalTransfersService.getInternalTransfersCount(filtersInternalTransfers);
+                transactions = await this.getInternalTransfers(filtersInternalTransfers, pagination.skip, pagination.limit);
                 break;
-
+            }
             case BALANCE_STATUSES.Withdrawal:
-                total = 0;
-                transactions = [];
+            {
+                total = await this.withdrawalsService.getWithdrawalsCount(filtersWithdrawals);
+                transactions = await this.getWithdrawals(filtersWithdrawals, pagination.skip, pagination.limit);
                 break;
-
+            }
             case BALANCE_STATUSES.Transaction:
             {
                 // Проверяем количество документов во двух источниках
@@ -118,11 +152,11 @@ export class GetTransactionsMerchantService {
             default:
             {
                 // Проверяем количество документов во всех источниках
-                const totalInternal = 0;
+                const totalInternal = await this.internalTransfersService.getInternalTransfersCount(filtersInternalTransfers);
                 const totalTransfers = await this.transfersService.getTransfersCount(filtersTransfers);
                 const totalSuccesPurchases = await this.purchasesService.getPurchasesCount(filtersSuccesPurchases);
                 const totalSuccesTransactions = await this.transactionsService.getTransactionsCount(filtersSuccesTransactions);
-                const totalWithdrawals = 0;
+                const totalWithdrawals = await this.withdrawalsService.getWithdrawalsCount(filtersWithdrawals);
 
                 // Вычисляем сколько всего источников, у которых на данной странице есть документы
                 const totalsCount = [
@@ -144,7 +178,7 @@ export class GetTransactionsMerchantService {
                 let transactionsWithdrawals = [];
 
                 if (totalInternal) {
-                    transactionsInternal = [];
+                    transactionsInternal = await this.getInternalTransfers(filtersInternalTransfers, skip, limit);
                 }
 
                 if (totalTransfers) {
@@ -160,7 +194,7 @@ export class GetTransactionsMerchantService {
                 }
 
                 if (totalWithdrawals) {
-                    transactionsWithdrawals = [];
+                    transactionsWithdrawals = await this.getWithdrawals(filtersWithdrawals, skip, limit);
                 }
 
                 transactions = [
@@ -213,6 +247,30 @@ export class GetTransactionsMerchantService {
             transactionId: item.transferId,
             paymentId: item.hashId,
             status: BALANCE_STATUSES.Transaction,
+            amount: item.amount,
+            date: item.dateCreate,
+        }));
+    }
+
+    private async getInternalTransfers(filters: unknown, skip: number, limit: number): Promise<BalanceTransaction[]> {
+        const data = await this.internalTransfersService.getInternalTransfersCollection(filters, skip, limit);
+
+        return data.map(item => ({
+            transactionId: item.internalTransferId,
+            paymentId: '',
+            status: BALANCE_STATUSES.Internal,
+            amount: item.amount,
+            date: item.dateCreate,
+        }));
+    }
+
+    private async getWithdrawals(filters: unknown, skip: number, limit: number): Promise<BalanceTransaction[]> {
+        const data = await this.withdrawalsService.getWithdrawalsCollection(filters, skip, limit);
+
+        return data.map(item => ({
+            transactionId: item.withdrawalId,
+            paymentId: '',
+            status: BALANCE_STATUSES.Withdrawal,
             amount: item.amount,
             date: item.dateCreate,
         }));

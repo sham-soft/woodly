@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { WithdrawalsService } from '../../withdrawals/withdrawals.service';
 import { TransfersService } from '../../transfers/transfers.service';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { PurchasesService } from '../../purchases/purchases.service';
@@ -15,6 +16,7 @@ export class GetTransactionsService {
     constructor(
         private readonly purchasesService: PurchasesService,
         private readonly transfersService: TransfersService,
+        private readonly withdrawalsService: WithdrawalsService,
         private readonly transactionsService: TransactionsService,
         private readonly internalTransfersService: InternalTransfersService,
     ) {}
@@ -26,6 +28,20 @@ export class GetTransactionsService {
 
         const filtersInternalTransfers = getFilters({
             internalTransferId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
+            hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
+            creatorId: { rule: FilterRules.EQUAL, value: userId },
+            amount: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.amountStart, lte: query.amountEnd },
+            },
+            dateCreate: {
+                rule: FilterRules.GTE_LTE,
+                value: { gte: query.dateStart, lte: query.dateEnd },
+            },
+        });
+
+        const filtersWithdrawals = getFilters({
+            withdrawalId: { rule: FilterRules.REGEX_INTEGER, value: query.transactionId },
             hashId: { rule: FilterRules.REGEX_STRING, value: query.paymentId },
             creatorId: { rule: FilterRules.EQUAL, value: userId },
             amount: {
@@ -104,6 +120,12 @@ export class GetTransactionsService {
                 transactions = await this.getInternalTransfers(filtersInternalTransfers, pagination.skip, pagination.limit);
                 break;
             }
+            case BALANCE_STATUSES.Withdrawal:
+            {
+                total = await this.withdrawalsService.getWithdrawalsCount(filtersWithdrawals);
+                transactions = await this.getWithdrawals(filtersWithdrawals, pagination.skip, pagination.limit);
+                break;
+            }
             case BALANCE_STATUSES.Deposit:
             {
                 // Проверяем количество документов во двух источниках
@@ -167,6 +189,7 @@ export class GetTransactionsService {
                 const totalSuccesPurchases = await this.purchasesService.getPurchasesCount(filtersSuccesPurchases);
                 const totalSuccesTransactions = await this.transactionsService.getTransactionsCount(filtersSuccesTransactions);
                 const totalActiveTransactions = await this.transactionsService.getTransactionsCount(filtersActiveTransactions);
+                const totalWithdrawals = await this.withdrawalsService.getWithdrawalsCount(filtersWithdrawals);
 
                 // Вычисляем сколько всего источников, у которых на данной странице есть документы
                 const totalsCount = [
@@ -175,6 +198,7 @@ export class GetTransactionsService {
                     totalSuccesPurchases,
                     totalSuccesTransactions,
                     totalActiveTransactions,
+                    totalWithdrawals,
                 ].filter(item => (item - pagination.skip) !== 0).length;
                 // Вычисляем отдельный лимит для источников
                 const limit = pagination.limit / totalsCount;
@@ -186,6 +210,7 @@ export class GetTransactionsService {
                 let transactionsSuccesPurchases = [];
                 let transactionsSuccesTransactions = [];
                 let transactionsActiveTransactions = [];
+                let transactionsWithdrawals = [];
 
                 if (totalInternal) {
                     transactionsInternal = await this.getInternalTransfers(filtersInternalTransfers, skip, limit);
@@ -207,12 +232,17 @@ export class GetTransactionsService {
                     transactionsActiveTransactions = await this.getTransactions(filtersActiveTransactions, skip, limit);
                 }
 
+                if (totalWithdrawals) {
+                    transactionsWithdrawals = await this.getWithdrawals(filtersWithdrawals, skip, limit);
+                }
+
                 transactions = [
                     ...transactionsInternal,
                     ...transactionsTransfers,
                     ...transactionsSuccesPurchases,
                     ...transactionsSuccesTransactions,
                     ...transactionsActiveTransactions,
+                    ...transactionsWithdrawals,
                 ];
                 break;
             }
@@ -269,6 +299,18 @@ export class GetTransactionsService {
             transactionId: item.internalTransferId,
             paymentId: '',
             status: BALANCE_STATUSES.Internal,
+            amount: item.amount,
+            date: item.dateCreate,
+        }));
+    }
+
+    private async getWithdrawals(filters: unknown, skip: number, limit: number): Promise<BalanceTransaction[]> {
+        const data = await this.withdrawalsService.getWithdrawalsCollection(filters, skip, limit);
+
+        return data.map(item => ({
+            transactionId: item.withdrawalId,
+            paymentId: '',
+            status: BALANCE_STATUSES.Withdrawal,
             amount: item.amount,
             date: item.dateCreate,
         }));
