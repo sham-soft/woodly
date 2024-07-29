@@ -1148,6 +1148,112 @@
           "description": ""
       "tags":
         - "Transfers"
+  "/internal-transfers":
+    "get":
+      "operationId": "InternalTransfersController_getAllInternalTransfers"
+      "summary": "Получение списка всех операций внутренних переводов"
+      "parameters":
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Internal Transfers"
+  "/internal-transfers/send":
+    "post":
+      "operationId": "InternalTransfersController_sendMoney"
+      "summary": "Перевод средств"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "recipientId":
+                  "type": "number"
+                "amount":
+                  "type": "number"
+              "required":
+                - "recipientId"
+                - "amount"
+      "responses":
+        "201":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Internal Transfers"
+  "/withdrawals":
+    "get":
+      "operationId": "WithdrawalsController_getAllWithdrawals"
+      "summary": "Получение списка всех операций выводов"
+      "parameters":
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Withdrawals"
+  "/withdrawals/create":
+    "post":
+      "operationId": "WithdrawalsController_createWithdrawal"
+      "summary": "Создание вывода"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "address":
+                  "type": "string"
+                "amount":
+                  "type": "number"
+              "required":
+                - "address"
+                - "amount"
+      "responses":
+        "201":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties": {}
+      "tags":
+        - "Withdrawals"
+  "/withdrawals/confirm/{id}":
+    "patch":
+      "operationId": "WithdrawalsController_confirmWithdrawal"
+      "summary": "Подтвердить вывод"
+      "parameters":
+        -
+          "name": "id"
+          "required": true
+          "in": "path"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Withdrawals"
   "/cards":
     "get":
       "operationId": "CardsController_getCards"
@@ -1811,6 +1917,32 @@
         - "transactionId"
         - "cardId"
         - "amount"
+    "InternalTransferSendDto":
+      "type": "object"
+      "properties":
+        "recipientId":
+          "type": "number"
+        "amount":
+          "type": "number"
+      "required":
+        - "recipientId"
+        - "amount"
+    "InternalTransfer":
+      "type": "object"
+      "properties": {}
+    "WithdrawalCreateDto":
+      "type": "object"
+      "properties":
+        "address":
+          "type": "string"
+        "amount":
+          "type": "number"
+      "required":
+        - "address"
+        - "amount"
+    "Withdrawal":
+      "type": "object"
+      "properties": {}
     "CardCreateDto":
       "type": "object"
       "properties":
