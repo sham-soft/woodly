@@ -39,6 +39,11 @@ export enum CASHBOX_STATUSES {
     Inactive,
 }
 
+export enum WITHDRAWALS_STATUSES {
+    Waiting = 1,
+    Sent,
+}
+
 export enum PAYMENT_SYSTEMS {
     Card = 1,
     SBP,

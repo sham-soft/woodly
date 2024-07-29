@@ -2,6 +2,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
+import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
 import { UsersModule } from './modules/users/users.module';
 import { TransfersModule } from './modules/transfers/transfers.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
@@ -37,6 +38,7 @@ import { AppController } from './app.controller';
         UsersModule,
         TransfersModule,
         InternalTransfersModule,
+        WithdrawalsModule,
         ScheduleModule.forRoot(),
         // MongooseModule.forRoot('mongodb://localhost:27017/woodly'),
         MongooseModule.forRoot('mongodb+srv://code-build:code-build@cluster0.3bdan.mongodb.net/woodly'),
