@@ -6,13 +6,13 @@ import { TransfersController } from './transfers.controller';
 import { UpdateTransfersService } from './services/update-transfers.service';
 import { TransferSchema } from './schemas/transfer.schema';
 import { UsersModule } from '../users/users.module';
-import { ConfigsModule } from '../configs/configs.module';
+import { CurrenciesModule } from '../currencies/currencies.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: 'transfers', schema: TransferSchema, collection: 'transfers' }]),
         HttpModule,
-        ConfigsModule,
+        CurrenciesModule,
         UsersModule,
     ],
     providers: [

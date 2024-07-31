@@ -11,7 +11,7 @@ import { PurchasesModule } from './modules/purchases/purchases.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { InternalTransfersModule } from './modules/internal-transfers/internal-transfers.module';
-import { ConfigsModule } from './modules/configs/configs.module';
+import { CurrenciesModule } from './modules/currencies/currencies.module';
 import { CashboxesModule } from './modules/cashboxes/cashboxes.module';
 import { CardsModule } from './modules/cards/cards.module';
 import { BalanceModule } from './modules/balance/balance.module';
@@ -29,7 +29,7 @@ import { AppController } from './app.controller';
         BalanceModule,
         CardsModule,
         CashboxesModule,
-        ConfigsModule,
+        CurrenciesModule,
         JobsModule,
         MessagesModule,
         PurchasesModule,

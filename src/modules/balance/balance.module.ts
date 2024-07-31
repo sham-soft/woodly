@@ -14,13 +14,13 @@ import { TransactionsModule } from '../transactions/transactions.module';
 import { TransactionSchema } from '../transactions/schemas/transaction.schema';
 import { PurchasesModule } from '../purchases/purchases.module';
 import { InternalTransfersModule } from '../internal-transfers/internal-transfers.module';
-import { ConfigsModule } from '../configs/configs.module';
+import { CurrenciesModule } from '../currencies/currencies.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: 'transactions', schema: TransactionSchema, collection: 'transactions' }]),
         UsersModule,
-        ConfigsModule,
+        CurrenciesModule,
         PurchasesModule,
         TransactionsModule,
         TransfersModule,

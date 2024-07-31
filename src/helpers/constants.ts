@@ -52,6 +52,7 @@ export enum PAYMENT_SYSTEMS {
 export enum CURRENCIES {
     Rub = 'rub',
     Kzt = 'kzt',
+    RubTrx = 'rub-trx',
 }
 
 export enum BANK_TYPES {
@@ -93,10 +94,6 @@ export enum PERMISSIONS {
     Statistics = 'statistics',
     Balance = 'balance',
     Settings = 'settings',
-}
-
-export enum CONFIGS {
-    RubleRate = 'RUBLE_RATE',
 }
 
 export enum TRADER_TARIFFS {

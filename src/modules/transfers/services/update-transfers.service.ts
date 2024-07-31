@@ -5,18 +5,18 @@ import { HttpService } from '@nestjs/axios';
 import { Transfer } from '../schemas/transfer.schema';
 import { UsersService } from '../../users/users.service';
 import { User } from '../../users/schemas/user.schema';
-import { ConfigsService } from '../../configs/configs.service';
+import { CurrenciesService } from '../../currencies/currencies.service';
 import { createId } from '../../../helpers/unique';
 import { getSumWithPercent } from '../../../helpers/numbers';
 import { convertDateToString } from '../../../helpers/date';
-import { CONFIGS, ROLES, TRADER_TARIFFS } from '../../../helpers/constants';
+import { ROLES, TRADER_TARIFFS, CURRENCIES } from '../../../helpers/constants';
 
 @Injectable()
 export class UpdateTransfersService {
     constructor(
         @InjectModel('transfers') private transferModel: Model<Transfer>,
         private readonly httpService: HttpService,
-        private readonly configsService: ConfigsService,
+        private readonly currenciesService: CurrenciesService,
         private readonly usersService: UsersService,
     ) {}
     async checkAndUpdateTransfers(userId: number): Promise<Transfer[]> {
@@ -54,7 +54,7 @@ export class UpdateTransfersService {
     private async getTronscanTransfers(limit: number, user: User): Promise<Transfer[]> {
         let newTransferId = await createId(this.transferModel, 'transferId');
 
-        const rate = await this.configsService.getConfigs(CONFIGS.RubleRate);
+        const currency = await this.currenciesService.getCurrency(CURRENCIES.Rub);
         const DECIMALS = 1000000;
 
         let tariffPercent = 0;
@@ -64,7 +64,7 @@ export class UpdateTransfersService {
             tariffPercent = tariff?.addPercent || 0;
         }
 
-        const rateWithPercent = getSumWithPercent(tariffPercent, Number(rate));
+        const rateWithPercent = getSumWithPercent(tariffPercent, currency.rate);
 
         const params = {
             relatedAddress: user.address,
@@ -83,7 +83,7 @@ export class UpdateTransfersService {
         return trsnsfers.map((item: any) => ({
             transferId: newTransferId++,
             hashId: item.transaction_id,
-            rate: rate,
+            rate: currency.rate,
             rateWithPercent: rateWithPercent,
             amount: (item.quant / DECIMALS) * rateWithPercent,
             dateCreate: convertDateToString(new Date(item.block_ts)),

@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../../users/users.service';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { PurchasesService } from '../../purchases/purchases.service';
-import { ConfigsService } from '../../configs/configs.service';
+import { CurrenciesService } from '../../currencies/currencies.service';
 import { getFixedFloat, getSumWithPercent } from '../../../helpers/numbers';
-import { TRANSACTION_STATUSES, PURCHASE_STATUSES, ROLES, TRADER_TARIFFS } from '../../../helpers/constants';
+import { TRANSACTION_STATUSES, PURCHASE_STATUSES, ROLES, TRADER_TARIFFS, CURRENCIES } from '../../../helpers/constants';
 import type { Balance } from '../types/balance.type';
 import type { CustomRequest } from '../../../types/custom-request.type';
 
 @Injectable()
 export class GetBalanceService {
     constructor(
-        private readonly configsService: ConfigsService,
+        private readonly currenciesService: CurrenciesService,
         private readonly usersService: UsersService,
         private readonly purchasesService: PurchasesService,
         private readonly transactionsService: TransactionsService,
@@ -54,8 +54,7 @@ export class GetBalanceService {
     }
 
     private async getRates(userId: number): Promise<any> {
-        const config = await this.configsService.getConfigs('RUBLE_RATE');
-        const rate = Number(config);
+        const currency = await this.currenciesService.getCurrency(CURRENCIES.Rub);
 
         const user = await this.usersService.getUser(userId);
 
@@ -66,10 +65,10 @@ export class GetBalanceService {
             ratePercent = tariff?.addPercent || 0;
         }
 
-        const rateWithPercent = getSumWithPercent(ratePercent, rate);
+        const rateWithPercent = getSumWithPercent(ratePercent, currency.rate);
 
         return {
-            rate,
+            rate: currency.rate,
             ratePercent,
             rateWithPercent,
         };

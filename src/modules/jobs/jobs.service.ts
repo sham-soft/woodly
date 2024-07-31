@@ -4,18 +4,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { TransactionsService } from '../transactions/transactions.service';
-import { ConfigDto } from '../configs/dto/config.dto';
-import { ConfigsService } from '../configs/configs.service';
+import { CurrenciesService } from '../currencies/currencies.service';
 import { Card } from '../cards/schemas/card.schema';
 import { getСurrentDateToString } from '../../helpers/date';
-import { TRANSACTION_STATUSES } from '../../helpers/constants';
+import { TRANSACTION_STATUSES, CURRENCIES } from '../../helpers/constants';
 
 @Injectable()
 export class JobsService {
     constructor(
         @InjectModel('cards') private cardModel: Model<Card>,
         private readonly httpService: HttpService,
-        private readonly configsService: ConfigsService,
+        private readonly currenciesService: CurrenciesService,
         private readonly transactionsService: TransactionsService,
     ) {}
 
@@ -54,12 +53,7 @@ export class JobsService {
 
         const rate = bybitData.data.result.items[2].price;
 
-        const params: ConfigDto = {
-            name: 'RUBLE_RATE',
-            value: rate,
-        };
-
-        this.configsService.setConfigs(params);
+        this.currenciesService.updateCurrency(CURRENCIES.Rub, rate);
         console.log('Called updateRubleRate every 10 minutes');
     }
 }
