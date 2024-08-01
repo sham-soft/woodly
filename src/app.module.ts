@@ -6,6 +6,7 @@ import { WithdrawalsModule } from './modules/withdrawals/withdrawals.module';
 import { UsersModule } from './modules/users/users.module';
 import { TransfersModule } from './modules/transfers/transfers.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
+import { SessionsModule } from './modules/sessions/sessions.module';
 import { ReferencesModule } from './modules/references/references.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
 import { MessagesModule } from './modules/messages/messages.module';
@@ -35,6 +36,7 @@ import { AppController } from './app.controller';
         PurchasesModule,
         ReferencesModule,
         TransactionsModule,
+        SessionsModule,
         UsersModule,
         TransfersModule,
         InternalTransfersModule,
