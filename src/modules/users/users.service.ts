@@ -47,6 +47,12 @@ export class UsersService {
     }
 
     async createUser(params: UserCreateDto): Promise<User> {
+        const user = await this.getUserByLogin(params.login);
+
+        if (user) {
+            throw new BadRequestException('Пользователь с таким логином уже существует');
+        }
+
         const newUserId = await createId(this.userModel, 'userId');
 
         const payload = {

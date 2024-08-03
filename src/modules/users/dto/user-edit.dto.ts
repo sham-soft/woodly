@@ -1,4 +1,4 @@
-import { IsString, IsEmail, Length, IsIn, IsNumber } from 'class-validator';
+import { IsString, IsEmail, Length, IsIn, IsNumber, IsOptional } from 'class-validator';
 import { ROLES } from '../../../helpers/constants';
 
 export class UserEditDto {
@@ -6,15 +6,19 @@ export class UserEditDto {
     userId: number;
 
     @IsString()
-    name: string;
+    @IsOptional()
+    name?: string;
 
     @IsEmail()
-    email: string;
+    @IsOptional()
+    email?: string;
 
     @Length(3, 16)
     @IsString()
-    password: string;
+    @IsOptional()
+    password?: string;
     
     @IsIn(Object.values(ROLES))
-    role: string;
+    @IsOptional()
+    role?: string;
 }

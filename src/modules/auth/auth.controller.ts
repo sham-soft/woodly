@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AccessToken } from './types/auth.type';
 import { SignInDto } from './dto/sign-in.dto';
+import { ProfileEditDto } from './dto/profile-edit.dto';
 import { AuthService } from './auth.service';
 import { ROLES } from '../../helpers/constants';
 import { RequireRoles } from '../../decorators/roles.decorator';
@@ -39,6 +40,15 @@ export class AuthController {
     @Get('profile')
     getUser(@Request() req: CustomRequest): CustomRequest['user'] {
         return req.user;
+    }
+
+    @ApiOperation({
+        summary: 'Редактирование данных профиля',
+        description: 'Внимание! После редактирования, обновить токен. Свежий токен приходит в ответе запроса',
+    })
+    @Patch('profile/edit')
+    editProfile(@Body() profileDto: ProfileEditDto, @Request() req: CustomRequest): Promise<AccessToken> {
+        return this.authService.editProfile(profileDto, req);
     }
 
     @ApiOperation({ summary: 'Получение статуса фалга сделки' })

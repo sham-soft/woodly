@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AccessToken } from './types/auth.type';
 import { SignInDto } from './dto/sign-in.dto';
+import { ProfileEditDto } from './dto/profile-edit.dto';
 import { UsersService } from '../users/users.service';
 import { SessionsService } from '../sessions/sessions.service';
 import type { CustomRequest } from '../../types/custom-request.type';
@@ -45,11 +46,24 @@ export class AuthService {
             creatorId: user.userId,
         };
 
-        await this.sessionsService.createSession(newSession); 
+        await this.sessionsService.createSession(newSession);
 
         return {
             accessToken,
         };
+    }
+
+    async editProfile(params: ProfileEditDto, req: CustomRequest): Promise<AccessToken> {
+        const payload = {
+            userId: req.user.userId,
+            ...params,
+        };
+        const user = await this.usersService.editUser(payload);
+
+        const newAccessToken = await this.signIn({ login: user.login, password: user.password }, req);
+        await this.sessionsService.deleteAllSessions(req.user.userId, newAccessToken.accessToken);
+
+        return newAccessToken;
     }
 
     async getTransactionsFlag(userId: number): Promise<boolean> {

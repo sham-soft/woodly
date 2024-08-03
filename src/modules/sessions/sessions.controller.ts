@@ -26,6 +26,6 @@ export class SessionsController {
     @ApiOperation({ summary: 'Удаление всех сессий кроме текущей' })
     @Delete('delete-all')
     deleteAllSessions(@Request() req: CustomRequest): Promise<void> {
-        return this.sessionsService.deleteAllSessions(req);
+        return this.sessionsService.deleteAllSessions(req.user.userId, req.token);
     }
 }

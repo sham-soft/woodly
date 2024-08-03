@@ -6,7 +6,6 @@ import { SessionQueryDto } from './dto/session.dto';
 import { getPagination } from '../../helpers/pagination';
 import { getСurrentDateToString } from '../../helpers/date';
 import type { PaginatedList } from '../../types/paginated-list.type';
-import type { CustomRequest } from '../../types/custom-request.type';
 import type { SessionCreateDto } from './dto/session-create.dto';
 
 @Injectable()
@@ -47,7 +46,7 @@ export class SessionsService {
         return newSession;
     }
 
-    async deleteAllSessions(req: CustomRequest): Promise<void> {
-        await this.sessionModel.deleteMany({ creatorId: req.user.userId, token: { $nin: [req.token] } });
+    async deleteAllSessions(creatorId: number, token: string): Promise<void> {
+        await this.sessionModel.deleteMany({ creatorId, token: { $nin: [token] } });
     }
 }
