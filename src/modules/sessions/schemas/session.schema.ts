@@ -16,4 +16,4 @@ export class Session {
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);
-SessionSchema.index({ sessionId: 1}, { unique : true });
+SessionSchema.index({ accessToken: 1 }, { unique : true });
