@@ -39,7 +39,13 @@ export class AuthService {
             req.headers['x-forwarded-for'] ||
             req.socket.remoteAddress || '';
 
-        await this.sessionsService.createSession(ip as string, accessToken); 
+        const newSession = {
+            ip: ip as string,
+            token: accessToken,
+            creatorId: user.userId,
+        };
+
+        await this.sessionsService.createSession(newSession); 
 
         return {
             accessToken,

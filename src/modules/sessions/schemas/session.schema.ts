@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type SessionDocument = HydratedDocument<Session>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Session {
     @Prop()
     ip: string;
@@ -13,7 +13,11 @@ export class Session {
 
     @Prop()
     token: string;
+
+    @Prop()
+    creatorId: number;
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);
 SessionSchema.index({ token: 1 }, { unique : true });
+SessionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });

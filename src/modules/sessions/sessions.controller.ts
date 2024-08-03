@@ -2,16 +2,17 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
     Controller,
     Get,
+    Delete,
     Query,
+    Request,
 } from '@nestjs/common';
 import { SessionsService } from './sessions.service';
 import { Session } from './schemas/session.schema';
 import { SessionQueryDto } from './dto/session.dto';
-import { Public } from '../../decorators/public.decorator';
 import type { PaginatedList } from '../../types/paginated-list.type';
+import type { CustomRequest } from '../../types/custom-request.type';
 
 @ApiTags('Sessions')
-@Public()
 @Controller('sessions')
 export class SessionsController {
     constructor(private readonly sessionsService: SessionsService) {}
@@ -20,5 +21,11 @@ export class SessionsController {
     @Get()
     getAllSessions(@Query() query: SessionQueryDto): Promise<PaginatedList<Session>> {
         return this.sessionsService.getAllSessions(query);
+    }
+
+    @ApiOperation({ summary: 'Удаление всех сессий кроме текущей' })
+    @Delete('delete-all')
+    deleteAllSessions(@Request() req: CustomRequest): Promise<void> {
+        return this.sessionsService.deleteAllSessions(req);
     }
 }
