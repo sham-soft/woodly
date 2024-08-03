@@ -21,11 +21,18 @@ export class SessionsController {
     @ApiOperation({ summary: 'Получение списка всех сессий' })
     @Get()
     getAllSessions(@Query() query: SessionQueryDto, @Request() req: CustomRequest): any {
+        const ip = 
+            req.headers['cf-connecting-ip'] ||  
+            req.headers['x-real-ip'] ||
+            req.headers['x-forwarded-for'] ||
+            req.socket.remoteAddress || '';
+
         return {
             remoteAddress: req.socket.remoteAddress,
             remotePort: req.socket.remotePort,
             localAddress: req.socket.localAddress,
             localPort: req.socket.localPort,
+            ip: ip,
         };
         // return this.sessionsService.getAllSessions(query);
     }
