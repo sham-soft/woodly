@@ -27,11 +27,15 @@ export class SessionsService {
         };
     }
 
-    async createSession(ip: string, accessToken: string): Promise<Session> {
+    async getSession(token: string): Promise<Session> {
+        return await this.sessionModel.findOne({ token });
+    }
+
+    async createSession(ip: string, token: string): Promise<Session> {
         const payload = {
-            ip: ip,
+            ip,
             dateCreate: getСurrentDateToString(),
-            accessToken: accessToken,
+            token,
         };
 
         const newSession = new this.sessionModel(payload);

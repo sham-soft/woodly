@@ -12,8 +12,8 @@ export class Session {
     dateCreate: string;
 
     @Prop()
-    accessToken: string;
+    token: string;
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);
-SessionSchema.index({ accessToken: 1 }, { unique : true });
+SessionSchema.index({ token: 1 }, { unique : true });

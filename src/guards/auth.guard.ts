@@ -7,6 +7,7 @@ import {
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
+import { SessionsService } from '../modules/sessions/sessions.service';
 import { jwtConstants } from '../helpers/constants';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
   
@@ -15,6 +16,7 @@ export class AuthGuard implements CanActivate {
     constructor(
         private jwtService: JwtService,
         private reflector: Reflector,
+        private readonly sessionsService: SessionsService,
     ) {}
   
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -44,6 +46,12 @@ export class AuthGuard implements CanActivate {
 
             request['user'] = payload;
         } catch {
+            throw new UnauthorizedException();
+        }
+
+        const session = await this.sessionsService.getSession(token);
+
+        if (!session) {
             throw new UnauthorizedException();
         }
 
