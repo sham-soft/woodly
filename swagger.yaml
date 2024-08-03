@@ -59,6 +59,34 @@
                 "properties": {}
       "tags":
         - "Auth"
+  "/auth/profile/edit":
+    "patch":
+      "operationId": "AuthController_editProfile"
+      "summary": "Редактирование данных профиля"
+      "description": "Внимание! После редактирования, обновить токен. Свежий токен приходит в ответе запроса"
+      "parameters": []
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "email":
+                  "type": "string"
+                "password":
+                  "type": "string"
+                  "minLength": 3
+                  "maxLength": 16
+      "responses":
+        "200":
+          "description": ""
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+      "tags":
+        - "Auth"
   "/auth/transactions-flag":
     "get":
       "operationId": "AuthController_getTransactionsFlag"
@@ -188,10 +216,6 @@
                     - "merchant"
               "required":
                 - "userId"
-                - "name"
-                - "email"
-                - "password"
-                - "role"
       "responses":
         "200":
           "description": ""
@@ -260,6 +284,32 @@
                 "properties": {}
       "tags":
         - "Users"
+  "/sessions":
+    "get":
+      "operationId": "SessionsController_getAllSessions"
+      "summary": "Получение списка всех сессий"
+      "parameters":
+        -
+          "name": "page"
+          "required": false
+          "in": "query"
+          "schema":
+            "type": "number"
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Sessions"
+  "/sessions/delete-all":
+    "delete":
+      "operationId": "SessionsController_deleteAllSessions"
+      "summary": "Удаление всех сессий кроме текущей"
+      "parameters": []
+      "responses":
+        "200":
+          "description": ""
+      "tags":
+        - "Sessions"
   "/autopayments":
     "get":
       "operationId": "AutopaymentsController_getAutopayments"
@@ -389,54 +439,22 @@
           "description": ""
       "tags":
         - "Balance"
-  "/configs/{name}":
+  "/currencies":
     "get":
-      "operationId": "ConfigsController_getConfigs"
-      "summary": "Получение значения конфигурации"
+      "operationId": "CurrenciesController_getAllCurrencies"
+      "summary": "Получение списка всех валют"
       "parameters":
         -
-          "name": "name"
-          "required": true
-          "in": "path"
+          "name": "page"
+          "required": false
+          "in": "query"
           "schema":
-            "type": "string"
+            "type": "number"
       "responses":
         "200":
           "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "string"
       "tags":
-        - "Configs"
-    "patch":
-      "operationId": "ConfigsController_setConfigs"
-      "summary": "Изменение значения конфигурации"
-      "parameters": []
-      "requestBody":
-        "required": true
-        "content":
-          "application/json":
-            "schema":
-              "type": "object"
-              "properties":
-                "name":
-                  "type": "string"
-                "value":
-                  "type": "string"
-              "required":
-                - "name"
-                - "value"
-      "responses":
-        "200":
-          "description": ""
-          "content":
-            "application/json":
-              "schema":
-                "type": "object"
-                "properties": {}
-      "tags":
-        - "Configs"
+        - "Currencies"
   "/purchases":
     "get":
       "operationId": "PurchasesController_getPurchases"
@@ -546,6 +564,7 @@
                   "enum":
                     - "rub"
                     - "kzt"
+                    - "rub-trx"
                 "requisites":
                   "type": "string"
                   "minLength": 11
@@ -918,6 +937,7 @@
                   "enum":
                     - "rub"
                     - "kzt"
+                    - "rub-trx"
                 "amount":
                   "type": "number"
                 "clientNumber":
@@ -1324,6 +1344,7 @@
                   "enum":
                     - "rub"
                     - "kzt"
+                    - "rub-trx"
                 "deviceId":
                   "type": "string"
                 "apiKey":
@@ -1400,6 +1421,7 @@
                   "enum":
                     - "rub"
                     - "kzt"
+                    - "rub-trx"
                 "deviceId":
                   "type": "string"
                 "apiKey":
@@ -1637,6 +1659,15 @@
     "User":
       "type": "object"
       "properties": {}
+    "ProfileEditDto":
+      "type": "object"
+      "properties":
+        "email":
+          "type": "string"
+        "password":
+          "type": "string"
+          "minLength": 3
+          "maxLength": 16
     "UserCreateDto":
       "type": "object"
       "properties":
@@ -1693,10 +1724,6 @@
             - "merchant"
       "required":
         - "userId"
-        - "name"
-        - "email"
-        - "password"
-        - "role"
     "UserEditTariffDto":
       "type": "object"
       "properties":
@@ -1720,19 +1747,6 @@
       "required":
         - "userId"
         - "tariffId"
-    "ConfigDto":
-      "type": "object"
-      "properties":
-        "name":
-          "type": "string"
-        "value":
-          "type": "string"
-      "required":
-        - "name"
-        - "value"
-    "Config":
-      "type": "object"
-      "properties": {}
     "PurchaseCreateDto":
       "type": "object"
       "properties":
@@ -1758,6 +1772,7 @@
           "enum":
             - "rub"
             - "kzt"
+            - "rub-trx"
         "requisites":
           "type": "string"
           "minLength": 11
@@ -1863,6 +1878,7 @@
           "enum":
             - "rub"
             - "kzt"
+            - "rub-trx"
         "amount":
           "type": "number"
         "clientNumber":
@@ -1972,6 +1988,7 @@
           "enum":
             - "rub"
             - "kzt"
+            - "rub-trx"
         "deviceId":
           "type": "string"
         "apiKey":
@@ -2032,6 +2049,7 @@
           "enum":
             - "rub"
             - "kzt"
+            - "rub-trx"
         "deviceId":
           "type": "string"
         "apiKey":
