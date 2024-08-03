@@ -31,8 +31,8 @@ export class AuthController {
     })
     @Public()
     @Post()
-    signIn(@Body() signInDto: SignInDto): Promise<AccessToken> {
-        return this.authService.signIn(signInDto);
+    signIn(@Body() signInDto: SignInDto, @Request() req: CustomRequest): Promise<AccessToken> {
+        return this.authService.signIn(signInDto, req);
     }
 
     @ApiOperation({ summary: 'Получение данных профиля' })

@@ -6,13 +6,13 @@ export type SessionDocument = HydratedDocument<Session>;
 @Schema()
 export class Session {
     @Prop()
-    sessionId: number;
-
-    @Prop()
     ip: string;
 
     @Prop()
     dateCreate: string;
+
+    @Prop()
+    accessToken: string;
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);

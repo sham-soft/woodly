@@ -3,14 +3,12 @@ import {
     Controller,
     Get,
     Query,
-    Request,
 } from '@nestjs/common';
 import { SessionsService } from './sessions.service';
-// import { Session } from './schemas/session.schema';
+import { Session } from './schemas/session.schema';
 import { SessionQueryDto } from './dto/session.dto';
 import { Public } from '../../decorators/public.decorator';
-// import type { PaginatedList } from '../../types/paginated-list.type';
-import type { CustomRequest } from '../../types/custom-request.type';
+import type { PaginatedList } from '../../types/paginated-list.type';
 
 @ApiTags('Sessions')
 @Public()
@@ -20,20 +18,7 @@ export class SessionsController {
 
     @ApiOperation({ summary: 'Получение списка всех сессий' })
     @Get()
-    getAllSessions(@Query() query: SessionQueryDto, @Request() req: CustomRequest): any {
-        const ip = 
-            req.headers['cf-connecting-ip'] ||  
-            req.headers['x-real-ip'] ||
-            req.headers['x-forwarded-for'] ||
-            req.socket.remoteAddress || '';
-
-        return {
-            remoteAddress: req.socket.remoteAddress,
-            remotePort: req.socket.remotePort,
-            localAddress: req.socket.localAddress,
-            localPort: req.socket.localPort,
-            ip: ip,
-        };
-        // return this.sessionsService.getAllSessions(query);
+    getAllSessions(@Query() query: SessionQueryDto): Promise<PaginatedList<Session>> {
+        return this.sessionsService.getAllSessions(query);
     }
 }
