@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Session } from './schemas/session.schema';
 import { SessionQueryDto } from './dto/session.dto';
 import { getPagination } from '../../helpers/pagination';
+import { getFilters, FilterRules } from '../../helpers/filters';
 import { getСurrentDateToString } from '../../helpers/date';
 import type { PaginatedList } from '../../types/paginated-list.type';
 import type { SessionCreateDto } from './dto/session-create.dto';
@@ -14,11 +15,15 @@ export class SessionsService {
         @InjectModel('sessions') private sessionModel: Model<Session>,
     ) {}
 
-    async getAllSessions(query: SessionQueryDto): Promise<PaginatedList<Session>> {
+    async getAllSessions(query: SessionQueryDto, userId: number): Promise<PaginatedList<Session>> {
         const pagination = getPagination(query.page); 
 
-        const total = await this.sessionModel.countDocuments();
-        const data = await this.sessionModel.find().skip(pagination.skip).limit(pagination.limit);
+        const filters = getFilters({
+            creatorId: { rule: FilterRules.EQUAL, value: userId },
+        });
+
+        const total = await this.sessionModel.countDocuments(filters);
+        const data = await this.sessionModel.find(filters).skip(pagination.skip).limit(pagination.limit);
 
         return {
             page: pagination.page,

@@ -19,8 +19,8 @@ export class SessionsController {
 
     @ApiOperation({ summary: 'Получение списка всех сессий' })
     @Get()
-    getAllSessions(@Query() query: SessionQueryDto): Promise<PaginatedList<Session>> {
-        return this.sessionsService.getAllSessions(query);
+    getAllSessions(@Query() query: SessionQueryDto, @Request() req: CustomRequest): Promise<PaginatedList<Session>> {
+        return this.sessionsService.getAllSessions(query, req.user.userId);
     }
 
     @ApiOperation({ summary: 'Удаление всех сессий кроме текущей' })
