@@ -25,7 +25,10 @@ export class JobsService {
             dateClose: { $lt: getСurrentDateToString() },
         };
         
-        await this.transactionsService.updateTransactionsCollection(filters, { status: TRANSACTION_STATUSES.Cancelled });
+        await this.transactionsService.updateTransactionsCollection(filters, {
+            status: TRANSACTION_STATUSES.Cancelled,
+            dateCancel: getСurrentDateToString(),
+        });
         console.log('Called updateActiveTransactions every 4 minutes');
     }
 

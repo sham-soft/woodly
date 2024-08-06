@@ -5,7 +5,6 @@ import { Card } from '../../cards/schemas/card.schema';
 
 export type TransactionDocument = HydratedDocument<Transaction>;
 
-// @Schema({ timestamps: true })
 @Schema()
 export class Transaction {
     @Prop()
@@ -33,10 +32,13 @@ export class Transaction {
     dateClose: string;
 
     @Prop()
-    paymentSystem: number;
+    paymentTime: string;
 
     @Prop()
-    paymentTime: string;
+    dateCancel: string;
+
+    @Prop()
+    paymentSystem: number;
 
     @Prop()
     message: string;
@@ -69,4 +71,3 @@ export class Transaction {
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
 TransactionSchema.index({ transactionId: 1 }, { unique : true });
-// TransactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 });

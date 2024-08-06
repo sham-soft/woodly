@@ -15,6 +15,7 @@ import { TransactionCreateDto } from './dto/transaction-create.dto';
 import { TransactionActivateDto } from './dto/transaction-activate.dto';
 import { getPagination } from '../../helpers/pagination';
 import { getFilters, FilterRules } from '../../helpers/filters';
+import { getСurrentDateToString } from '../../helpers/date';
 import { TRANSACTION_STATUSES } from '../../helpers/constants';
 import { ROLES } from '../../helpers/constants';
 import type { PaginatedList } from '../../types/paginated-list.type';
@@ -108,7 +109,7 @@ export class TransactionsService {
     async cancelTransaction(id: number): Promise<Transaction> {
         return this.transactionModel.findOneAndUpdate(
             { transactionId: id },
-            { $set: { status: TRANSACTION_STATUSES.Cancelled } }, 
+            { $set: { status: TRANSACTION_STATUSES.Cancelled, dateCancel: getСurrentDateToString() } }, 
             { new: true }
         );
     }
